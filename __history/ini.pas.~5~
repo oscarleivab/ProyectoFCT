@@ -1,0 +1,34 @@
+unit ini;
+
+interface
+
+uses
+  System.IniFiles, System.SysUtils;
+
+type
+  TINIUtils = class
+  public
+    class procedure LeerConexionBase(var Host, DBName, User, Pass: string; var Port: Integer);
+  end;
+
+implementation
+
+class procedure TINIUtils.LeerConexionBase(var Host, DBName, User, Pass: string; var Port: Integer);
+var
+  INI: TIniFile;
+  RutaINI: string;
+begin
+  RutaINI := ExtractFilePath(ParamStr(0)) + 'gevensoft.ini';
+  INI := TIniFile.Create(RutaINI);
+  try
+    Host   := INI.ReadString('BD_BASE', 'host', 'localhost');
+    DBName := INI.ReadString('BD_BASE', 'database', 'gevensoftbase');
+    User   := INI.ReadString('BD_BASE', 'user', 'postgres');
+    Pass   := INI.ReadString('BD_BASE', 'password', '');
+    Port   := INI.ReadInteger('BD_BASE', 'port', 5432);
+  finally
+    INI.Free;
+  end;
+end;
+
+end.

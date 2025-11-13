@@ -1,0 +1,120 @@
+﻿unit uConfig;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uIniUtils;
+
+type
+  {------------------------------------------------------------
+    FORMULARIO: TfrmConfig
+    ------------------------------------------------------------
+    Este formulario permite modificar los datos de conexión
+    guardados en el archivo Gevensoft.ini.
+
+    - Carga los valores actuales al abrir
+    - Permite editarlos (servidor, puerto, usuario, contraseña)
+    - Los guarda usando uIniUtils.GuardarDatosConexion
+
+    *Importante:* Solo gestiona la base principal (bdgevensoftbase),
+    no las bases de datos de empresas.
+  ------------------------------------------------------------}
+  TfrmConfig = class(TForm)
+    Button1: TButton;   // Guardar cambios
+    Button2: TButton;   // Cancelar
+    Edit1: TEdit;       // Servidor
+    Edit2: TEdit;       // Puerto
+    Edit3: TEdit;       // Usuario
+    Edit4: TEdit;       // Contraseña
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+  private
+    procedure CargarDatos;   // Carga datos del INI a los Edit
+    procedure GuardarDatos;  // Guarda cambios en el INI
+  public
+  end;
+
+var
+  frmConfig: TfrmConfig;
+
+implementation
+
+{$R *.dfm}
+
+{==============================================================}
+{  EVENTO: FormCreate                                          }
+{--------------------------------------------------------------}
+{  Carga los datos de conexión desde el archivo INI y los      }
+{  muestra en los campos editables del formulario.             }
+{==============================================================}
+procedure TfrmConfig.FormCreate(Sender: TObject);
+begin
+  CargarDatos;
+end;
+
+{==============================================================}
+{  CARGAR DATOS DESDE EL INI                                    }
+{--------------------------------------------------------------}
+{  Obtiene los valores actuales de conexión (host, puerto,     }
+{  usuario, contraseña) mediante la función LeerDatosConexion   }
+{  del módulo uIniUtils y los coloca en los Edit.              }
+{==============================================================}
+procedure TfrmConfig.CargarDatos;
+var
+  Host, DBName, User, Pass: string;
+  Port: Integer;
+begin
+  LeerDatosConexion(Host, DBName, User, Pass, Port);
+
+  Edit1.Text := Host;              // Servidor
+  Edit2.Text := IntToStr(Port);    // Puerto
+  Edit3.Text := User;              // Usuario
+  Edit4.Text := Pass;              // Contraseña
+end;
+
+{==============================================================}
+{  GUARDAR DATOS MODIFICADOS EN EL INI                          }
+{--------------------------------------------------------------}
+{  Guarda servidor, puerto, usuario y contraseña en la sección }
+{  [DATABASE] del archivo Gevensoft.ini                         }
+{  usando la función GuardarDatosConexion de uIniUtils.         }
+{==============================================================}
+procedure TfrmConfig.GuardarDatos;
+var
+  Servidor, Usuario, Clave: string;
+  Puerto: Integer;
+begin
+  Servidor := Edit1.Text;
+  Puerto   := StrToIntDef(Edit2.Text, 5432);
+  Usuario  := Edit3.Text;
+  Clave    := Edit4.Text;
+
+  // Guardar siempre sobre la base PRINCIPAL bdgevensoftbase
+  GuardarDatosConexion(Servidor, 'bdgevensoftbase', Usuario, Clave, Puerto);
+end;
+
+{==============================================================}
+{  BOTÓN GUARDAR                                               }
+{==============================================================}
+procedure TfrmConfig.Button1Click(Sender: TObject);
+begin
+  GuardarDatos;
+  Close;
+end;
+
+{==============================================================}
+{  BOTÓN CANCELAR                                              }
+{==============================================================}
+procedure TfrmConfig.Button2Click(Sender: TObject);
+begin
+  Close;
+end;
+
+end.
+

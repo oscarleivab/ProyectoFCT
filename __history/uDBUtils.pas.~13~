@@ -1,0 +1,159 @@
+﻿unit uDBUtils;
+
+interface
+
+uses
+  System.SysUtils, FireDAC.Comp.Client, Vcl.Dialogs, System.Variants;
+
+var
+  FDConnectionBase: TFDConnection;
+  FDConnectionEmpresa: TFDConnection;
+  FDQueryTemp: TFDQuery;
+
+function ConfigurarConexion(FDConn: TFDConnection; Servidor, BaseDatos, Usuario, Clave: string; Puerto: Integer = 5432): Boolean;
+function CrearQuery(Conexion: TFDConnection): TFDQuery;
+
+// Métodos de gestión genérica
+function EjecutarSQL(Conexion: TFDConnection; const SQL: string): Boolean;
+function EjecutarSQLConParametros(Conexion: TFDConnection; const SQL: string; const Params: array of Variant): Boolean;
+function ExisteRegistro(Conexion: TFDConnection; const SQL: string): Boolean;
+function ContarRegistros(Conexion: TFDConnection; const SQL: string): Integer;
+function ObtenerValor(Conexion: TFDConnection; const SQL: string): Variant;
+
+implementation
+
+//--------------------------------------------
+// Configura un TFDConnection existente
+//--------------------------------------------
+function ConfigurarConexion(FDConn: TFDConnection; Servidor, BaseDatos, Usuario, Clave: string; Puerto: Integer): Boolean;
+begin
+  Result := False;
+  FDConn.Connected := False;
+  FDConn.Params.Clear;
+
+  FDConn.DriverName := 'PG';
+  FDConn.Params.Values['Server'] := Servidor;
+  FDConn.Params.Values['Database'] := BaseDatos;
+  FDConn.Params.Values['User_Name'] := Usuario;
+  FDConn.Params.Values['Password'] := Clave;
+  FDConn.Params.Values['Port'] := IntToStr(Puerto);
+
+  try
+    FDConn.Connected := True;
+    Result := True;
+  except
+    on E: Exception do
+      ShowMessage('❌ No se pudo conectar: ' + E.Message);
+  end;
+end;
+
+//--------------------------------------------
+// Crea un TFDQuery asociado a una conexión
+//--------------------------------------------
+function CrearQuery(Conexion: TFDConnection): TFDQuery;
+begin
+  Result := TFDQuery.Create(nil);
+  Result.Connection := Conexion;
+end;
+
+//--------------------------------------------
+// Ejecuta una instrucción SQL (INSERT, UPDATE, DELETE)
+//--------------------------------------------
+function EjecutarSQL(Conexion: TFDConnection; const SQL: string): Boolean;
+var
+  Q: TFDQuery;
+begin
+  Result := False;
+  Q := CrearQuery(Conexion);
+  try
+    Q.SQL.Text := SQL;
+    Q.ExecSQL;
+    Result := True;
+  except
+    on E: Exception do
+      ShowMessage('Error al ejecutar SQL: ' + E.Message);
+  end;
+  Q.Free;
+end;
+
+//--------------------------------------------
+// Ejecutar SQL con parámetros (array)
+//--------------------------------------------
+function EjecutarSQLConParametros(Conexion: TFDConnection; const SQL: string; const Params: array of Variant): Boolean;
+var
+  Q: TFDQuery;
+  I: Integer;
+begin
+  Result := False;
+  Q := CrearQuery(Conexion);
+  try
+    Q.SQL.Text := SQL;
+    for I := 0 to High(Params) do
+      Q.Params[I].Value := Params[I];
+    Q.ExecSQL;
+    Result := True;
+  except
+    on E: Exception do
+      ShowMessage('Error al ejecutar SQL parametrizado: ' + E.Message);
+  end;
+  Q.Free;
+end;
+
+//--------------------------------------------
+// Verifica si un registro existe (true/false)
+//--------------------------------------------
+function ExisteRegistro(Conexion: TFDConnection; const SQL: string): Boolean;
+var
+  Q: TFDQuery;
+begin
+  Q := CrearQuery(Conexion);
+  try
+    Q.SQL.Text := SQL;
+    Q.Open;
+    Result := not Q.IsEmpty;
+  finally
+    Q.Free;
+  end;
+end;
+
+//--------------------------------------------
+// Devuelve la cantidad de registros
+//--------------------------------------------
+function ContarRegistros(Conexion: TFDConnection; const SQL: string): Integer;
+var
+  Q: TFDQuery;
+begin
+  Result := 0;
+  Q := CrearQuery(Conexion);
+  try
+    Q.SQL.Text := SQL;
+    Q.Open;
+    if not Q.Fields[0].IsNull then
+      Result := Q.Fields[0].AsInteger;
+  finally
+    Q.Free;
+  end;
+end;
+
+//--------------------------------------------
+// Devuelve un único valor (por ejemplo un campo)
+//--------------------------------------------
+function ObtenerValor(Conexion: TFDConnection; const SQL: string): Variant;
+var
+  Q: TFDQuery;
+begin
+  Q := CrearQuery(Conexion);
+  try
+    Q.SQL.Text := SQL;
+    Q.Open;
+    if not Q.IsEmpty then
+      Result := Q.Fields[0].Value
+    else
+      Result := Null;
+  finally
+    Q.Free;
+  end;
+end;
+
+end.
+

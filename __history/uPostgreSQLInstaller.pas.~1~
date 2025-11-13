@@ -1,0 +1,134 @@
+unit uPostgreSQLInstaller;
+
+interface
+
+uses
+  System.SysUtils, Winapi.Windows, Winapi.ShellAPI, Vcl.Dialogs, Vcl.Forms, Vcl.Controls;
+
+{------------------------------------------------------------
+  MÓDULO: uPostgreSQLInstaller (VERSIÓN SIMPLIFICADA)
+  ------------------------------------------------------------
+  Detecta e instala PostgreSQL 18 de forma sencilla.
+-------------------------------------------------------------}
+
+// Función principal - devuelve True si PostgreSQL está disponible
+function VerificarPostgreSQL: Boolean;
+
+implementation
+
+{------------------------------------------------------------
+  DETECTAR SI POSTGRESQL ESTÁ INSTALADO
+-------------------------------------------------------------}
+function PostgreSQLEstaInstalado: Boolean;
+var
+  ExitCode: Cardinal;
+begin
+  // Intentar ejecutar psql --version
+  // Si existe, devolverá 0, si no existe devolverá error
+  Result := (WinExec('psql --version', SW_HIDE) >= 32);
+end;
+
+{------------------------------------------------------------
+  INSTALAR POSTGRESQL SILENCIOSAMENTE
+-------------------------------------------------------------}
+function InstalarPostgreSQL: Boolean;
+var
+  RutaInstalador: string;
+  Parametros: string;
+  ExitCode: DWORD;
+  SEI: TShellExecuteInfo;
+begin
+  Result := False;
+
+  // Ruta del instalador en carpeta "utilidades"
+  RutaInstalador := ExtractFilePath(ParamStr(0)) + 'utilidades\postgresql-18-windows-x64.exe';
+
+  // Verificar que existe el instalador
+  if not FileExists(RutaInstalador) then
+  begin
+    ShowMessage('No se encontró el instalador de PostgreSQL en:' + #13#10 +
+                RutaInstalador + #13#10#13#10 +
+                'Por favor, coloque el instalador de PostgreSQL 18 en la carpeta "utilidades".');
+    Exit;
+  end;
+
+  // Preguntar al usuario
+  if MessageDlg(
+       'PostgreSQL no está instalado.' + #13#10 +
+       '¿Desea instalarlo ahora? (Requiere permisos de administrador)',
+       mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    Exit;
+
+  // Parámetros de instalación silenciosa
+  Parametros := '--mode unattended --superpassword "2003" --serverport 5432';
+
+  // Mostrar mensaje
+  Application.MessageBox(
+    'Instalando PostgreSQL 18...' + #13#10 +
+    'Este proceso tardará unos minutos.' + #13#10#13#10 +
+    'Por favor, espere.',
+    'Instalación en progreso',
+    MB_OK or MB_ICONINFORMATION
+  );
+
+  // Ejecutar instalador con privilegios de administrador
+  ZeroMemory(@SEI, SizeOf(SEI));
+  SEI.cbSize := SizeOf(SEI);
+  SEI.Wnd := 0;
+  SEI.fMask := SEE_MASK_NOCLOSEPROCESS;
+  SEI.lpVerb := 'runas'; // Ejecutar como administrador
+  SEI.lpFile := PChar(RutaInstalador);
+  SEI.lpParameters := PChar(Parametros);
+  SEI.nShow := SW_HIDE;
+
+  if ShellExecuteEx(@SEI) then
+  begin
+    if SEI.hProcess <> 0 then
+    begin
+      // Esperar a que termine
+      WaitForSingleObject(SEI.hProcess, INFINITE);
+      GetExitCodeProcess(SEI.hProcess, ExitCode);
+      CloseHandle(SEI.hProcess);
+
+      Result := (ExitCode = 0);
+
+      if Result then
+      begin
+        ShowMessage('PostgreSQL 18 se instaló correctamente.');
+        // Esperar 5 segundos para que el servicio inicie
+        Sleep(5000);
+      end
+      else
+        ShowMessage('Error durante la instalación de PostgreSQL.');
+    end;
+  end
+  else
+  begin
+    ShowMessage('No se pudo ejecutar el instalador.' + #13#10 +
+                'Asegúrese de tener permisos de administrador.');
+  end;
+end;
+
+{------------------------------------------------------------
+  FUNCIÓN PRINCIPAL
+-------------------------------------------------------------}
+function VerificarPostgreSQL: Boolean;
+begin
+  // Si ya está instalado, todo OK
+  if PostgreSQLEstaInstalado then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  // No está instalado - intentar instalar
+  Result := InstalarPostgreSQL;
+
+  // Si no se pudo instalar, no continuar
+  if not Result then
+  begin
+    ShowMessage('No se puede continuar sin PostgreSQL instalado.');
+  end;
+end;
+
+end.

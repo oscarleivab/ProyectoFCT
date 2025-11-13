@@ -1,0 +1,44 @@
+﻿unit connect;
+
+interface
+
+uses
+  System.SysUtils, FireDAC.Comp.Client, FireDAC.Phys.PG, Vcl.Dialogs;
+
+function CrearConexion(Servidor, BaseDatos, Usuario, Clave: string; Puerto: Integer = 5432): TFDConnection;
+function CrearQuery(Conexion: TFDConnection): TFDQuery;
+
+implementation
+
+// Crea una conexión a PostgreSQL
+function CrearConexion(FDConn: TFDConnection; Servidor, BaseDatos, Usuario, Clave: string; Puerto: Integer = 5432): Boolean;
+begin
+  Result := False;
+  FDConn.Connected := False;
+  FDConn.Params.Clear;
+
+  FDConn.Params.Values['Server'] := Servidor;
+  FDConn.Params.Values['Database'] := BaseDatos;
+  FDConn.Params.Values['User_Name'] := Usuario;
+  FDConn.Params.Values['Password'] := Clave;
+  FDConn.Params.Values['Port'] := IntToStr(Puerto);
+
+  try
+    FDConn.Connected := True;
+    Result := True;
+  except
+    on E: Exception do
+      ShowMessage('❌ No se pudo conectar: ' + E.Message);
+  end;
+end;
+
+
+// Crea un query usando una conexión
+function CrearQuery(Conexion: TFDConnection): TFDQuery;
+begin
+  Result := TFDQuery.Create(nil);
+  Result.Connection := Conexion;
+end;
+
+end.
+

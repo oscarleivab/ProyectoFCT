@@ -1,0 +1,35 @@
+unit connect;
+
+interface
+
+uses
+  FireDAC.Comp.Client, System.SysUtils, Vcl.Dialogs;
+
+function CrearConexion(const Host, DBName, User, Pass: string; Port: Integer): TFDConnection;
+
+implementation
+
+function CrearConexion(const Host, DBName, User, Pass: string; Port: Integer): TFDConnection;
+begin
+  Result := TFDConnection.Create(nil);
+  try
+    Result.LoginPrompt := False;
+    Result.DriverName := 'PG';
+    Result.Params.Values['Server'] := Host;
+    Result.Params.Values['Database'] := DBName;
+    Result.Params.Values['User_Name'] := User;
+    Result.Params.Values['Password'] := Pass;
+    Result.Params.Values['Port'] := IntToStr(Port);
+    Result.Connected := True;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('Error al conectar: ' + E.Message);
+      Result.Free;
+      Result := nil;
+    end;
+  end;
+end;
+
+end.
+
