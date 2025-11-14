@@ -55,21 +55,26 @@ begin
       de datos
   --------------------------------------------------------------}
     // Verificar o crear archivo INI
-     VerificarOCrearIni;
+    VerificarOCrearIni;
 
-      PrimeraVez := LeerPrimeraEjecucion;
+    PrimeraVez := LeerPrimeraEjecucion;
 
-      if PrimeraVez = 0 then
+    if PrimeraVez = 0 then
+    begin
+      Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
+      frmNuevaEmpresa.ShowModal;
+
+      if not frmNuevaEmpresa.Creada then
       begin
-        Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
-        frmNuevaEmpresa.ShowModal;
-
-       if not frmNuevaEmpresa.Creada then
-        begin
-          Application.Terminate;
-          Exit;
-        end;
+        Application.Terminate;
+        Exit;
       end;
+
+      GuardarPrimeraEjecucion(1);
+
+      frmNuevaEmpresa.Free;
+    end;
+
   {--------------------------------------------------------------
     Paso 2: Crear y mostrar el formulario principal (frmMain)
     -------------------------------------------------------------

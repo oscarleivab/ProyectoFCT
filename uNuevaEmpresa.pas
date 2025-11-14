@@ -55,13 +55,14 @@ implementation
 {=========================================}
 procedure TfrmNuevaEmpresa.Button1Click(Sender: TObject);
 begin
-  Creada := False;
   try
     CrearNuevaBaseDatos;
     ShowMessage('Empresa creada correctamente.');
     Creada := True;   // Para que Login sepa que ya puede continuar
-  finally
-    Close;
+     Close;
+  except
+    on E: Exception do
+      ShowMessage('Error: ' + E.Message);
   end;
 end;
 
