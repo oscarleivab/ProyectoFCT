@@ -12,7 +12,7 @@ uses
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, IniFiles, uMain,
   Vcl.Imaging.pngimage, Vcl.ExtCtrls, System.Actions, Vcl.ActnList,
   System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
-  Vcl.ImageCollection, uDBUtils, uIniUtils, uConfig, uNuevaEmpresa;
+  Vcl.ImageCollection, uDBUtils, uIniUtils, uConfig, uNuevaEmpresa, DataModule;
 
 type
   {------------------------------------------------------------
@@ -31,12 +31,9 @@ type
     ComboBox1: TComboBox;         // Lista de empresas activas
     Edit1: TEdit;                 // Usuario de login interno
     Edit2: TEdit;                 // Contraseña interna
-    Button1: TButton;             // Iniciar sesión
-    FDConnection1: TFDConnection; // Conexión a bdgevensoftbase
-    FDQuery1: TFDQuery;           // Query auxiliar
-    FDPhysPgDriverLink1: TFDPhysPgDriverLink;
-    FDQuery2: TFDQuery;           // Query para datos de la empresa seleccionada
-    FDConnection2: TFDConnection; // Conexión a la base de datos de la empresa
+    Button1: TButton; // Conexión a bdgevensoftbase
+    FDQuery1: TFDQuery;
+    FDQuery2: TFDQuery; // Conexión a la base de datos de la empresa
     Button2: TButton;             // Configuración
     Button3: TButton;             // Salir
     ImageCollection1: TImageCollection;
@@ -50,6 +47,7 @@ type
   private
     procedure CargarEmpresas;
     procedure ConectarBase;
+    procedure InicializarSistema;
   public
     LoginExitoso: Boolean;  // Indica al sistema si el login ha sido correcto
   end;
@@ -72,14 +70,15 @@ implementation
 {==============================================================}
 procedure TfrmLogin.FormCreate(Sender: TObject);
 begin
+  FDQuery1.Connection := DataModule1.FDConnection1;
   try
-    ConectarBase;
+    InicializarSistema;
 
-    FDQuery1.SQL.Text := 'SELECT COUNT(*) AS total FROM empresa';
-    FDQuery1.Open;
+    //ConectarBase;
+    CargarEmpresas;
 
     // No existe ninguna empresa → abrir asistente de creación
-    if FDQuery1.FieldByName('total').AsInteger = 0 then
+    if ComboBox1.Items.Count = 0 then
     begin
       ShowMessage('No se ha encontrado ninguna empresa en la base de datos.');
 
@@ -96,6 +95,35 @@ begin
     on E: Exception do
       ShowMessage('Error al conectar con la base de datos: ' + E.Message);
   end;
+end;
+
+procedure TfrmLogin.InicializarSistema;
+var
+  PrimeraVez: Integer;
+begin
+  // Verificar o crear archivo INI
+  VerificarOCrearIni;
+
+  PrimeraVez := LeerPrimeraEjecucion;
+
+  if PrimeraVez = 0 then
+  begin
+    Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
+    frmNuevaEmpresa.ShowModal;
+
+    if not frmNuevaEmpresa.Creada then
+    begin
+      Application.Terminate;
+      Exit;
+    end;
+
+    GuardarPrimeraEjecucion(1);
+    frmNuevaEmpresa.Free;
+  end;
+
+  // Conectar DataModule a la base principal
+  if not DataModule1.Conectar then
+    raise Exception.Create('No se pudo conectar a la base de datos principal.');
 end;
 
 {==============================================================}
@@ -126,16 +154,14 @@ end;
 {  - Usa uDBUtils.ConfigurarConexion                           }
 {==============================================================}
 procedure TfrmLogin.ConectarBase;
-var
-  Host, DBName, User, Pass: string;
-  Port: Integer;
 begin
-  // Obtener datos desde el INI
-  LeerDatosConexion(Host, DBName, User, Pass, Port);
-
-  // Conecta a la base de datos mediante el método ConfigurarConexion
-  if ConfigurarConexion(FDConnection1, Host, DBName, User, Pass, Port) then
-    ShowMessage('Conexión correcta con la base de datos: ' + DBName);
+  try
+    DataModule1.Conectar;
+    ShowMessage('Conexión correcta con la base de datos: ' + DataModule1.FDConnection1.Params.Values['Database']);
+  except
+    on E: Exception do
+      ShowMessage('Error al conectar con la base de datos: ' + E.Message);
+  end;
 end;
 
 {==============================================================}
@@ -172,6 +198,7 @@ procedure TfrmLogin.Button1Click(Sender: TObject);
 var
   user, pass: string;
   BDName, Host: string;
+  Port: Integer;
 begin
   // Debe seleccionar una empresa
   if ComboBox1.ItemIndex < 0 then
@@ -181,9 +208,10 @@ begin
   end;
 
   // Obtener datos de la empresa
+  FDQuery2.Connection := DataModule1.FDConnection1;
   FDQuery2.Close;
   FDQuery2.SQL.Text :=
-    'SELECT "host", bdname, userbd, passbd, port ' +
+    'SELECT host, bdname, userbd, passbd, port ' +
     'FROM empresa WHERE empresaname = :name';
   FDQuery2.ParamByName('name').AsString := ComboBox1.Text;
   FDQuery2.Open;
@@ -209,15 +237,16 @@ begin
   // Datos para conectar a la base de la empresa
   Host   := FDQuery2.FieldByName('host').AsString;
   BDName := FDQuery2.FieldByName('bdname').AsString;
+  Port := FDQuery2.FieldByName('port').AsInteger;
 
   // Conectarse usando usuario PostgreSQL real
   if not ConfigurarConexion(
-         FDConnection2,
+         DataModule1.FDConnection2,
          Host,
          BDName,
          'postgres',        // Usuario real de PostgreSQL
          '2003',            // Contraseña real
-         FDQuery2.FieldByName('port').AsInteger
+         Port
        ) then
   begin
     ShowMessage('No se pudo conectar con la base de datos ' + ComboBox1.Text);

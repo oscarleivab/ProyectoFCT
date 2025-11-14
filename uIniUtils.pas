@@ -93,7 +93,7 @@ begin
     Servidor  := Ini.ReadString('DATABASE', 'Server',   'localhost');
     BaseDatos := Ini.ReadString('DATABASE', 'Database', 'bdgevensoftbase');
     Usuario   := Ini.ReadString('DATABASE', 'User',     'postgres');
-    Clave     := Ini.ReadString('DATABASE', 'Password', '');
+    Clave     := Ini.ReadString('DATABASE', 'Password', '2003');
     Puerto    := Ini.ReadInteger('DATABASE', 'Port',    5432);
   finally
     Ini.Free;

@@ -36,7 +36,7 @@ implementation
 function ConfigurarConexion(FDConn: TFDConnection; Servidor, BaseDatos, Usuario, Clave: string;
                             Puerto: Integer): Boolean;
 begin
-  Result := False;
+//  Result := False;
 
   FDConn.Connected := False;
   FDConn.Params.Clear;
@@ -47,15 +47,15 @@ begin
   FDConn.Params.Values['User_Name']:= Usuario;
   FDConn.Params.Values['Password'] := Clave;
   FDConn.Params.Values['Port']     := IntToStr(Puerto);
-
-  try
-    FDConn.Connected := True;
-    Result := True;
-
-  except
-    on E: Exception do
-      ShowMessage('❌ No se pudo conectar: ' + E.Message);
-  end;
+  Result := True;
+//  try
+//    FDConn.Connected := True;
+//    Result := True;
+//
+//  except
+//    on E: Exception do
+//      ShowMessage('❌ No se pudo conectar: ' + E.Message);
+//  end;
 end;
 
 {------------------------------------------------------------

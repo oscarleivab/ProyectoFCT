@@ -65,13 +65,4 @@ object frmNuevaEmpresa: TfrmNuevaEmpresa
     Left = 344
     Top = 8
   end
-  object FDConnection1: TFDConnection
-    Left = 8
-    Top = 16
-  end
-  object FDPhysPgDriverLink1: TFDPhysPgDriverLink
-    VendorLib = 'C:\Program Files\PostgreSQL\psqlODBC\bin\libpq.dll'
-    Left = 344
-    Top = 80
-  end
 end

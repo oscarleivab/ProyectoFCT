@@ -15,8 +15,6 @@ uses
   DataModuleAction in 'DataModuleAction.pas' {DataModule3: TDataModule};
 
 {$R *.res}
-var
-  PrimeraVez: Integer;
 
 begin
   Application.Initialize;
@@ -54,26 +52,7 @@ begin
       valor del archivo .ini a 1 al terminar con la creación de una base
       de datos
   --------------------------------------------------------------}
-  VerificarOCrearIni;
-
-  PrimeraVez := LeerPrimeraEjecucion;
-
-  if PrimeraVez = 0 then
-  begin
-    Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
-    frmNuevaEmpresa.ShowModal;
-
-    if not frmNuevaEmpresa.Creada then
-    begin
-      Application.Terminate;
-      Exit;
-    end;
-
-    GuardarPrimeraEjecucion(1);
-
-    frmNuevaEmpresa.Free;
-  end;
-
+  // Movido a uLogin
   {--------------------------------------------------------------
     Paso 2: Crear y mostrar el formulario principal (frmMain)
     -------------------------------------------------------------

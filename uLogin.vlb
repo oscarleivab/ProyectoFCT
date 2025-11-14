@@ -1,11 +1,5 @@
-﻿[FDConnection1]
-Coordinates=231,78,104,36
-
-[Button1]
+﻿[Button1]
 Coordinates=188,10,59,58
-
-[FDConnection2]
-Coordinates=231,133,104,36
 
 [FDQuery1]
 Coordinates=93,144,73,58
@@ -15,9 +9,6 @@ Coordinates=176,144,44,58
 
 [FDQuery2]
 Coordinates=10,144,73,58
-
-[FDPhysPgDriverLink1]
-Coordinates=373,1,141,36
 
 [ComboBox1]
 Coordinates=10,10,101,124
@@ -45,5 +36,5 @@ Coordinates=373,166,78,36
 Coordinates=257,10,59,58
 
 []
-Coordinates=0,203,91,36
+Coordinates=373,1,141,36
 
