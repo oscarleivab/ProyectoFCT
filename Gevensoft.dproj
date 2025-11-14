@@ -106,8 +106,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_ExeOutput>D:\Proyecto Gevensoft\Gevensoft\</DCC_ExeOutput>
-        <DCC_DcuOutput>D:\Proyecto Gevensoft\Desarrollo\Gevensoft\</DCC_DcuOutput>
+        <DCC_ExeOutput>D:\ProyectoFCT\Gevensoft\</DCC_ExeOutput>
+        <DCC_DcuOutput>D:\ProyectoFCT\Desarrollo\Gevensoft\</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>

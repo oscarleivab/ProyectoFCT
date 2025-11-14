@@ -47,7 +47,6 @@ type
   private
     procedure CargarEmpresas;
     procedure ConectarBase;
-    procedure InicializarSistema;
   public
     LoginExitoso: Boolean;  // Indica al sistema si el login ha sido correcto
   end;
@@ -72,9 +71,7 @@ procedure TfrmLogin.FormCreate(Sender: TObject);
 begin
   FDQuery1.Connection := DataModule1.FDConnection1;
   try
-    InicializarSistema;
-
-    //ConectarBase;
+    ConectarBase;
     CargarEmpresas;
 
     // No existe ninguna empresa → abrir asistente de creación
@@ -95,35 +92,6 @@ begin
     on E: Exception do
       ShowMessage('Error al conectar con la base de datos: ' + E.Message);
   end;
-end;
-
-procedure TfrmLogin.InicializarSistema;
-var
-  PrimeraVez: Integer;
-begin
-  // Verificar o crear archivo INI
-  VerificarOCrearIni;
-
-  PrimeraVez := LeerPrimeraEjecucion;
-
-  if PrimeraVez = 0 then
-  begin
-    Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
-    frmNuevaEmpresa.ShowModal;
-
-    if not frmNuevaEmpresa.Creada then
-    begin
-      Application.Terminate;
-      Exit;
-    end;
-
-    GuardarPrimeraEjecucion(1);
-    frmNuevaEmpresa.Free;
-  end;
-
-  // Conectar DataModule a la base principal
-  if not DataModule1.Conectar then
-    raise Exception.Create('No se pudo conectar a la base de datos principal.');
 end;
 
 {==============================================================}

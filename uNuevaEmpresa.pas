@@ -55,14 +55,13 @@ implementation
 {=========================================}
 procedure TfrmNuevaEmpresa.Button1Click(Sender: TObject);
 begin
+  Creada := False;
   try
     CrearNuevaBaseDatos;
     ShowMessage('Empresa creada correctamente.');
     Creada := True;   // Para que Login sepa que ya puede continuar
+  finally
     Close;
-  except
-    on E: Exception do
-      ShowMessage('Error al crear la empresa: ' + E.Message);
   end;
 end;
 
@@ -126,7 +125,7 @@ begin
       ConnTemp.Free;
     end;
 
-    if not DataModule1.Conectar then
+    if not ConfigurarConexion(Datamodule1.FDConnection1, 'localhost', 'bdgevensoftbase', 'postgres', '2003', 5432) then
       raise Exception.Create('No se ha podido conectar con la base de datos recien creada.');
   end;
 
