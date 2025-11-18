@@ -1,4 +1,4 @@
-# 💫 About Me:
+# 💫 Acerca:
 🙋‍♂️ Óscar Marian Leiva Bielka<br>💼 2º DAM<br>💻 Proyecto FCT - Gevensoft<br>🔩 Realizado en Delphi
 
 # 📂 Flujo del programa
