@@ -12,7 +12,7 @@ uses
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, IniFiles, uMain,
   Vcl.Imaging.pngimage, Vcl.ExtCtrls, System.Actions, Vcl.ActnList,
   System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
-  Vcl.ImageCollection, uDBUtils, uIniUtils, uConfig, uNuevaEmpresa, dmConnection;
+  Vcl.ImageCollection, uDBUtils, uIniUtils, uConfig, uNuevaEmpresa, dmConnection, dmAction, dmImages;
 
 type
   {------------------------------------------------------------
@@ -35,10 +35,7 @@ type
     FDQuery1: TFDQuery;
     FDQuery2: TFDQuery; // Conexión a la base de datos de la empresa
     Button2: TButton;             // Configuración
-    Button3: TButton;             // Salir
-    ImageCollection1: TImageCollection;
-    VirtualImageList1: TVirtualImageList;
-    ActionList1: TActionList;
+    Button3: TButton;
     Image1: TImage;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);

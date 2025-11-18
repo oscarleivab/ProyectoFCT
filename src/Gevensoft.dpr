@@ -59,10 +59,7 @@ begin
     if PrimeraVez = 0 then
     begin
       Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
-  Application.CreateForm(TDataModule3, DataModule3);
-  Application.CreateForm(TDataModule1, DataModule1);
-  Application.CreateForm(TDataModule2, DataModule2);
-  frmNuevaEmpresa.ShowModal;
+      frmNuevaEmpresa.ShowModal;
 
       if not frmNuevaEmpresa.Creada then
       begin
@@ -95,9 +92,12 @@ begin
     - Se ejecuta de forma modal, por lo que el flujo del programa
       se detiene hasta que el usuario cierre el formulario de Login.
   --------------------------------------------------------------}
+  Application.CreateForm(TDataModule2, DataModule2);
+  Application.CreateForm(TDataModule3, DataModule3);
   Application.CreateForm(TfrmLogin, frmLogin);
   frmLogin.Position := poScreenCenter;
   frmLogin.ShowModal;
+
 
   {--------------------------------------------------------------
     Paso 4: Validación del inicio de sesión
