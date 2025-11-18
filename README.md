@@ -1,5 +1,5 @@
 # 💫 Acerca:
-🙋‍♂️ Óscar Marian Leiva Bielka<br>💼 2º DAM<br>💻 Proyecto FCT - Gevensoft<br>🔩 Realizado en Delphi
+🙋‍♂️ Óscar Marian Leiva Bielka<br>🧑‍🤝‍🧑 Exposición junto: Jose Rubén Romero Gonzalez y Pablo Caro Salvador<br>💼 2º DAM<br>💻 Proyecto FCT - Gevensoft<br>🔩 Realizado en Delphi
 
 # 📂 Flujo del programa
 Al ejecutar por primera vez el programa comprueba si PostgreSQL (la base de datos con la que se trabaja) esta instalada o no. En el caso de que no lo este empieza una instalación de esta en el equipo. Una vez finalizada la instalación comprueba si se encuentra el archivo .ini donde esta la información de la base de datos principal del programa; al tratarse de la primera ejecución este archivo es normal que no este en el directorio del programa por ello lo crea le asigna los distintos valores de conexión a la base de datos y posteriormente inicia el primer formulario del programa uNuevaEmpresa.<br>
