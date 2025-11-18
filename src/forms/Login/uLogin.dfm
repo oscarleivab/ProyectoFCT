@@ -2217,8 +2217,9 @@ object frmLogin: TfrmLogin
     Margins.Left = 0
     Margins.Right = 0
     Margins.Bottom = 0
-    Action = DataModule3.actApagar
     ImageAlignment = iaCenter
+    ImageIndex = 0
+    ImageName = 'apagarico'
     Images = DataModule2.VirtualImageList1
     TabOrder = 5
     StyleElements = [seFont, seBorder]
