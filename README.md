@@ -11,6 +11,8 @@ Este primer formulario se encarga de añadir empresas del usuario a la base de d
 # 🎥 Ejecución del programa
 Dejo un enlace con lo que sería la primera versión del programa. Tiene que ser un enlace a YouTube porque GitHub no me dejaba subirlo por pesar demasiado.
 
-https://youtu.be/5UwPDNvvRTg
+[![Watch the video](https://img.youtube.com/vi/5UwPDNvvRTg/maxresdefault.jpg)](https://youtu.be/5UwPDNvvRTg)
+
+### [Enlace al vídeo](https://youtu.be/5UwPDNvvRTg)
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
