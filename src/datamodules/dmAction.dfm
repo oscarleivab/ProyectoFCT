@@ -7,7 +7,9 @@ object DataModule3: TDataModule3
     Top = 104
     StyleName = 'Platform Default'
     object actLogin: TAction
+      AutoCheck = True
       Caption = 'Conectar'
+      Checked = True
       ImageIndex = 2
       ImageName = 'loginico'
       OnExecute = actLoginExecute
@@ -19,6 +21,7 @@ object DataModule3: TDataModule3
     object actApagar: TAction
       ImageIndex = 0
       ImageName = 'apagarico'
+      OnExecute = actLoginExecute
     end
   end
 end

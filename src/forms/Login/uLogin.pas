@@ -38,7 +38,7 @@ type
     Button3: TButton;
     Image1: TImage;
     procedure FormCreate(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure actLoginExecute(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
@@ -66,6 +66,8 @@ implementation
 {==============================================================}
 procedure TfrmLogin.FormCreate(Sender: TObject);
 begin
+  DataModule3.actLogin.OnExecute := actLoginExecute;
+
   FDQuery1.Connection := DataModule1.FDConnection1;
   try
     ConectarBase;
@@ -159,7 +161,7 @@ end;
 {    - Se conecta a la base de datos de la empresa            }
 {    - Si funciona → LoginExitoso = True                       }
 {==============================================================}
-procedure TfrmLogin.Button1Click(Sender: TObject);
+procedure TfrmLogin.actLoginExecute(Sender: TObject);
 var
   user, pass: string;
   BDName, Host: string;

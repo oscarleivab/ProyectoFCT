@@ -2182,13 +2182,10 @@ object frmLogin: TfrmLogin
     Top = 311
     Width = 206
     Height = 50
-    Caption = 'Conectar'
-    ImageIndex = 2
-    ImageName = 'loginico'
+    Action = DataModule3.actLogin
     Images = DataModule2.VirtualImageList1
     TabOrder = 3
     StyleName = 'Windows'
-    OnClick = Button1Click
   end
   object Button2: TButton
     Left = 144
