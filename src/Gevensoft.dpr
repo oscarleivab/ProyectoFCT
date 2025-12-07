@@ -6,16 +6,17 @@ uses
   dmAction in 'datamodules\dmAction.pas' {DataModule3: TDataModule},
   dmConnection in 'datamodules\dmConnection.pas' {DataModule1: TDataModule},
   dmImages in 'datamodules\dmImages.pas' {DataModule2: TDataModule},
-  uDBUtils in 'utils\uDBUtils.pas',
-  uIniUtils in 'utils\uIniUtils.pas',
-  uLogin in 'forms\Login\uLogin.pas' {frmLogin},
-  uNuevaEmpresa in 'forms\Inicio\uNuevaEmpresa.pas' {frmNuevaEmpresa},
-  uConfig in 'forms\Config\uConfig.pas' {frmConfig},
-  uMain in 'forms\Main\uMain.pas' {frmMain},
-  uPostgreSQLInstaller in 'utils\uPostgreSQLInstaller.pas',
+  uDBUtils in 'Utils\uDBUtils.pas',
+  uIniUtils in 'Utils\uIniUtils.pas',
+  uLogin in 'UI\Login\uLogin.pas' {frmLogin},
+  uNuevaEmpresa in 'UI\Inicio\uNuevaEmpresa.pas' {frmNuevaEmpresa},
+  uConfig in 'UI\Config\uConfig.pas' {frmConfig},
+  uMain in 'UI\Main\uMain.pas' {frmMain},
+  uPostgreSQLInstaller in 'Utils\uPostgreSQLInstaller.pas',
   uSession in 'Utils\uSession.pas',
   uLog in 'Services\uLog.pas',
-  uToastHelper in 'Common\uToastHelper.pas';
+  uToastHelper in 'Common\uToastHelper.pas',
+  FrameBase in 'UI\Main\FrameBase.pas' {Frame1: TFrame};
 
 {$R *.res}
 var

@@ -142,28 +142,29 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="utils\uDBUtils.pas"/>
-        <DCCReference Include="utils\uIniUtils.pas"/>
-        <DCCReference Include="forms\Login\uLogin.pas">
+        <DCCReference Include="Utils\uDBUtils.pas"/>
+        <DCCReference Include="Utils\uIniUtils.pas"/>
+        <DCCReference Include="UI\Login\uLogin.pas">
             <Form>frmLogin</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="forms\Inicio\uNuevaEmpresa.pas">
+        <DCCReference Include="UI\Inicio\uNuevaEmpresa.pas">
             <Form>frmNuevaEmpresa</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="forms\Config\uConfig.pas">
+        <DCCReference Include="UI\Config\uConfig.pas">
             <Form>frmConfig</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="forms\Main\uMain.pas">
+        <DCCReference Include="UI\Main\uMain.pas">
             <Form>frmMain</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="utils\uPostgreSQLInstaller.pas"/>
+        <DCCReference Include="Utils\uPostgreSQLInstaller.pas"/>
         <DCCReference Include="Utils\uSession.pas"/>
         <DCCReference Include="Services\uLog.pas"/>
         <DCCReference Include="Common\uToastHelper.pas"/>
+        <DCCReference Include="UI\Main\FrameBase.pas">
+            <Form>Frame1</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
