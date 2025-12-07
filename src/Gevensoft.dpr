@@ -12,7 +12,10 @@ uses
   uNuevaEmpresa in 'forms\Inicio\uNuevaEmpresa.pas' {frmNuevaEmpresa},
   uConfig in 'forms\Config\uConfig.pas' {frmConfig},
   uMain in 'forms\Main\uMain.pas' {frmMain},
-  uPostgreSQLInstaller in 'utils\uPostgreSQLInstaller.pas';
+  uPostgreSQLInstaller in 'utils\uPostgreSQLInstaller.pas',
+  uSession in 'Utils\uSession.pas',
+  uLog in 'Services\uLog.pas',
+  uToastHelper in 'Common\uToastHelper.pas';
 
 {$R *.res}
 var

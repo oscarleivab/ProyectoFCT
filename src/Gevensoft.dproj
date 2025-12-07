@@ -161,6 +161,9 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="utils\uPostgreSQLInstaller.pas"/>
+        <DCCReference Include="Utils\uSession.pas"/>
+        <DCCReference Include="Services\uLog.pas"/>
+        <DCCReference Include="Common\uToastHelper.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
