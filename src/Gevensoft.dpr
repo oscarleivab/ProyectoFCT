@@ -16,7 +16,9 @@ uses
   uSession in 'Utils\uSession.pas',
   uLog in 'Services\uLog.pas',
   uToastHelper in 'Common\uToastHelper.pas',
-  FrameBase in 'UI\Main\FrameBase.pas' {Frame1: TFrame};
+  FrameBase in 'UI\Main\FrameBase.pas' {Frame1: TFrame},
+  uLoginManager in 'UI\Login\uLoginManager.pas',
+  frLoginOverlay in 'UI\Login\frLoginOverlay.pas' {Frame2: TFrame};
 
 {$R *.res}
 var
