@@ -132,9 +132,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="datamodules\dmConnection.pas">
-            <Form>DataModule1</Form>
-            <FormType>dfm</FormType>
+        <DCCReference Include="Data\dmConnection.pas">
+            <Form>W</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="datamodules\dmImages.pas">
@@ -143,7 +142,7 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Utils\uDBUtils.pas"/>
-        <DCCReference Include="Utils\uIniUtils.pas"/>
+        <DCCReference Include="Utils\uConfigIni.pas"/>
         <DCCReference Include="UI\Login\uLogin.pas">
             <Form>frmLogin</Form>
         </DCCReference>
@@ -171,6 +170,12 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="Data\uDatabaselib.pas"/>
+        <DCCReference Include="Services\uTranslator.pas"/>
+        <DCCReference Include="Common\uFuncionesglobales.pas"/>
+        <DCCReference Include="Common\uGridHelper.pas"/>
+        <DCCReference Include="Data\uSQL.pas"/>
+        <DCCReference Include="Utils\uConnectionUtils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

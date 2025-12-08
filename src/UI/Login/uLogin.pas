@@ -12,7 +12,7 @@ uses
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, IniFiles, uMain,
   Vcl.Imaging.pngimage, Vcl.ExtCtrls, System.Actions, Vcl.ActnList,
   System.ImageList, Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
-  Vcl.ImageCollection, uDBUtils, uIniUtils, uConfig, uNuevaEmpresa, dmConnection, dmAction, dmImages;
+  Vcl.ImageCollection, uDBUtils, uConfigIni, uConfig, uNuevaEmpresa, dmConnection, dmAction, dmImages;
 
 type
   {------------------------------------------------------------

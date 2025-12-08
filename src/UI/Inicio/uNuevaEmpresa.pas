@@ -9,7 +9,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Phys,
   FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.DataSet,
-  uDBUtils, uIniUtils, FireDAC.Phys.PGDef, FireDAC.Phys.PG, dmConnection;
+  uDBUtils, uConfigIni, FireDAC.Phys.PGDef, FireDAC.Phys.PG, dmConnection;
 
 type
   {------------------------------------------------------------

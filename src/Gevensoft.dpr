@@ -4,10 +4,10 @@ uses
   Vcl.Forms,
   Winapi.Windows,
   dmAction in 'datamodules\dmAction.pas' {DataModule3: TDataModule},
-  dmConnection in 'datamodules\dmConnection.pas' {DataModule1: TDataModule},
+  dmConnection in 'Data\dmConnection.pas' {W: TDataModule},
   dmImages in 'datamodules\dmImages.pas' {DataModule2: TDataModule},
   uDBUtils in 'Utils\uDBUtils.pas',
-  uIniUtils in 'Utils\uIniUtils.pas',
+  uConfigIni in 'Utils\uConfigIni.pas',
   uLogin in 'UI\Login\uLogin.pas' {frmLogin},
   uNuevaEmpresa in 'UI\Inicio\uNuevaEmpresa.pas' {frmNuevaEmpresa},
   uConfig in 'UI\Config\uConfig.pas' {frmConfig},
@@ -18,16 +18,20 @@ uses
   uToastHelper in 'Common\uToastHelper.pas',
   FrameBase in 'UI\Main\FrameBase.pas' {Frame1: TFrame},
   uLoginManager in 'UI\Login\uLoginManager.pas',
-  frLoginOverlay in 'UI\Login\frLoginOverlay.pas' {Frame2: TFrame};
+  frLoginOverlay in 'UI\Login\frLoginOverlay.pas' {Frame2: TFrame},
+  uDatabaselib in 'Data\uDatabaselib.pas',
+  uTranslator in 'Services\uTranslator.pas',
+  uFuncionesglobales in 'Common\uFuncionesglobales.pas',
+  uGridHelper in 'Common\uGridHelper.pas',
+  uSQL in 'Data\uSQL.pas',
+  uConnectionUtils in 'Utils\uConnectionUtils.pas';
 
 {$R *.res}
-var
-  PrimeraVez: Integer;
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TDataModule1, DataModule1);
+  //Application.CreateForm(TW, W);
   {--------------------------------------------------------------
     ⭐ PASO 0: VERIFICAR E INSTALAR POSTGRESQL SI ES NECESARIO
     -------------------------------------------------------------
@@ -35,48 +39,16 @@ begin
     - Si no está, lo instala desde: utilidades\postgresql-18-windows-x64.exe
     - Si falla o se cancela, cierra la aplicación
   --------------------------------------------------------------}
-    if not VerificarPostgreSQL then
-    begin
-      Application.MessageBox(
-        'PostgreSQL es requerido para ejecutar Gevensoft.' + #13#10 +
-        'La aplicación se cerrará.',
-        'Error - PostgreSQL no disponible',
-        MB_OK or MB_ICONERROR
-      );
-      Exit;
-    end;
-
-  {--------------------------------------------------------------
-    Paso 1: Verificar existencia del archivo INI y primera ejecucion
-    -------------------------------------------------------------
-    - Se utiliza la función VerificarOCrearIni del módulo uIniUtils.
-    - Esta función centraliza la lógica de comprobación y creación
-      del archivo Gevensoft.ini si no existe.
-    - Una vez creada comprueba si es la primera ejecución del programa o
-      no. Si lo es muestra el formulario uNuevaEmpresa y este cambia el
-      valor del archivo .ini a 1 al terminar con la creación de una base
-      de datos
-  --------------------------------------------------------------}
-    // Verificar o crear archivo INI
-    VerificarOCrearIni;
-
-    PrimeraVez := LeerPrimeraEjecucion;
-
-    if PrimeraVez = 0 then
-    begin
-      Application.CreateForm(TfrmNuevaEmpresa, frmNuevaEmpresa);
-      frmNuevaEmpresa.ShowModal;
-
-      if not frmNuevaEmpresa.Creada then
-      begin
-        Application.Terminate;
-        Exit;
-      end;
-
-      GuardarPrimeraEjecucion(1);
-
-      frmNuevaEmpresa.Free;
-    end;
+  if not VerificarPostgreSQL then
+  begin
+    Application.MessageBox(
+      'PostgreSQL es requerido para ejecutar Gevensoft.' + #13#10 +
+      'La aplicación se cerrará.',
+      'Error - PostgreSQL no disponible',
+      MB_OK or MB_ICONERROR
+    );
+    Exit;
+  end;
 
   {--------------------------------------------------------------
     Paso 2: Crear y mostrar el formulario principal (frmMain)
@@ -103,7 +75,6 @@ begin
   Application.CreateForm(TfrmLogin, frmLogin);
   frmLogin.Position := poScreenCenter;
   frmLogin.ShowModal;
-
 
   {--------------------------------------------------------------
     Paso 4: Validación del inicio de sesión
