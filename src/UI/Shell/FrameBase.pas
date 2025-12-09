@@ -20,6 +20,7 @@ type
   public
     { Public declarations }
     Dialogouserfrm: TDialogouserfrm;
+    FrameOrigen: String;
     procedure doClose; Virtual;
     procedure doFilter; Virtual;
     procedure doClearFilter; Virtual;
@@ -77,6 +78,14 @@ end;
 procedure TFrBase.doSave;
 begin
 //
+ if FDQuery.State in dsEditModes then
+ begin
+    FDQuery.Post;     // Guarda en memoria y ejecuta el UPDATE
+
+    //refresca y posiciona si tiene listado, el resgistro que hemos guardado
+    if FrameOrigen<>'' then
+    FrmMain.RefrescarFrame(FrameOrigen, FDQuery.FieldByName('id').AsInteger);
+ end;
 end;
 
 procedure TFrBase.doDelete;

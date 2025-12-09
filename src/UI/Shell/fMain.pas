@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls,uTranslator, Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.ComCtrls,
   System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, uLog,
   Vcl.ToolWin, Vcl.ActnCtrls, Vcl.ActnMenus, uConfigIni, System.UITypes,utoashelper,FormBase,FrameBase,ListadoClientes,
-  ListadoProveedor, ListadoLog;
+  ListadoProveedor, ListadoLog, FrameListado;
 
 type
   TFrmMain = class(TFBase)
@@ -73,6 +73,8 @@ type
   public
     function ActiveFrame: TFrBase;
     Procedure EliminarSheet;
+    procedure RefrescarSheet(const ANombrePestana: string;id:Integer);
+    procedure RefrescarFrame(const ANombreFrame: string; AId: Integer);
 
   end;
 
@@ -87,6 +89,59 @@ uses
 
 
 {$R *.dfm}
+
+procedure TFrmMain.RefrescarSheet(const ANombrePestana: string;id:Integer);
+var
+  I: Integer;
+  Tab: TTabSheet;
+  F: TListadoFrame;
+begin
+  for I := 0 to PageControl1.PageCount - 1 do
+  begin
+    Tab := PageControl1.Pages[I];
+
+    // Compara por caption o por name
+    if SameText(Tab.Name, ANombrePestana) then
+    begin
+      // Verificar que la pestaña tiene un frame dentro
+      if (Tab.ControlCount > 0) and (Tab.Controls[0] is TFrame) then
+      begin
+        F := TListadoFrame(Tab.Controls[0]);
+
+        F.ActualizarRegistro(id);
+
+        Exit;
+      end;
+    end;
+  end;
+end;
+
+procedure TFrmMain.RefrescarFrame(const ANombreFrame: string; AId: Integer);
+var
+  I: Integer;
+  Tab: TTabSheet;
+  F: TFrame;
+begin
+  for I := 0 to PageControl1.PageCount - 1 do
+  begin
+    Tab := PageControl1.Pages[I];
+
+    if (Tab.ControlCount > 0) and (Tab.Controls[0] is TFrame) then
+    begin
+      F := TFrame(Tab.Controls[0]);
+
+      // Buscar por nombre de frame
+      if SameText(F.Name, ANombreFrame) then
+      begin
+        // Si ese frame es algún tipo de listado, se le puede pedir ActualizarRegistro
+        if F is TListadoFrame then
+          TListadoFrame(F).ActualizarRegistro(AId);
+
+        Exit;
+      end;
+    end;
+  end;
+end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
 begin
@@ -346,7 +401,7 @@ end;
 procedure TFrmMain.abrirlistado(Tipo:integer);
 var
   ListadoCliente: TListadoFrameCliente;
-  ListadoProveedor: TFrBase1;
+  ListadoProveedor: TListadoFrameProveedor;
   ListadoLog: TFrListadoLog;
   nuevaTab: TTabSheet;
   nombreTab: string;
@@ -376,7 +431,7 @@ begin
 
       1: begin
            // PROVEEDORES
-           ListadoProveedor := TFrBase1.Create(nuevaTab);
+           ListadoProveedor := TListadoFrameProveedor.Create(nuevaTab);
            ListadoProveedor.Parent := nuevaTab;
            ListadoProveedor.Align := alClient;
            ListadoProveedor.doSearch;

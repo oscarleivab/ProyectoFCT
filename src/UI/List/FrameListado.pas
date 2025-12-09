@@ -40,6 +40,7 @@ type
     procedure doEdit; override;
     procedure doAdd; override;
     procedure doDelete; override;
+    procedure ActualizarRegistro(AId: Integer);
 
   Protected
     procedure Loaded; override;
@@ -53,6 +54,17 @@ implementation
 {$R *.dfm}
 
 { TListadoFrame }
+
+procedure TListadoFrame.ActualizarRegistro(AId: Integer);
+begin
+  FDQuery.DisableControls;
+  try
+    FDQuery.Refresh;                        // vuelve a ejecutar el SELECT
+    FDQuery.Locate('id', AId, []);  // vuelve a la fila
+  finally
+    FDQuery.EnableControls;
+  end;
+end;
 
 procedure TListadoFrame.doSearch;
 begin

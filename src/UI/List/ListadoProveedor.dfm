@@ -1,2 +1,2 @@
-inherited FrBase1: TFrBase1
+inherited ListadoFrameProveedor: TListadoFrameProveedor
 end
