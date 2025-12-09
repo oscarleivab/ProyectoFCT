@@ -1,0 +1,138 @@
+unit uLoginManager;
+
+interface
+
+uses
+  System.SysUtils, System.Classes,System.StrUtils,
+  FireDAC.Comp.Client, FireDAC.Stan.Param,
+  dmConnection, uSession;
+
+type
+  TLoginManager = class
+  public
+    // BD principal ? combo de empresas
+    class procedure LoadCompanies(ATarget: TStrings);
+
+    // Conecta a la BD de empresa y carga empleados activos en el combo
+    class procedure ConnectCompanyAndLoadEmployees(ACompanyId: Integer; ATarget: TStrings; out ACompanyName: string);
+
+    // Valida empleado (en BD de empresa)
+    class function ValidateEmployee(AEmployeeId: Integer; const APassword: string): Boolean;
+  end;
+
+implementation
+
+{ Empresas en BD principal }
+
+class procedure TLoginManager.LoadCompanies(ATarget: TStrings);
+var
+  Q: TFDQuery;
+begin
+  ATarget.Clear;
+
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := DataModuleConnection.FDConnectionMain;
+    Q.SQL.Text :=
+      'SELECT id, empresaname '+
+      'FROM empresa '+
+      'WHERE activa = TRUE '+
+      'ORDER BY empresaname';
+    Q.Open;
+
+    while not Q.Eof do
+    begin
+      ATarget.AddObject(
+        Q.FieldByName('empresaname').AsString,
+        TObject(NativeInt(Q.FieldByName('id').AsInteger))
+      );
+      Q.Next;
+    end;
+  finally
+    Q.Free;
+  end;
+end;
+
+{ Conexión a empresa + empleados }
+
+class procedure TLoginManager.ConnectCompanyAndLoadEmployees(ACompanyId: Integer; ATarget: TStrings; out ACompanyName: string);
+var
+  Q: TFDQuery;
+begin
+  ATarget.Clear;
+  ACompanyName := '';
+
+  if ACompanyId = 0 then Exit;
+
+  // 1) Conectar a la BD de empresa usando empresa.userbd/passbd
+  DataModuleConnection.ConnectToCompanyDatabase(ACompanyId, ACompanyName);
+
+  // 2) Cargar empleados activos (BD empresa)
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := DataModuleConnection.FDConnectionCompany;
+    Q.SQL.Text :=
+      'SELECT id_empleado, user_login, nombre, apellidos '+
+      'FROM empleado '+
+      'WHERE COALESCE(activo, TRUE) = TRUE '+
+      'ORDER BY UPPER(user_login)';
+    Q.Open;
+
+    while not Q.Eof do
+    begin
+      // Mostramos user_login; guardamos id_empleado en Objects
+      ATarget.AddObject(
+        Q.FieldByName('user_login').AsString,
+        TObject(NativeInt(Q.FieldByName('id_empleado').AsInteger))
+      );
+      Q.Next;
+    end;
+  finally
+    Q.Free;
+  end;
+end;
+
+{ Validación en tabla empleado }
+
+class function TLoginManager.ValidateEmployee(AEmployeeId: Integer; const APassword: string): Boolean;
+var
+  Q: TFDQuery;
+  PassDB, UserLogin, Nombre, Apellidos: string;
+begin
+  Result := False;
+  if (AEmployeeId = 0) or (APassword = '') then Exit;
+
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := DataModuleConnection.FDConnectionCompany;
+    Q.SQL.Text :=
+      'SELECT user_login, pass_login, nombre, apellidos '+
+      'FROM empleado '+
+      'WHERE id_empleado = :id AND COALESCE(activo, TRUE) = TRUE';
+    Q.ParamByName('id').AsInteger := AEmployeeId;
+    Q.Open;
+
+    if Q.IsEmpty then
+      Exit;
+
+    UserLogin := Q.FieldByName('user_login').AsString;
+    PassDB    := Q.FieldByName('pass_login').AsString;
+    Nombre    := Q.FieldByName('nombre').AsString;
+    Apellidos := Q.FieldByName('apellidos').AsString;
+
+    // TODO: migrar a hash (bcrypt/argon2). De momento: texto plano, case-sensitive.
+    if APassword = PassDB then
+    begin
+      AppSession.UserId      := AEmployeeId;
+      AppSession.UserName    := IfThen(Trim(Nombre + ' ' + Apellidos) <> '',
+                                       Trim(Nombre + ' ' + Apellidos),
+                                       UserLogin);
+      Result := True;
+    end;
+  finally
+    Q.Free;
+  end;
+end;
+
+end.
+

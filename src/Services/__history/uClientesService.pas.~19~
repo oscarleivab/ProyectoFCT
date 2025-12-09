@@ -1,0 +1,294 @@
+﻿unit uClientesService;
+
+interface
+
+uses
+  System.Generics.Collections,
+  FireDAC.Comp.Client,
+  uClienteModel,uDatabaselib;
+
+
+type
+  TClientesService = class
+  public
+    class function Cargarlistado(filtro:string): TObjectList<TCliente>;
+    class function Cargardatos(Id: Integer): TCliente;
+    class function Grabardatos(Cliente:TCliente):boolean;
+  end;
+
+implementation
+
+uses
+  System.SysUtils;
+
+{ TClientesService }
+
+class function TClientesService.Cargarlistado(filtro: string): TObjectList<TCliente>;
+var
+  Q: TFDQuery;
+  C: TCliente;
+  TieneFiltro: Boolean;
+begin
+  Result := TObjectList<TCliente>.Create(True); // OwnsObjects = True
+
+  Q := crearquery(nil);
+  try
+    TieneFiltro := not filtro.Trim.IsEmpty;
+
+    Q.SQL.Clear;
+    Q.SQL.Add('SELECT ');
+    Q.SQL.Add('  id_cliente,');
+    Q.SQL.Add('  id_tipo,');
+    Q.SQL.Add('  id_tipo_documento,');
+    Q.SQL.Add('  detalle_documento,');
+    Q.SQL.Add('  nombre,');
+    Q.SQL.Add('  apellidos,');
+    Q.SQL.Add('  empresa,');
+    Q.SQL.Add('  email,');
+    Q.SQL.Add('  observaciones,');
+    Q.SQL.Add('  telefono1,');
+    Q.SQL.Add('  telefono2,');
+    Q.SQL.Add('  id_tarifa,');
+    Q.SQL.Add('  persona_contacto,');
+    Q.SQL.Add('  url_web,');
+    Q.SQL.Add('  user_login,');
+    Q.SQL.Add('  pass_login,');
+    Q.SQL.Add('  activo,');
+    Q.SQL.Add('  id_permiso');
+    Q.SQL.Add('FROM cliente');
+
+    if TieneFiltro then
+    begin
+      Q.SQL.Add('WHERE (');
+      Q.SQL.Add('      unaccent(CAST(id_cliente AS TEXT)) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(detalle_documento) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(nombre) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(apellidos) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(nombre || '' '' || apellidos) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(apellidos || '' '' || nombre) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(empresa) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(email) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(observaciones) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(telefono1) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(telefono2) ILIKE unaccent(:filtro)');
+      Q.SQL.Add('   OR unaccent(persona_contacto) ILIKE unaccent(:filtro)');
+      Q.SQL.Add(')');
+    end;
+
+    Q.SQL.Add('ORDER BY id_cliente');
+
+    if TieneFiltro then
+      Q.ParamByName('filtro').AsString := '%' + filtro.Trim + '%';
+
+    try
+      Q.Open;
+    except
+      on E: Exception do
+        raise Exception.Create('Error cargando clientes: ' + E.Message);
+    end;
+
+    while not Q.Eof do
+    begin
+      C := TCliente.Create;
+      C.IdCliente        := Q.FieldByName('id_cliente').AsInteger;
+      C.IdTipo           := Q.FieldByName('id_tipo').AsInteger;
+      C.IdTipoDocumento  := Q.FieldByName('id_tipo_documento').AsInteger;
+      C.DetalleDocumento := Q.FieldByName('detalle_documento').AsString;
+      C.Nombre           := Q.FieldByName('nombre').AsString;
+      C.Apellidos        := Q.FieldByName('apellidos').AsString;
+      C.Empresa          := Q.FieldByName('empresa').AsString;
+      C.Email            := Q.FieldByName('email').AsString;
+      C.Observaciones    := Q.FieldByName('observaciones').AsString;
+      C.Telefono1        := Q.FieldByName('telefono1').AsString;
+      C.Telefono2        := Q.FieldByName('telefono2').AsString;
+      C.IdTarifa         := Q.FieldByName('id_tarifa').AsInteger;
+      C.PersonaContacto  := Q.FieldByName('persona_contacto').AsString;
+      C.UrlWeb           := Q.FieldByName('url_web').AsString;
+      C.UserLogin        := Q.FieldByName('user_login').AsString;
+      C.PassLogin        := Q.FieldByName('pass_login').AsString;
+      C.Activo           := Q.FieldByName('activo').AsBoolean;
+      C.IdPermiso        := Q.FieldByName('id_permiso').AsInteger;
+
+      Result.Add(C);
+      Q.Next;
+    end;
+  finally
+    Q.Free;
+  end;
+end;
+
+
+class function TClientesService.CargarDatos(Id: Integer): TCliente;
+var
+  Q: TFDQuery;
+  C: TCliente;
+begin
+  Result := TCliente.Create;
+
+  Q := crearquery(nil);
+  try
+    Q.SQL.Clear;
+    Q.SQL.Add('SELECT ');
+    Q.SQL.Add('  id_cliente,');
+    Q.SQL.Add('  id_tipo,');
+    Q.SQL.Add('  id_tipo_documento,');
+    Q.SQL.Add('  detalle_documento,');
+    Q.SQL.Add('  nombre,');
+    Q.SQL.Add('  apellidos,');
+    Q.SQL.Add('  empresa,');
+    Q.SQL.Add('  email,');
+    Q.SQL.Add('  observaciones,');
+    Q.SQL.Add('  telefono1,');
+    Q.SQL.Add('  telefono2,');
+    Q.SQL.Add('  id_tarifa,');
+    Q.SQL.Add('  persona_contacto,');
+    Q.SQL.Add('  url_web,');
+    Q.SQL.Add('  user_login,');
+    Q.SQL.Add('  pass_login,');
+    Q.SQL.Add('  activo,');
+    Q.SQL.Add('  id_permiso');
+    Q.SQL.Add('FROM cliente');
+    Q.SQL.Add('WHERE id_cliente=:pId');
+
+    Q.ParamByName('pId').Asinteger := Id;
+
+    try
+      Q.Open;
+    except
+      on E: Exception do
+        raise Exception.Create('Error cargando cliente: '+id.ToString+ ' ' + E.Message);
+    end;
+
+    if Not Q.IsEmpty then begin
+      Q.First;
+      C := TCliente.Create;
+      C.IdCliente        := Q.FieldByName('id_cliente').AsInteger;
+      C.IdTipo           := Q.FieldByName('id_tipo').AsInteger;
+      C.IdTipoDocumento  := Q.FieldByName('id_tipo_documento').AsInteger;
+      C.DetalleDocumento := Q.FieldByName('detalle_documento').AsString;
+      C.Nombre           := Q.FieldByName('nombre').AsString;
+      C.Apellidos        := Q.FieldByName('apellidos').AsString;
+      C.Empresa          := Q.FieldByName('empresa').AsString;
+      C.Email            := Q.FieldByName('email').AsString;
+      C.Observaciones    := Q.FieldByName('observaciones').AsString;
+      C.Telefono1        := Q.FieldByName('telefono1').AsString;
+      C.Telefono2        := Q.FieldByName('telefono2').AsString;
+      C.IdTarifa         := Q.FieldByName('id_tarifa').AsInteger;
+      C.PersonaContacto  := Q.FieldByName('persona_contacto').AsString;
+      C.UrlWeb           := Q.FieldByName('url_web').AsString;
+      C.UserLogin        := Q.FieldByName('user_login').AsString;
+      C.PassLogin        := Q.FieldByName('pass_login').AsString;
+      C.Activo           := Q.FieldByName('activo').AsBoolean;
+      C.IdPermiso        := Q.FieldByName('id_permiso').AsInteger;
+
+      Result := C;
+    end;
+
+  finally
+    Q.Free;
+  end;
+end;
+
+class function TClientesService.GrabarDatos(Cliente: TCliente): boolean;
+var
+  Q: TFDQuery;
+  EsUpdate: Boolean;
+begin
+  Result := False;
+
+  if Cliente = nil then
+    Exit;
+
+  Q := crearquery(nil);
+  try
+    EsUpdate := Cliente.IdCliente <> 0;
+
+    Q.SQL.Clear;
+
+    if EsUpdate then
+    begin
+      Q.SQL.Add('UPDATE cliente SET ');
+      Q.SQL.Add('  id_tipo = :id_tipo,');
+      Q.SQL.Add('  id_tipo_documento = :id_tipo_documento,');
+      Q.SQL.Add('  detalle_documento = :detalle_documento,');
+      Q.SQL.Add('  nombre = :nombre,');
+      Q.SQL.Add('  apellidos = :apellidos,');
+      Q.SQL.Add('  empresa = :empresa,');
+      Q.SQL.Add('  email = :email,');
+      Q.SQL.Add('  observaciones = :observaciones,');
+      Q.SQL.Add('  telefono1 = :telefono1,');
+      Q.SQL.Add('  telefono2 = :telefono2,');
+      Q.SQL.Add('  id_tarifa = :id_tarifa,');
+      Q.SQL.Add('  persona_contacto = :persona_contacto,');
+      Q.SQL.Add('  url_web = :url_web,');
+      Q.SQL.Add('  user_login = :user_login,');
+      Q.SQL.Add('  pass_login = :pass_login,');
+      Q.SQL.Add('  activo = :activo,');
+      Q.SQL.Add('  id_permiso = :id_permiso');
+      Q.SQL.Add('WHERE id_cliente = :id_cliente');
+    end
+    else
+    begin
+      Q.SQL.Add('INSERT INTO cliente (');
+      Q.SQL.Add('  id_tipo, id_tipo_documento, detalle_documento,');
+      Q.SQL.Add('  nombre, apellidos, empresa, email, observaciones,');
+      Q.SQL.Add('  telefono1, telefono2, id_tarifa, persona_contacto,');
+      Q.SQL.Add('  url_web, user_login, pass_login, activo, id_permiso');
+      Q.SQL.Add(') VALUES (');
+      Q.SQL.Add('  :id_tipo, :id_tipo_documento, :detalle_documento,');
+      Q.SQL.Add('  :nombre, :apellidos, :empresa, :email, :observaciones,');
+      Q.SQL.Add('  :telefono1, :telefono2, :id_tarifa, :persona_contacto,');
+      Q.SQL.Add('  :url_web, :user_login, :pass_login, :activo, :id_permiso');
+      Q.SQL.Add(') RETURNING id_cliente');
+    end;
+
+    // ---- parámetros comunes ----
+    Q.ParamByName('id_tipo').AsInteger := Cliente.IdTipo;
+    Q.ParamByName('id_tipo_documento').AsInteger := Cliente.IdTipoDocumento;
+    Q.ParamByName('detalle_documento').AsString := Cliente.DetalleDocumento;
+    Q.ParamByName('nombre').AsString := Cliente.Nombre;
+    Q.ParamByName('apellidos').AsString := Cliente.Apellidos;
+    Q.ParamByName('empresa').AsString := Cliente.Empresa;
+    Q.ParamByName('email').AsString := Cliente.Email;
+    Q.ParamByName('observaciones').AsString := Cliente.Observaciones;
+    Q.ParamByName('telefono1').AsString := Cliente.Telefono1;
+    Q.ParamByName('telefono2').AsString := Cliente.Telefono2;
+    Q.ParamByName('id_tarifa').AsInteger := Cliente.IdTarifa;
+    Q.ParamByName('persona_contacto').AsString := Cliente.PersonaContacto;
+    Q.ParamByName('url_web').AsString := Cliente.UrlWeb;
+    Q.ParamByName('user_login').AsString := Cliente.UserLogin;
+    Q.ParamByName('pass_login').AsString := Cliente.PassLogin;
+    Q.ParamByName('activo').AsBoolean := Cliente.Activo;
+    Q.ParamByName('id_permiso').AsInteger := Cliente.IdPermiso;
+
+    if EsUpdate then
+      Q.ParamByName('id_cliente').AsInteger := Cliente.IdCliente;
+
+    try
+      if EsUpdate then
+      begin
+        Q.ExecSQL;
+        Result := Q.RowsAffected > 0;
+      end
+      else
+      begin
+        Q.Open;
+        if not Q.IsEmpty then
+        begin
+          Cliente.IdCliente := Q.Fields[0].AsInteger;
+          Result := True;
+        end;
+      end;
+    except
+      on E: Exception do
+        raise Exception.Create('Error grabando cliente: ' + E.Message);
+    end;
+
+  finally
+    Q.Free;
+  end;
+end;
+
+
+
+end.

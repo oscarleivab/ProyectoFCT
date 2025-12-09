@@ -1,0 +1,32 @@
+﻿unit frStatusBar;
+
+interface
+
+uses
+  System.SysUtils, System.Classes,
+  Vcl.Controls, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Graphics, Vcl.Forms;
+
+type
+  TFrameStatusBar = class(TFrame)
+    pnlBackground: TPanel;
+    lblUser: TLabel;
+    lblCompany: TLabel;
+  public
+    procedure UpdateStatus(const AUser, ACompany: string);
+  end;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrameStatusBar.UpdateStatus(const AUser, ACompany: string);
+begin
+   // Etiquetas simples; ajusta prefijos si quieres
+  if Assigned(lblUser) then
+    lblUser.Caption := 'Usuario: ' + AUser;
+
+  if Assigned(lblCompany) then
+    lblCompany.Caption := 'Empresa: ' + ACompany;
+end;
+
+end.

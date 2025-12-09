@@ -1,0 +1,103 @@
+﻿unit uImageResources;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.IOUtils,
+  System.Generics.Collections,
+  Vcl.Graphics, Vcl.Imaging.pngimage,
+  Vcl.Controls,
+  Vcl.BaseImageCollection, Vcl.ImageCollection,
+  Vcl.VirtualImageList, System.ImageList, Vcl.ImgList;
+
+type
+  TdmImages = class(TDataModule)
+    ImageCollection1: TImageCollection;
+    VirtualImageList1: TVirtualImageList;
+  private
+    FIconIndex: TDictionary<string, Integer>;
+  public
+    procedure LoadFromImages;                // Carga todos los PNG en la ImageCollection
+    function GetIconIndex(const AName: string): Integer;
+    destructor Destroy; override;
+  end;
+
+var
+  dmImages: TdmImages;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+{$R *.dfm}
+
+uses
+  System.Types, System.UITypes;
+
+{ TdmImages }
+
+procedure TdmImages.LoadFromImages;
+var
+  Folder, FileName, NameOnly: string;
+  Files: TArray<string>;
+  ImgItem: TImageCollectionItem;
+  I: Integer;
+begin
+  // Inicializa o limpia el diccionario de nombres
+  if FIconIndex = nil then
+    FIconIndex := TDictionary<string, Integer>.Create
+  else
+    FIconIndex.Clear;
+
+  // Limpia colecciones previas
+  ImageCollection1.Images.Clear;
+  VirtualImageList1.Images.Clear;
+
+  // Carpeta de imágenes (junto al ejecutable)
+  Folder := TPath.Combine(ExtractFilePath(ParamStr(0)), 'images');
+  if not TDirectory.Exists(Folder) then
+    Exit;
+
+  // Obtiene todos los archivos PNG y los ordena por nombre
+  Files := TDirectory.GetFiles(Folder, '*.png');
+  TArray.Sort<string>(Files);
+
+  for I := 0 to High(Files) do
+  begin
+    FileName := Files[I];
+    NameOnly := LowerCase(TPath.GetFileNameWithoutExtension(FileName));
+
+    // Añade cada imagen a la colección con su nombre
+    ImgItem := ImageCollection1.Images.Add;
+    ImgItem.Name := NameOnly;
+    ImgItem.SourceImages.Add.Source.LoadFromFile(FileName);
+
+    // Guarda el índice en el diccionario (para compatibilidad con ImageIndex)
+    FIconIndex.AddOrSetValue(NameOnly, I);
+  end;
+
+  // Conecta la VirtualImageList a la colección
+  VirtualImageList1.ImageCollection := ImageCollection1;
+  VirtualImageList1.Width  := 32;  // tamaño estándar GevenSoft
+  VirtualImageList1.Height := 32;
+  VirtualImageList1.Clear;
+  VirtualImageList1.Images.Clear;
+
+  // Copia automáticamente las referencias por nombre
+  VirtualImageList1.SyncImages;
+end;
+
+function TdmImages.GetIconIndex(const AName: string): Integer;
+begin
+  if (FIconIndex <> nil) and FIconIndex.TryGetValue(LowerCase(AName), Result) then
+    Exit;
+  Result := -1;
+end;
+
+destructor TdmImages.Destroy;
+begin
+  FIconIndex.Free;
+  inherited;
+end;
+
+end.
+

@@ -1,0 +1,43 @@
+unit FormBase;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs,Dialogoaccionusuario,toashelper;
+
+type
+  TFBase = class(TForm)
+    procedure FormCreate(Sender: TObject);
+  private
+   Dialogouserfrm: TDialogouserfrm;
+   FToastManager: TToastManager;
+
+
+    { Private declarations }
+  public
+  procedure MostrarToast(const Texto: string; Tipo: string = 'success');
+    { Public declarations }
+  end;
+
+var
+  FBase: TFBase;
+
+implementation
+
+{$R *.dfm}
+
+
+procedure TFBase.FormCreate(Sender: TObject);
+begin
+ FToastManager := TToastManager.Create(Self);
+end;
+
+procedure TFBase.MostrarToast(const Texto: string; Tipo: string = 'success');
+begin
+  if Assigned(FToastManager) then
+    FToastManager.Show(Texto, Tipo);
+end;
+
+
+end.

@@ -1,0 +1,141 @@
+﻿unit uImageResources;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.IOUtils,
+  System.Generics.Collections,
+  Vcl.ImgList, Vcl.Controls, Vcl.Graphics, Vcl.Imaging.pngimage,
+  System.ImageList;
+
+type
+  TdmImages = class(TDataModule)
+    ImageListSmall: TImageList;
+  private
+    FIconIndex: TDictionary<string, Integer>;
+    function AddPngToImageList(const FileName: string): Integer;
+    function AddBmpToImageList(const FileName: string): Integer;
+  public
+    procedure LoadFromImages; // carga PNG
+    procedure SetButtonIcon(ABtn: TButton; const AIconName: string; Align: TImageAlignment = iaLeft);
+    function GetIconIndex(const AName: string): Integer;
+    destructor Destroy; override;
+  end;
+
+var
+  dmImages: TdmImages;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+{$R *.dfm}
+
+function TdmImages.AddPngToImageList(const FileName: string): Integer;
+var
+  Png: TPngImage;
+  Bmp: TBitmap;
+begin
+  Png := TPngImage.Create;
+  Bmp := TBitmap.Create;
+  try
+    Png.LoadFromFile(FileName);
+    Bmp.Assign(Png);                   // mantiene alfa
+    Result := ImageListSmall.Add(Bmp, nil); // <-- índice real devuelto
+  finally
+    Bmp.Free;
+    Png.Free;
+  end;
+end;
+
+function TdmImages.AddBmpToImageList(const FileName: string): Integer;
+var
+  Bmp: TBitmap;
+begin
+  Bmp := TBitmap.Create;
+  try
+    Bmp.LoadFromFile(FileName);
+    // si tus BMP no tienen fondo transparente, puedes usar Add:
+    Result := ImageListSmall.Add(Bmp, nil);
+    // si necesitas máscara: Result := ImageListSmall.AddMasked(Bmp, clFuchsia);
+  finally
+    Bmp.Free;
+  end;
+end;
+
+procedure TdmImages.SetButtonIcon(ABtn: TButton; const AIconName: string; Align: TImageAlignment = iaLeft);
+begin
+  ABtn.Images := dmImages.ImageListSmall;
+  ABtn.ImageIndex := dmImages.GetIconIndex(AIconName);
+  ABtn.ImageAlignment := Align;
+  ABtn.ImageMargins.Left := 8;
+  ABtn.ImageMargins.Right := 6;
+  ABtn.ImageMargins.Top := 4;
+  ABtn.ImageMargins.Bottom := 4;
+end;
+
+procedure TdmImages.LoadFromImages;
+var
+  Folder, FileName, NameOnly: string;
+  Files: TArray<string>;
+  Png: TPngImage;
+  Bmp: TBitmap;
+  Idx: Integer;
+begin
+  // Crea o limpia el diccionario de nombres
+  if FIconIndex = nil then
+    FIconIndex := TDictionary<string, Integer>.Create
+  else
+    FIconIndex.Clear;
+
+  // Limpia el ImageList
+  ImageListSmall.Clear;
+  ImageListSmall.ColorDepth := cd32bit;  // Transparencia alfa
+  ImageListSmall.Masked := False;        // No se usa máscara en PNG
+  ImageListSmall.Width := 32;            // Tamaño estándar GevenSoft
+  ImageListSmall.Height := 32;
+
+  // Carpeta de imágenes (junto al ejecutable)
+  Folder := TPath.Combine(ExtractFilePath(ParamStr(0)), 'images');
+  if not TDirectory.Exists(Folder) then
+    Exit;
+
+  // Obtiene todos los archivos PNG y los ordena por nombre
+  Files := TDirectory.GetFiles(Folder, '*.png');
+  TArray.Sort<string>(Files);
+
+  for FileName in Files do
+  begin
+    NameOnly := LowerCase(TPath.GetFileNameWithoutExtension(FileName));
+
+    Png := TPngImage.Create;
+    Bmp := TBitmap.Create;
+    try
+      Png.LoadFromFile(FileName);
+      Bmp.Assign(Png); // Convierte manteniendo la transparencia alfa
+
+      // Añade al ImageList y guarda el índice real
+      Idx := ImageListSmall.Add(Bmp, nil);
+      FIconIndex.AddOrSetValue(NameOnly, Idx);
+
+    finally
+      Png.Free;
+      Bmp.Free;
+    end;
+  end;
+end;
+
+
+function TdmImages.GetIconIndex(const AName: string): Integer;
+begin
+  if (FIconIndex <> nil) and FIconIndex.TryGetValue(LowerCase(AName), Result) then
+    Exit;
+  Result := -1; // no encontrado
+end;
+
+destructor TdmImages.Destroy;
+begin
+  FIconIndex.Free;
+  inherited;
+end;
+
+end.

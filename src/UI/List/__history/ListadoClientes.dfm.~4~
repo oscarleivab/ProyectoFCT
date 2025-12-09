@@ -1,0 +1,23 @@
+inherited ListadoFrameCliente: TListadoFrameCliente
+  inherited panelbusquedavanzada: TPanel
+    inherited buscaedit: TEdit
+      ExplicitLeft = 164
+    end
+    inherited botonsalir: TButton
+      ExplicitLeft = 821
+    end
+  end
+  inherited Panelfiltros: TPanel
+    ExplicitTop = 62
+  end
+  inherited Listadogrid: TStringGrid
+    ExplicitTop = 75
+    ExplicitHeight = 591
+  end
+  inherited FDQuery: TFDQuery
+    Left = 528
+  end
+  inherited DataSource: TDataSource
+    Left = 456
+  end
+end

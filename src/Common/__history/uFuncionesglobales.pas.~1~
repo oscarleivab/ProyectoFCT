@@ -1,0 +1,91 @@
+unit uFuncionesglobales;
+
+interface
+
+uses
+
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.WinXPickers,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Phys, FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.VCLUI.Wait,
+  Data.DB, FireDAC.Comp.Client, FireDAC.Phys.IBDef, FireDAC.Phys.IBBase,
+  FireDAC.Phys.IB, FireDAC.Stan.Param, FireDAC.DatS,toashelper,
+  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Grids, Vcl.ExtCtrls,
+  Vcl.Buttons, Datasnap.Provider, Datasnap.DBClient, Vcl.DBGrids,Vcl.DBCtrls, Vcl.ComCtrls, Vcl.Mask,System.Hash;
+
+  //FUNCIONES GLOBALES
+  procedure SeleccionarComboPorID(Combo: TComboBox; ID: Integer);
+  procedure CargarDatosEnGrid(Query: TFDQuery; Grid: TStringGrid);
+  procedure AjustarAnchoColumnas(Grid: TStringGrid);
+  procedure OcultarColumnas(Grid: TStringGrid; Columnas: array of Integer);
+  function GetSHA256(const Texto: string): string;
+
+implementation
+
+function GetSHA256(const Texto: string): string;
+begin
+  Result := THashSHA2.GetHashString(Texto, SHA256);
+end;
+
+procedure SeleccionarComboPorID(Combo: TComboBox; ID: Integer);
+var
+  i: Integer;
+begin
+  for i := 0 to Combo.Items.Count - 1 do
+    if Integer(Combo.Items.Objects[i]) = ID then
+    begin
+      Combo.ItemIndex := i;
+      Break;
+    end;
+end;
+
+procedure CargarDatosEnGrid(Query: TFDQuery; Grid: TStringGrid);
+var
+  i, row: Integer;
+begin
+  // Configurar las columnas del StringGrid
+  Grid.ColCount := Query.FieldCount;
+  for i := 0 to Query.FieldCount - 1 do
+    Grid.Cells[i, 0] := Uppercase(Query.Fields[i].DisplayName);
+
+  // Configurar las filas del StringGrid
+  Grid.RowCount := Query.RecordCount + 1;
+  row := 1;
+  Query.First;
+  while not Query.Eof do
+  begin
+    for i := 0 to Query.FieldCount - 1 do
+      Grid.Cells[i, row] := Query.Fields[i].AsString;
+    Inc(row);
+    Query.Next;
+  end;
+end;
+
+procedure AjustarAnchoColumnas(Grid: TStringGrid);
+var
+  Col, Row, MaxWidth: Integer;
+  Texto: string;
+begin
+  for Col := 0 to Grid.ColCount - 1 do
+  begin
+    MaxWidth := Grid.Canvas.TextWidth(Grid.Cells[Col, 0]) + 10; // Ancho del encabezado
+    for Row := 1 to Grid.RowCount - 1 do
+    begin
+      Texto := Grid.Cells[Col, Row];
+      if Grid.Canvas.TextWidth(Texto) + 10 > MaxWidth then
+        MaxWidth := Grid.Canvas.TextWidth(Texto) + 10;
+    end;
+    Grid.ColWidths[Col] := MaxWidth;
+  end;
+end;
+
+procedure OcultarColumnas(Grid: TStringGrid; Columnas: array of Integer);
+var
+  i: Integer;
+begin
+  for i := Low(Columnas) to High(Columnas) do
+    Grid.ColWidths[Columnas[i]] := 0;
+end;
+
+end.

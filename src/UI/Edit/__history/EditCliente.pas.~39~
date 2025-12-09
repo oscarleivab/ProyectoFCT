@@ -1,0 +1,162 @@
+unit EditCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FrameEdit, Vcl.StdCtrls, Vcl.ExtCtrls,uClienteModel, uClientesService,
+  Vcl.WinXCtrls,utoashelper,uTranslator;
+
+type
+  TFrEditCliente = class(TFrEdit)
+    ScrollBox1: TScrollBox;
+    pandeldatosfiscales: TPanel;
+    labeldatoscontacto: TLabel;
+    labelcontacto: TLabel;
+    labeltelefono1: TLabel;
+    labeltelefono2: TLabel;
+    labelemail: TLabel;
+    personacontacto: TEdit;
+    telefono1edit: TEdit;
+    telefono2edit: TEdit;
+    emailedit: TEdit;
+    Panel1: TPanel;
+    Panel7: TPanel;
+    labeldirecciones: TLabel;
+    Panel9: TPanel;
+    Panel2: TPanel;
+    Panel8: TPanel;
+    labelbanco: TLabel;
+    Panel10: TPanel;
+    Panel3: TPanel;
+    labelaccesos: TLabel;
+    labelweb: TLabel;
+    labelusuario: TLabel;
+    labelpass: TLabel;
+    Webedit: TEdit;
+    usuarioedit: TEdit;
+    passwordedit: TEdit;
+    Panel6: TPanel;
+    labeltarifaypermisos: TLabel;
+    labeltarifa: TLabel;
+    labelpermiso: TLabel;
+    tipotarifabox: TComboBox;
+    grupopermisobox: TComboBox;
+    activocheck: TToggleSwitch;
+    Panel4: TPanel;
+    labelobservaciones: TLabel;
+    observacionesmemo: TMemo;
+    Panel5: TPanel;
+    labeldatosfiscales: TLabel;
+    labeltipo: TLabel;
+    labeldocumento: TLabel;
+    labelnombre: TLabel;
+    labelapellidos: TLabel;
+    labelempresa: TLabel;
+    labelcodigo: TLabel;
+    tipodocbox: TComboBox;
+    documentoedit: TEdit;
+    nombreedit: TEdit;
+    apellidosedit: TEdit;
+    Empresaedit: TEdit;
+    idedit: TEdit;
+    Panel11: TPanel;
+  private
+    Cliente:TCliente;
+    { Private declarations }
+  public
+    Procedure Cargardatos(Id:Integer); Override;
+    Procedure Grabardatos;
+    Procedure CargarClienteEnFormulario;
+    Procedure CargarFormularioEnCliente;
+    Procedure DoAdd; Override;
+    Procedure DoSave; Override;
+    { Public declarations }
+  end;
+
+var
+  FrEditCliente: TFrEditCliente;
+
+implementation
+
+Procedure TFrEditCliente.CargarFormularioEnCliente;
+begin
+  Cliente.IdCliente        :=   StrToIntDef(idEdit.Text, 0);
+  Cliente.Nombre           :=   nombreedit.Text;
+  Cliente.Apellidos        :=   apellidosedit.Text;
+  Cliente.IdTipoDocumento  :=   tipodocbox.ItemIndex;
+  Cliente.DetalleDocumento :=   documentoedit.Text;
+  Cliente.Empresa          :=   EmpresaEdit.Text;
+  Cliente.Telefono1        :=   Telefono1Edit.Text;
+  Cliente.Telefono2        :=   Telefono2Edit.Text;
+  Cliente.Email            :=   EmailEdit.Text;
+  Cliente.PersonaContacto  :=   PersonaContacto.Text;
+  Cliente.UserLogin        :=   UsuarioEdit.Text;
+  Cliente.PassLogin        :=   PasswordEdit.Text;
+  Cliente.UrlWeb           :=   WebEdit.Text;
+  Cliente.IdTarifa         :=   TipoTarifaBox.ItemIndex;
+  Cliente.IdPermiso        :=   GrupoPermisoBox.ItemIndex;
+  Cliente.Observaciones    :=   observacionesmemo.Text;
+end;
+
+Procedure TFrEditCliente.CargarClienteEnFormulario;
+begin
+  idEdit.Text                 := Cliente.IdCliente.ToString;
+  nombreEdit.Text             := Cliente.Nombre;
+  apellidosEdit.Text          := Cliente.Apellidos;
+  tipoDocBox.ItemIndex        := Cliente.IdTipoDocumento;
+  documentoEdit.Text          := Cliente.DetalleDocumento;
+  empresaEdit.Text            := Cliente.Empresa;
+  telefono1Edit.Text          := Cliente.Telefono1;
+  telefono2Edit.Text          := Cliente.Telefono2;
+  emailEdit.Text              := Cliente.Email;
+  personaContacto.Text        := Cliente.PersonaContacto;
+  usuarioEdit.Text            := Cliente.UserLogin;
+  passwordEdit.Text           := Cliente.PassLogin;
+  webEdit.Text                := Cliente.UrlWeb;
+  tipoTarifaBox.ItemIndex     := Cliente.IdTarifa;
+  grupoPermisoBox.ItemIndex   := Cliente.IdPermiso;
+  observacionesmemo.Text      := Cliente.Observaciones;
+end;
+
+Procedure TFrEditCliente.Cargardatos(Id:Integer);
+begin
+   try
+     Cliente:=TCliente.Create;
+     Cliente:=TClientesService.Cargardatos(Id);
+     CargarClienteEnFormulario;
+  except
+    on E: Exception do
+      MostrarToast(T_('Errores','errorload')+' '+ E.Message, 'error');
+  end;
+
+end;
+
+Procedure TFrEditCliente.DoAdd;
+begin
+  Cargardatos(0);
+end;
+
+Procedure TFrEditCliente.DoSave;
+begin
+  Grabardatos;
+end;
+
+Procedure TFrEditCliente.Grabardatos;
+begin
+
+  try
+    CargarFormularioEnCliente;
+    Cliente.IdCliente:= TClientesService.Grabardatos(Cliente);
+    MostrarToast(T_('info','saveok'), 'ok');
+  except
+    on E: Exception do
+      MostrarToast(T_('Errores','errorsave')+' '+ E.Message, 'error');
+  end;
+end;
+
+
+
+{$R *.dfm}
+
+end.

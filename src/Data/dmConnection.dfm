@@ -1,25 +1,29 @@
-object W: TW
-  Height = 208
+object DataModuleConnection: TDataModuleConnection
+  Height = 138
   Width = 640
   object FDConnectionMain: TFDConnection
     Params.Strings = (
-      'DriverID=PG')
-    Left = 80
-    Top = 80
+      'DriverID=PG'
+      'Port=5433'
+      'Password=48954146')
+    LoginPrompt = False
+    Left = 72
+    Top = 24
+  end
+  object FDPhysPgDriverLink1: TFDPhysPgDriverLink
+    VendorLib = 'C:\Program Files\PostgreSQL\17\bin\libpq.dll'
+    Left = 200
+    Top = 24
+  end
+  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    Left = 320
+    Top = 24
   end
   object FDConnectionCompany: TFDConnection
     Params.Strings = (
       'DriverID=PG')
-    Left = 216
-    Top = 80
-  end
-  object FDPhysPgDriverLink1: TFDPhysPgDriverLink
-    Left = 360
-    Top = 80
-  end
-  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
-    Provider = 'Forms'
-    Left = 488
-    Top = 80
+    Left = 456
+    Top = 24
   end
 end

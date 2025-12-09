@@ -1,0 +1,52 @@
+﻿unit uUIStyle;
+
+interface
+
+uses
+  Vcl.Controls, Vcl.ImgList, Vcl.Buttons, System.SysUtils;
+
+type
+  // <-- tipo compatible con métodos de objeto como dmImages.GetIconIndex
+  TGetIndexFunc = function(const AName: string): Integer of object;
+
+procedure StyleIconBitBtn(ABtn: TBitBtn; AImages: TImageList;
+  const AIconIndex: Integer; AIsDefault: Boolean = False;
+  AIsCancel: Boolean = False; ASpacing: Integer = 6);
+
+procedure StyleIconBitBtnByName(ABtn: TBitBtn; AImages: TImageList;
+  const AIconName: string; AGetIndexFunc: TGetIndexFunc;
+  AIsDefault: Boolean = False; AIsCancel: Boolean = False;
+  ASpacing: Integer = 6);
+
+implementation
+
+procedure StyleIconBitBtn(ABtn: TBitBtn; AImages: TImageList;
+  const AIconIndex: Integer; AIsDefault, AIsCancel: Boolean; ASpacing: Integer);
+begin
+  ABtn.Glyph.SetSize(AImages.Width, AImages.Height);
+  AImages.GetBitmap(AIconIndex, ABtn.Glyph);
+
+  ABtn.NumGlyphs := 1;
+  ABtn.Layout    := blGlyphLeft;
+  ABtn.Spacing   := ASpacing;
+  ABtn.Margin    := -1;
+
+  ABtn.Default := AIsDefault;
+  ABtn.Cancel  := AIsCancel;
+end;
+
+procedure StyleIconBitBtnByName(ABtn: TBitBtn; AImages: TImageList;
+  const AIconName: string; AGetIndexFunc: TGetIndexFunc;
+  AIsDefault, AIsCancel: Boolean; ASpacing: Integer);
+var
+  Idx: Integer;
+begin
+  Idx := -1;
+  if Assigned(AGetIndexFunc) then
+    Idx := AGetIndexFunc(AIconName);
+  if Idx >= 0 then
+    StyleIconBitBtn(ABtn, AImages, Idx, AIsDefault, AIsCancel, ASpacing);
+end;
+
+end.
+

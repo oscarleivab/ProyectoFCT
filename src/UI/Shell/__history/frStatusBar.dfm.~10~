@@ -1,0 +1,40 @@
+object frameStatusBar: TframeStatusBar
+  Left = 0
+  Top = 0
+  Width = 800
+  Height = 28
+  Align = alBottom
+  TabOrder = 0
+  object pnlBackground: TPanel
+    Align = alClient
+    BevelOuter = bvNone
+    Color = clBtnFace
+    ParentBackground = False
+    TabOrder = 0
+    object lblUser: TLabel
+      Left = 10
+      Top = 6
+      Caption = 'Usuario: ---'
+      Font.Style = [fsBold]
+      Transparent = True
+    end
+    object lblCompany: TLabel
+      Left = 180
+      Top = 6
+      Caption = 'Empresa: ---'
+      Transparent = True
+    end
+    object lblConnection: TLabel
+      Left = 380
+      Top = 6
+      Caption = 'Estado: ---'
+      Transparent = True
+    end
+    object lblVersion: TLabel
+      Left = 600
+      Top = 6
+      Caption = 'Versión: ---'
+      Transparent = True
+    end
+  end
+end

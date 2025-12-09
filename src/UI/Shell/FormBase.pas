@@ -1,0 +1,63 @@
+unit FormBase;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs,faccionusuario,utoashelper;
+
+type
+  TFBase = class(TForm)
+    procedure FormCreate(Sender: TObject);
+
+  private
+   Dialogouserfrm: TDialogouserfrm;
+   FToastManager: TToastManager;
+
+   procedure liberarObjetos;
+    { Private declarations }
+  public
+  procedure MostrarToast(const Texto: string; Tipo: string = 'success');
+    { Public declarations }
+
+  protected
+    destructor Destroy; override;
+  end;
+
+var
+  FBase: TFBase;
+
+implementation
+
+{$R *.dfm}
+
+
+procedure TFBase.FormCreate(Sender: TObject);
+begin
+ FToastManager := TToastManager.Create(Self);
+ Dialogouserfrm := TDialogouserfrm.Create(Self);
+end;
+
+procedure TFBase.MostrarToast(const Texto: string; Tipo: string = 'success');
+begin
+  if Assigned(FToastManager) then
+    FToastManager.Show(Texto, Tipo);
+end;
+
+destructor TFBase.Destroy;
+begin
+  liberarObjetos;
+  inherited;
+end;
+
+procedure TFBase.liberarObjetos;
+begin
+ if Assigned(FToastManager) then
+    begin
+      FToastManager.ClearAll;
+    end;
+end;
+
+
+
+end.

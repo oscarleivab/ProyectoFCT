@@ -1,4 +1,4 @@
-unit uTranslator;
+ï»¿unit uTranslator;
 
 interface
 
@@ -20,7 +20,7 @@ type
     // Devuelve el texto traducido; si no existe, devuelve Default o la clave
     function GetText(const Section, Key: string; const Default: string = ''): string;
 
-    // Saber si una clave existe (aunque su valor sea vacío)
+    // Saber si una clave existe (aunque su valor sea vacÃ­o)
     function ValueExists(const Section, Key: string): Boolean;
 
     // Cambiar idioma en caliente
@@ -35,15 +35,15 @@ procedure UseLanguage(const Lang: string);
 procedure LoadAvailableLanguages(ACombo: TComboBox);
 function Translator: TTranslator;
 
-// === Aplicar traducción al árbol de componentes (Form, Frame, DataModule, etc.) ===
-// SIN overloads, SIN parámetros por defecto
+// === Aplicar traducciÃ³n al Ã¡rbol de componentes (Form, Frame, DataModule, etc.) ===
+// SIN overloads, SIN parÃ¡metros por defecto
 procedure TranslateTree(Root: TComponent; const Section: string);
 
 // === Utilidades para cambio de idioma en caliente (opcional) ===
 procedure TranslateAllOpenUI;
 procedure UseLanguageAndRefresh(const Lang: string);
 
-// === Banderas de exclusión por Tag (útiles para combos llenados desde BBDD, etc.) ===
+// === Banderas de exclusiÃ³n por Tag (Ãºtiles para combos llenados desde BBDD, etc.) ===
 const
   NT_SKIP_ALL   = $1; // No traducir nada del control
   NT_SKIP_ITEMS = $2; // No traducir Items (listas)
@@ -51,7 +51,7 @@ const
   _MISS = #1; // sentinela para detectar "no encontrado"
 var
   // Opcional: cambiar la ruta base de idiomas si no quieres la carpeta por defecto
-  TranslationsBasePath: string = ''; // si está vacío: usa carpeta del EXE\idiomas\
+  TranslationsBasePath: string = ''; // si estÃ¡ vacÃ­o: usa carpeta del EXE\idiomas\
 
 implementation
 
@@ -63,7 +63,7 @@ uses
 var
   GTranslator: TTranslator;
 
-{ ---------- Utilidad local para evitar ambigüedad con StringReplace ---------- }
+{ ---------- Utilidad local para evitar ambigÃ¼edad con StringReplace ---------- }
 
 function ReplaceAll(const S, OldPattern, NewPattern: string): string; inline;
 begin
@@ -104,12 +104,12 @@ begin
 
   if not TFile.Exists(FileName) then
   begin
-    if not SameText(Lang, 'Español') then
+    if not SameText(Lang, 'EspaÃ±ol') then
     begin
-      FileName := LangFilePath('Español');
+      FileName := LangFilePath('EspaÃ±ol');
       if not TFile.Exists(FileName) then
         raise Exception.CreateFmt('No se encuentra el archivo de idioma: %s', [LangFilePath(Lang)]);
-      FLang := 'Español';
+      FLang := 'EspaÃ±ol';
     end
     else
       raise Exception.CreateFmt('No se encuentra el archivo de idioma: %s', [FileName]);
@@ -136,9 +136,9 @@ begin
     Result := FIni.ReadString(Section, Key, Default)
   else
   begin
-    // default vacío para permitir valores vacíos reales
+    // default vacÃ­o para permitir valores vacÃ­os reales
     Result := FIni.ReadString(Section, Key, '');
-    // Si la clave NO existe, usar la propia Key como fallback (útil para depurar)
+    // Si la clave NO existe, usar la propia Key como fallback (Ãºtil para depurar)
     if (Result = '') and (not ValueExists(Section, Key)) then
       Result := Key;
   end;
@@ -208,7 +208,7 @@ begin
   end;
 end;
 
-{ ----------------------------- Traducción visual --------------------------- }
+{ ----------------------------- TraducciÃ³n visual --------------------------- }
 
 
 
@@ -228,7 +228,7 @@ begin
   FullKey := CompKey + '.' + PropName;
   Result := Translator.ValueExists(Section, FullKey);
   if Result then
-    Value := Translator.GetText(Section, FullKey, ''); // conserva vacío real
+    Value := Translator.GetText(Section, FullKey, ''); // conserva vacÃ­o real
 end;
 
 function ShouldSkipTranslate(C: TComponent): Boolean;
@@ -365,7 +365,7 @@ begin
     Exit;
   end;
 
-  // --- Menús ---
+  // --- MenÃºs ---
   if C is TMenuItem then
   begin
     if TMenuItem(C).Action = nil then
@@ -472,7 +472,7 @@ begin
 
   TranslateOne(C, SectionName);
 
-  // Solo recorremos el árbol de ownership
+  // Solo recorremos el Ã¡rbol de ownership
   for I := 0 to C.ComponentCount - 1 do
     RecurseComponent(C.Components[I], SectionName);
 end;
@@ -499,11 +499,11 @@ var
 begin
   // DataModules
   for I := 0 to Screen.DataModuleCount - 1 do
-    TranslateTree(Screen.DataModules[I], ''); // SIEMPRE con 2º parámetro
+    TranslateTree(Screen.DataModules[I], ''); // SIEMPRE con 2Âº parÃ¡metro
 
   // Formularios
   for I := 0 to Screen.FormCount - 1 do
-    TranslateTree(Screen.Forms[I], '');       // SIEMPRE con 2º parámetro
+    TranslateTree(Screen.Forms[I], '');       // SIEMPRE con 2Âº parÃ¡metro
 end;
 
 procedure UseLanguageAndRefresh(const Lang: string);

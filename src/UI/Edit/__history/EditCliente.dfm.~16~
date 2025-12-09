@@ -1,0 +1,597 @@
+inherited FrEditCliente: TFrEditCliente
+  Width = 895
+  Height = 1170
+  ExplicitWidth = 895
+  ExplicitHeight = 1170
+  inherited paneltop: TPanel
+    Width = 895
+    OnClick = paneltopClick
+    ExplicitWidth = 895
+    inherited Buttonsalir: TButton
+      Left = 830
+      ExplicitLeft = 830
+    end
+  end
+  object ScrollBox1: TScrollBox
+    Left = 0
+    Top = 65
+    Width = 895
+    Height = 1105
+    Align = alClient
+    BevelInner = bvNone
+    BevelOuter = bvNone
+    BorderStyle = bsNone
+    ParentBackground = True
+    TabOrder = 1
+    OnMouseWheelDown = ScrollBox1MouseWheelDown
+    OnMouseWheelUp = ScrollBox1MouseWheelUp
+    object pandeldatosfiscales: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 150
+      Width = 865
+      Height = 101
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 0
+      object labeldatoscontacto: TLabel
+        AlignWithMargins = True
+        Left = 10
+        Top = 10
+        Width = 852
+        Height = 15
+        Margins.Left = 10
+        Margins.Top = 10
+        Align = alTop
+        Caption = 'Datos contacto'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowFrame
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        ExplicitWidth = 80
+      end
+      object labelcontacto: TLabel
+        Left = 299
+        Top = 68
+        Width = 49
+        Height = 15
+        Caption = 'Contacto'
+      end
+      object labeltelefono1: TLabel
+        Left = 10
+        Top = 39
+        Width = 55
+        Height = 15
+        Caption = 'Tel'#233'fono 1'
+      end
+      object labeltelefono2: TLabel
+        Left = 10
+        Top = 68
+        Width = 55
+        Height = 15
+        Caption = 'Tel'#233'fono 2'
+      end
+      object labelemail: TLabel
+        Left = 299
+        Top = 39
+        Width = 29
+        Height = 15
+        Caption = 'Email'
+      end
+      object personacontacto: TEdit
+        Left = 359
+        Top = 63
+        Width = 417
+        Height = 23
+        Hint = 'Empresa'
+        TabOrder = 0
+      end
+      object telefono1edit: TEdit
+        Left = 94
+        Top = 34
+        Width = 166
+        Height = 23
+        Hint = 'DNI/CIF'
+        TabOrder = 1
+      end
+      object telefono2edit: TEdit
+        Left = 94
+        Top = 63
+        Width = 166
+        Height = 23
+        Hint = 'DNI/CIF'
+        TabOrder = 2
+      end
+      object emailedit: TEdit
+        Left = 359
+        Top = 34
+        Width = 417
+        Height = 23
+        Hint = 'Empresa'
+        TabOrder = 3
+      end
+    end
+    object Panel1: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 269
+      Width = 865
+      Height = 179
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 1
+      ExplicitLeft = 25
+      ExplicitTop = 312
+      object Panel7: TPanel
+        Left = 0
+        Top = 0
+        Width = 865
+        Height = 25
+        Margins.Left = 15
+        Margins.Right = 15
+        Margins.Bottom = 15
+        Align = alTop
+        BevelOuter = bvNone
+        ParentColor = True
+        TabOrder = 0
+        ExplicitLeft = 20
+        object labeldirecciones: TLabel
+          AlignWithMargins = True
+          Left = 10
+          Top = 10
+          Width = 61
+          Height = 12
+          Margins.Left = 10
+          Margins.Top = 10
+          Align = alLeft
+          Caption = 'Direcciones'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowFrame
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          ExplicitHeight = 15
+        end
+      end
+      object Panel9: TPanel
+        AlignWithMargins = True
+        Left = 10
+        Top = 28
+        Width = 50
+        Height = 149
+        Margins.Left = 10
+        Margins.Right = 15
+        Margins.Bottom = 0
+        Align = alLeft
+        BevelOuter = bvNone
+        ParentColor = True
+        TabOrder = 1
+        ExplicitHeight = 151
+      end
+    end
+    object Panel2: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 648
+      Width = 865
+      Height = 179
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 2
+      ExplicitTop = 669
+      object Panel8: TPanel
+        Left = 0
+        Top = 0
+        Width = 865
+        Height = 25
+        Margins.Left = 15
+        Margins.Right = 15
+        Margins.Bottom = 15
+        Align = alTop
+        BevelOuter = bvNone
+        ParentColor = True
+        TabOrder = 0
+        object labelbanco: TLabel
+          AlignWithMargins = True
+          Left = 10
+          Top = 10
+          Width = 33
+          Height = 12
+          Margins.Left = 10
+          Margins.Top = 10
+          Align = alLeft
+          Caption = 'Banco'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowFrame
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          ExplicitHeight = 15
+        end
+      end
+      object Panel10: TPanel
+        AlignWithMargins = True
+        Left = 10
+        Top = 28
+        Width = 49
+        Height = 149
+        Margins.Left = 10
+        Margins.Right = 15
+        Margins.Bottom = 0
+        Align = alLeft
+        BevelOuter = bvNone
+        ParentColor = True
+        TabOrder = 1
+        ExplicitHeight = 151
+      end
+    end
+    object Panel3: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 845
+      Width = 865
+      Height = 102
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 3
+      ExplicitTop = 866
+      object labelaccesos: TLabel
+        AlignWithMargins = True
+        Left = 10
+        Top = 10
+        Width = 852
+        Height = 15
+        Margins.Left = 10
+        Margins.Top = 10
+        Align = alTop
+        Caption = 'Accesos'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowFrame
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        ExplicitWidth = 43
+      end
+      object labelweb: TLabel
+        Left = 10
+        Top = 70
+        Width = 48
+        Height = 15
+        Caption = 'Web URL'
+      end
+      object labelusuario: TLabel
+        Left = 10
+        Top = 41
+        Width = 40
+        Height = 15
+        Caption = 'Usuario'
+      end
+      object labelpass: TLabel
+        Left = 422
+        Top = 41
+        Width = 95
+        Height = 15
+        Caption = 'Nueva contrase'#241'a'
+      end
+      object Webedit: TEdit
+        Left = 94
+        Top = 67
+        Width = 710
+        Height = 23
+        TabOrder = 0
+      end
+      object usuarioedit: TEdit
+        Left = 94
+        Top = 38
+        Width = 289
+        Height = 23
+        TabOrder = 1
+      end
+      object passwordedit: TEdit
+        Left = 523
+        Top = 38
+        Width = 281
+        Height = 23
+        PasswordChar = '*'
+        TabOrder = 2
+      end
+    end
+    object Panel6: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 965
+      Width = 865
+      Height = 77
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 4
+      ExplicitTop = 986
+      object labeltarifaypermisos: TLabel
+        AlignWithMargins = True
+        Left = 10
+        Top = 10
+        Width = 852
+        Height = 15
+        Margins.Left = 10
+        Margins.Top = 10
+        Align = alTop
+        Caption = 'Tarifa y permisos'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowFrame
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        ExplicitWidth = 89
+      end
+      object labeltarifa: TLabel
+        Left = 10
+        Top = 42
+        Width = 76
+        Height = 15
+        Caption = 'Tarifa aplicada'
+      end
+      object labelpermiso: TLabel
+        Left = 354
+        Top = 44
+        Width = 48
+        Height = 15
+        Caption = 'Permisos'
+      end
+      object tipotarifabox: TComboBox
+        Left = 94
+        Top = 39
+        Width = 204
+        Height = 23
+        Style = csDropDownList
+        TabOrder = 0
+        TabStop = False
+      end
+      object grupopermisobox: TComboBox
+        Left = 420
+        Top = 41
+        Width = 197
+        Height = 23
+        Style = csDropDownList
+        TabOrder = 1
+        TabStop = False
+      end
+      object activocheck: TToggleSwitch
+        Left = 706
+        Top = 41
+        Width = 98
+        Height = 20
+        Alignment = taLeftJustify
+        State = tssOn
+        StateCaptions.CaptionOn = 'Activo'
+        StateCaptions.CaptionOff = 'Inactivo'
+        StyleName = 'Windows'
+        TabOrder = 2
+      end
+    end
+    object Panel4: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 466
+      Width = 865
+      Height = 164
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 5
+      object labelobservaciones: TLabel
+        AlignWithMargins = True
+        Left = 10
+        Top = 10
+        Width = 852
+        Height = 15
+        Margins.Left = 10
+        Margins.Top = 10
+        Align = alTop
+        Caption = 'Observaciones'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowFrame
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        ExplicitWidth = 77
+      end
+      object observacionesmemo: TMemo
+        AlignWithMargins = True
+        Left = 20
+        Top = 38
+        Width = 825
+        Height = 104
+        Hint = 'Observaciones'
+        Margins.Left = 20
+        Margins.Top = 10
+        Margins.Right = 20
+        Margins.Bottom = 20
+        Align = alClient
+        Color = 16121598
+        TabOrder = 0
+        ExplicitHeight = 115
+      end
+    end
+    object Panel5: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 3
+      Width = 865
+      Height = 129
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelEdges = [beBottom]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 6
+      object labeldatosfiscales: TLabel
+        AlignWithMargins = True
+        Left = 10
+        Top = 10
+        Width = 852
+        Height = 15
+        Margins.Left = 10
+        Margins.Top = 10
+        Align = alTop
+        Caption = 'Datos fiscales'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowFrame
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        ExplicitWidth = 71
+      end
+      object labeltipo: TLabel
+        Left = 10
+        Top = 67
+        Width = 24
+        Height = 15
+        Caption = 'Tipo'
+      end
+      object labeldocumento: TLabel
+        Left = 10
+        Top = 96
+        Width = 63
+        Height = 15
+        Caption = 'Documento'
+      end
+      object labelnombre: TLabel
+        Left = 299
+        Top = 35
+        Width = 44
+        Height = 15
+        Caption = 'Nombre'
+      end
+      object labelapellidos: TLabel
+        Left = 299
+        Top = 64
+        Width = 49
+        Height = 15
+        Caption = 'Apellidos'
+      end
+      object labelempresa: TLabel
+        Left = 299
+        Top = 93
+        Width = 45
+        Height = 15
+        Caption = 'Empresa'
+      end
+      object labelcodigo: TLabel
+        Left = 10
+        Top = 38
+        Width = 11
+        Height = 15
+        Caption = 'ID'
+      end
+      object tipodocbox: TComboBox
+        Left = 94
+        Top = 64
+        Width = 166
+        Height = 23
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        Style = csDropDownList
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 0
+        Items.Strings = (
+          'DNI'
+          'CIF'
+          'PASAPORTE')
+      end
+      object documentoedit: TEdit
+        Left = 94
+        Top = 93
+        Width = 166
+        Height = 23
+        TabOrder = 1
+      end
+      object nombreedit: TEdit
+        Left = 359
+        Top = 32
+        Width = 417
+        Height = 23
+        Hint = 'Nombre'
+        TabOrder = 2
+      end
+      object apellidosedit: TEdit
+        Left = 359
+        Top = 61
+        Width = 417
+        Height = 23
+        Hint = 'Apellidos'
+        TabOrder = 3
+      end
+      object Empresaedit: TEdit
+        Left = 359
+        Top = 90
+        Width = 417
+        Height = 23
+        Hint = 'Empresa'
+        TabOrder = 4
+      end
+      object idedit: TEdit
+        Left = 94
+        Top = 35
+        Width = 166
+        Height = 23
+        ReadOnly = True
+        TabOrder = 5
+      end
+    end
+    object Panel11: TPanel
+      AlignWithMargins = True
+      Left = 15
+      Top = 1060
+      Width = 865
+      Height = 9
+      Margins.Left = 15
+      Margins.Right = 15
+      Margins.Bottom = 15
+      Align = alTop
+      BevelOuter = bvNone
+      ParentColor = True
+      TabOrder = 7
+      ExplicitTop = 1081
+    end
+  end
+end

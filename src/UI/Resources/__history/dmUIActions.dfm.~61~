@@ -1,0 +1,106 @@
+object dmActions: TdmActions
+  OnCreate = DataModuleCreate
+  Height = 240
+  Width = 320
+  object ActionManager1: TActionManager
+    ActionBars = <
+      item
+        Items = <
+          item
+            Action = ActCliente
+            Caption = '&Clientes'
+            ImageIndex = 4
+            ImageName = 'cliente'
+          end>
+      end
+      item
+        Items = <
+          item
+            Items = <
+              item
+                Action = actApagar
+                Caption = '&Apagar'
+                ImageIndex = 0
+                ImageName = 'apagar'
+              end>
+            Caption = '&Menu'
+          end
+          item
+            Caption = '-'
+          end
+          item
+            Items = <
+              item
+                Action = ActCliente
+                Caption = '&Clientes'
+                ImageIndex = 4
+                ImageName = 'cliente'
+              end>
+            Caption = '&Entidad'
+            ImageIndex = 0
+            ImageName = 'apagar'
+          end>
+      end>
+    Images = dmImages.VirtualImageList1
+    Left = 176
+    Top = 40
+    StyleName = 'Platform Default'
+    object ActCliente: TAction
+      Category = 'Entidad1'
+      Caption = 'Clientes'
+      ImageIndex = 4
+      ImageName = 'cliente'
+    end
+    object actLogin: TAction
+      Caption = 'Conectar'
+      ImageIndex = 1
+      ImageName = 'loginico'
+    end
+    object actLogout: TAction
+      Caption = 'Salir'
+      ImageIndex = 2
+      ImageName = 'logout'
+    end
+    object actSearch: TAction
+      Caption = 'Buscar'
+      ImageIndex = 3
+      ImageName = 'buscarico'
+      OnExecute = actSearchExecute
+    end
+    object actApagar: TAction
+      Category = 'Menu'
+      Caption = 'Apagar'
+      ImageIndex = 0
+      ImageName = 'apagar'
+    end
+    object actClose: TAction
+      Caption = 'Cerrar'
+      ImageIndex = 5
+      ImageName = 'cerrar'
+      OnExecute = actCloseExecute
+    end
+    object actClearFilter: TAction
+      Caption = 'ClearFilter'
+      ImageIndex = 7
+      ImageName = 'borrarfiltro'
+      OnExecute = actClearFilterExecute
+    end
+    object actFilter: TAction
+      Caption = 'Filter'
+      ImageIndex = 6
+      ImageName = 'filtro'
+      OnExecute = actFilterExecute
+    end
+    object actAdd: TAction
+      Caption = 'Add'
+      ImageIndex = 8
+      ImageName = 'new'
+      OnExecute = actAddExecute
+    end
+    object actEdit: TAction
+      Caption = 'Edit'
+      ImageIndex = 9
+      ImageName = 'edit'
+    end
+  end
+end

@@ -1,0 +1,40 @@
+object FrameStatusBar: TFrameStatusBar
+  Left = 0
+  Top = 0
+  Width = 800
+  Height = 28
+  Align = alBottom
+  TabOrder = 0
+  object pnlBackground: TPanel
+    Left = 0
+    Top = 0
+    Width = 800
+    Height = 28
+    Align = alClient
+    BevelOuter = bvNone
+    ParentBackground = False
+    TabOrder = 0
+    object lblUser: TLabel
+      Left = 10
+      Top = 6
+      Width = 63
+      Height = 15
+      Caption = 'Usuario: ---'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Transparent = True
+    end
+    object lblCompany: TLabel
+      Left = 180
+      Top = 6
+      Width = 66
+      Height = 15
+      Caption = 'Empresa: ---'
+      Transparent = True
+    end
+  end
+end

@@ -1,0 +1,106 @@
+﻿unit uUIStyle;
+
+interface
+
+uses
+  Vcl.ImgList,      // TCustomImageList
+  Vcl.Buttons,      // TBitBtn
+  Vcl.StdCtrls;     // TButton
+
+type
+  // Para pasar dmImages.GetIconIndex (método de objeto)
+  TGetIndexFunc = function(const AName: string): Integer of object;
+
+procedure StyleIconBitBtn(ABtn: TBitBtn; AImages: TCustomImageList;
+  const AIconIndex: Integer; AIsDefault: Boolean = False;
+  AIsCancel: Boolean = False; ASpacing: Integer = 6);
+
+procedure StyleIconButton(ABtn: TButton; AImages: TCustomImageList;
+  const AIconIndex: Integer; AIsDefault: Boolean = False;
+  AIsCancel: Boolean = False; ASpacing: Integer = 6);
+
+procedure StyleIconBitBtnByName(ABtn: TBitBtn; AImages: TCustomImageList;
+  const AIconName: string; AGetIndexFunc: TGetIndexFunc;
+  AIsDefault: Boolean = False; AIsCancel: Boolean = False;
+  ASpacing: Integer = 6);
+
+procedure StyleIconButtonByName(ABtn: TButton; AImages: TCustomImageList;
+  const AIconName: string; AGetIndexFunc: TGetIndexFunc;
+  AIsDefault: Boolean = False; AIsCancel: Boolean = False;
+  ASpacing: Integer = 6);
+
+implementation
+
+// -----------------------------------------------------------------------------
+// BITBTN (usa Glyph)
+// -----------------------------------------------------------------------------
+procedure StyleIconBitBtn(ABtn: TBitBtn; AImages: TCustomImageList;
+  const AIconIndex: Integer; AIsDefault, AIsCancel: Boolean; ASpacing: Integer);
+begin
+  if (AIconIndex < 0) or (AIconIndex >= AImages.Count) then
+    Exit;
+
+  ABtn.Glyph.SetSize(AImages.Width, AImages.Height);
+  AImages.GetBitmap(AIconIndex, ABtn.Glyph);
+
+  ABtn.NumGlyphs := 1;
+  ABtn.Layout    := blGlyphLeft;
+  ABtn.Spacing   := ASpacing;
+  ABtn.Margin    := -1;
+
+  ABtn.Default := AIsDefault;
+  ABtn.Cancel  := AIsCancel;
+end;
+
+// -----------------------------------------------------------------------------
+// BUTTON (usa Images + ImageIndex)
+// -----------------------------------------------------------------------------
+procedure StyleIconButton(ABtn: TButton; AImages: TCustomImageList;
+  const AIconIndex: Integer; AIsDefault, AIsCancel: Boolean; ASpacing: Integer);
+begin
+  if (AIconIndex < 0) or (AIconIndex >= AImages.Count) then
+    Exit;
+
+  ABtn.Images      := AImages;
+  ABtn.ImageIndex  := AIconIndex;
+  ABtn.ImageAlignment := iaLeft;
+  ABtn.Spacing     := ASpacing;
+
+  ABtn.Default := AIsDefault;
+  ABtn.Cancel  := AIsCancel;
+end;
+
+// -----------------------------------------------------------------------------
+// BITBTN + nombre
+// -----------------------------------------------------------------------------
+procedure StyleIconBitBtnByName(ABtn: TBitBtn; AImages: TCustomImageList;
+  const AIconName: string; AGetIndexFunc: TGetIndexFunc;
+  AIsDefault, AIsCancel: Boolean; ASpacing: Integer);
+var
+  Idx: Integer;
+begin
+  Idx := -1;
+  if Assigned(AGetIndexFunc) then
+    Idx := AGetIndexFunc(AIconName);
+  if Idx >= 0 then
+    StyleIconBitBtn(ABtn, AImages, Idx, AIsDefault, AIsCancel, ASpacing);
+end;
+
+// -----------------------------------------------------------------------------
+// BUTTON + nombre
+// -----------------------------------------------------------------------------
+procedure StyleIconButtonByName(ABtn: TButton; AImages: TCustomImageList;
+  const AIconName: string; AGetIndexFunc: TGetIndexFunc;
+  AIsDefault, AIsCancel: Boolean; ASpacing: Integer);
+var
+  Idx: Integer;
+begin
+  Idx := -1;
+  if Assigned(AGetIndexFunc) then
+    Idx := AGetIndexFunc(AIconName);
+  if Idx >= 0 then
+    StyleIconButton(ABtn, AImages, Idx, AIsDefault, AIsCancel, ASpacing);
+end;
+
+end.
+

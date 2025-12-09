@@ -1,0 +1,102 @@
+﻿unit uImageResources;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.IOUtils, System.Generics.Collections,
+  Vcl.Graphics, Vcl.Controls,
+  Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.VirtualImageList,
+  System.ImageList, Vcl.ImgList;
+
+type
+  TdmImages = class(TDataModule)
+    ImageCollection1: TImageCollection;
+    VirtualImageList1: TVirtualImageList;
+  private
+    FIconIndex: TDictionary<string, Integer>; // opcional, para compatibilidad con ImageIndex
+  public
+    procedure LoadFromImages;                 // carga todos los PNG en la colección
+    function GetIconIndex(const AName: string): Integer;
+    destructor Destroy; override;
+  end;
+
+var
+  dmImages: TdmImages;
+
+implementation
+
+{$R *.dfm}
+
+procedure TdmImages.LoadFromImages;
+var
+  Folder, FileName, NameOnly: string;
+  Files: TArray<string>;
+  I: Integer;
+  Item: TImageCollectionItem;
+begin
+  // Crear o limpiar el mapa de índices
+  if FIconIndex = nil then
+    FIconIndex := TDictionary<string, Integer>.Create
+  else
+    FIconIndex.Clear;
+
+  // Limpiar componentes
+  ImageCollection1.Images.Clear;
+  VirtualImageList1.Images.Clear;
+
+  // Carpeta /images junto al ejecutable
+  Folder := TPath.Combine(ExtractFilePath(ParamStr(0)), 'images');
+  if not TDirectory.Exists(Folder) then
+    Exit;
+
+  // Buscar archivos PNG
+  Files := TDirectory.GetFiles(Folder, '*.png');
+  TArray.Sort<string>(Files);
+
+  for I := 0 to High(Files) do
+  begin
+    FileName := Files[I];
+    NameOnly := LowerCase(TPath.GetFileNameWithoutExtension(FileName));
+
+    // Crear nuevo item en la colección
+    Item := ImageCollection1.Images.Add;
+    Item.Name := NameOnly;
+
+    // Añadir una fuente (SourceImage) con el PNG
+    with Item.SourceImages.Add do
+      Image.LoadFromFile(FileName); // sin propiedad Scale
+
+    // Guardar índice
+    FIconIndex.AddOrSetValue(NameOnly, I);
+  end;
+
+  // Configurar VirtualImageList
+  VirtualImageList1.ImageCollection := ImageCollection1;
+  VirtualImageList1.Width  := 32;  // Tamaño estándar
+  VirtualImageList1.Height := 32;
+
+  // Poblar las imágenes
+  VirtualImageList1.Images.Clear;
+  for I := 0 to ImageCollection1.Images.Count - 1 do
+    with VirtualImageList1.Images.Add do
+    begin
+      Name            := ImageCollection1.Images[I].Name;
+      CollectionIndex := I;
+    end;
+end;
+
+function TdmImages.GetIconIndex(const AName: string): Integer;
+begin
+  if Assigned(FIconIndex) and FIconIndex.TryGetValue(LowerCase(AName), Result) then
+    Exit;
+  Result := -1;
+end;
+
+destructor TdmImages.Destroy;
+begin
+  FIconIndex.Free;
+  inherited;
+end;
+
+end.
+

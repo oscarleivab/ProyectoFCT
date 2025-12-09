@@ -1,0 +1,2 @@
+inherited ListadoFrameCliente: TListadoFrameCliente
+end

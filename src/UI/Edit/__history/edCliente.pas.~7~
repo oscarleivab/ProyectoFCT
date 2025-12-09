@@ -1,0 +1,134 @@
+unit edCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FrameEdit, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Mask, Vcl.DBCtrls, Vcl.WinXCtrls, dmConnection;
+
+type
+  TFrEdCliente = class(TFrEdit)
+    ScrollBox1: TScrollBox;
+    Panel5: TPanel;
+    GroupBox1: TGroupBox;
+    labelnombre: TLabel;
+    labelapellidos: TLabel;
+    labelempresa: TLabel;
+    labelcodigo: TLabel;
+    labeltipo: TLabel;
+    labeldocumento: TLabel;
+    GroupBox2: TGroupBox;
+    labeltarifa: TLabel;
+    labelpermiso: TLabel;
+    GroupBox3: TGroupBox;
+    GroupBox4: TGroupBox;
+    labeltelefono1: TLabel;
+    labeltelefono2: TLabel;
+    labelcontacto: TLabel;
+    labelemail: TLabel;
+    GroupBox5: TGroupBox;
+    GroupBox6: TGroupBox;
+    GroupBox7: TGroupBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    DBnombre: TDBEdit;
+    DBapellidos: TDBEdit;
+    DBempresa: TDBEdit;
+    DBtelefono1: TDBEdit;
+    DBtelefono2: TDBEdit;
+    DBemail: TDBEdit;
+    DBpersona_contacto: TDBEdit;
+    DBobservaciones: TDBMemo;
+    DBuser_login: TDBEdit;
+    DBpass_login: TDBEdit;
+    DBEdit10: TDBEdit;
+    DBid_tarifa: TDBComboBox;
+    DBid_permiso: TDBEdit;
+    DBactivo: TDBCheckBox;
+    DBid_tipo_documento: TDBComboBox;
+    DBdetalle_documento: TDBEdit;
+  private
+    procedure VincularControlesCliente;
+    { Private declarations }
+  public
+  Procedure Cargardatos(Id: Integer); Override;
+    { Public declarations }
+  end;
+
+var
+  FrEdCliente: TFrEdCliente;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrEdCliente.VincularControlesCliente;
+var
+  I: Integer;
+  Ed: TDBEdit;
+  FieldName: string;
+begin
+
+  // 2. Recorremos TODOS los componentes del formulario
+  for I := 0 to ComponentCount - 1 do
+  begin
+    if Components[I] is TDBEdit then
+    begin
+      Ed := TDBEdit(Components[I]);
+
+      // Esperamos nombres tipo: DBid_cliente, DBnombre, DBapellidos, etc.
+      if SameText(Copy(Ed.Name, 1, 2), 'DB') then
+      begin
+        // Quitamos el "DB" del principio para obtener el nombre del campo
+        FieldName := Copy(Ed.Name, 3, MaxInt);  // "DBnombre" -> "nombre"
+
+        // Si el campo existe en el dataset, lo enlazamos
+        if Assigned(FDQuery.FindField(FieldName)) then
+        begin
+          Ed.DataField  := FieldName;
+        end;
+      end;
+    end;
+  end;
+end;
+
+
+Procedure TFrEdCliente.Cargardatos(Id: Integer);
+begin
+  if Id<>0 then begin
+    with FDQuery do begin
+      SQL.Clear;
+      SQL.Add('SELECT ');
+        SQL.Add('id_cliente ID,');
+        SQL.Add('id_tipo_documento,');
+        SQL.Add('detalle_documento,');
+        SQL.Add('nombre,');
+        SQL.Add('apellidos,');
+        SQL.Add('empresa,');
+        SQL.Add('email,');
+        SQL.Add('observaciones,');
+        SQL.Add('telefono1,');
+        SQL.Add('telefono2,');
+        SQL.Add('id_tarifa, ');
+        SQL.Add('persona_contacto,');
+        SQL.Add('url_web,');
+        SQL.Add('user_login, ');
+        SQL.Add('pass_login,');
+        SQL.Add('activo,');
+        SQL.Add('id_permiso  ');
+        SQL.Add('FROM cliente');
+        SQL.Add('WHERE (id_cliente=:id_cliente)');
+        ParamByName('id_cliente').Asinteger := ID;
+        Open;
+    end;
+  end;
+
+
+end;
+
+end.

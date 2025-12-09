@@ -1,0 +1,109 @@
+unit uConfigIni;
+
+interface
+
+uses
+  System.SysUtils, System.IniFiles, System.IOUtils, System.Classes;
+
+type
+  TAppConfig = class
+  private
+    FHost: string;
+    FPort: Integer;
+    FDatabase: string;
+    FUser: string;
+    FPass: string;
+    FDefaultLang: string;
+  public
+    procedure LoadConfig;
+    procedure SaveConfig;
+    property Host: string read FHost write FHost;
+    property Port: Integer read FPort write FPort;
+    property Database: string read FDatabase write FDatabase;
+    property User: string read FUser write FUser;
+    property Pass: string read FPass write FPass;
+    property DefaultLang: string read FDefaultLang write FDefaultLang;
+  end;
+
+var
+  AppConfig: TAppConfig;
+
+implementation
+
+{ TAppConfig }
+
+procedure TAppConfig.LoadConfig;
+var
+  SL: TStringList;
+  IniMem: TMemIniFile;
+  PathIni: string;
+begin
+  PathIni := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ini\config.ini');
+
+  if not TFile.Exists(PathIni) then
+    raise Exception.CreateFmt('No se encontró el archivo de configuración: %s', [PathIni]);
+
+  SL := TStringList.Create;
+  try
+    // Leer el INI en UTF-8
+    SL.LoadFromFile(PathIni, TEncoding.UTF8);
+
+    IniMem := TMemIniFile.Create('');
+    try
+      IniMem.SetStrings(SL);
+
+      FHost        := IniMem.ReadString('Conexion', 'varHost', 'localhost');
+      FPort        := IniMem.ReadInteger('Conexion', 'varPort', 5432);
+      FDatabase    := IniMem.ReadString('Conexion', 'varDatabase', '');
+      FUser        := IniMem.ReadString('Conexion', 'varUser', '');
+      FPass        := IniMem.ReadString('Conexion', 'varPass', '');
+      FDefaultLang := IniMem.ReadString('lang', 'defaultlang', '');
+    finally
+      IniMem.Free;
+    end;
+  finally
+    SL.Free;
+  end;
+end;
+
+procedure TAppConfig.SaveConfig;
+var
+  SL: TStringList;
+  IniMem: TMemIniFile;
+  PathIni: string;
+  UTF8Enc: TEncoding;
+begin
+  PathIni := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ini\config.ini');
+
+  IniMem := TMemIniFile.Create('');
+  SL := TStringList.Create;
+  UTF8Enc := TUTF8Encoding.Create(False); // False = sin BOM
+  try
+    // Escribir los valores actuales
+    IniMem.WriteString('Conexion', 'varHost', FHost);
+    IniMem.WriteInteger('Conexion', 'varPort', FPort);
+    IniMem.WriteString('Conexion', 'varDatabase', FDatabase);
+    IniMem.WriteString('Conexion', 'varUser', FUser);
+    IniMem.WriteString('Conexion', 'varPass', FPass);
+    IniMem.WriteString('lang', 'defaultlang', FDefaultLang);
+
+    // Guardar a StringList
+    IniMem.GetStrings(SL);
+
+    // Grabar el archivo INI en UTF-8
+    SL.SaveToFile(PathIni, UTF8Enc);
+  finally
+    UTF8Enc.Free;
+    SL.Free;
+    IniMem.Free;
+  end;
+end;
+
+initialization
+  AppConfig := TAppConfig.Create;
+
+finalization
+  AppConfig.Free;
+
+end.
+

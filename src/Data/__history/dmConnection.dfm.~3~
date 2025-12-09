@@ -1,0 +1,11 @@
+object DataModuleConnection: TDataModuleConnection
+  Height = 480
+  Width = 640
+  object FDConnectionMain: TFDConnection
+    Params.Strings = (
+      'DriverID=PG')
+    LoginPrompt = False
+    Left = 72
+    Top = 24
+  end
+end

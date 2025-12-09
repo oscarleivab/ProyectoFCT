@@ -1,0 +1,163 @@
+unit ListadoEntidad;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Datasnap.Provider,
+  Datasnap.DBClient, Vcl.Buttons, Vcl.DBCtrls, Vcl.DBGrids, Vcl.StdCtrls,
+  Vcl.Grids, Vcl.ExtCtrls, Vcl.ComCtrls,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.Client, FireDAC.Comp.DataSet,
+  Vcl.WinXCtrls,fmain,usession,FrameListado, uFuncionesglobales;
+
+type
+  TListadoEntidadFrame = class(TListadoFrame)
+    activocheck: TToggleSwitch;
+  private
+    procedure cargardialogoedit(ID:Integer); override;
+    Procedure Cargarlistado; override;
+    Procedure mostrarfiltros; Override;
+    procedure TraducirTexto; override;
+    { Private declarations }
+  public
+  TipoEntidad:Integer;
+    { Public declarations }
+  end;
+
+var
+  ListadoEntidadFrame: TListadoEntidadFrame;
+
+implementation
+
+{$R *.dfm}
+
+{ TListadoEntidadFrame }
+
+procedure TListadoEntidadFrame.cargardialogoedit(ID: Integer);
+var
+//DatosEntidadframe: TDatosEntidadFrame;
+nuevaTab: TTabSheet;
+begin
+//nuevaTab := TTabSheet.Create(mainfrm.Pagecontrol1);
+//nuevaTab.PageControl := mainfrm.PageControl1;
+//if ID=0 then
+//nuevaTab.Caption := SheetDialogo[TipoEntidad]+' Nuevo '
+//else
+//nuevaTab.Caption := SheetDialogo[TipoEntidad]+' ID '+ID.ToString;
+//
+//if TipoEntidad=1 then
+//nuevaTab.ImageIndex:=9
+//else if TipoEntidad=2 then
+//nuevaTab.ImageIndex:=1
+//else if TipoEntidad=3 then
+//nuevaTab.ImageIndex:=8;
+//
+//DatosEntidadframe := TDatosEntidadFrame.Create(nuevaTab);
+//DatosEntidadframe.Parent:=nuevaTab;
+//DatosEntidadframe.usapagecontrol:=true;
+//DatosEntidadframe.Align:=Alclient;
+//DatosEntidadframe.Interfaz.SetTipoId(TipoEntidad);
+//DatosEntidadframe.Interfaz.SetId(ID);
+//DatosEntidadframe.cargardatos;
+//
+//mainfrm.Pagecontrol1.ActivePageIndex:=mainfrm.Pagecontrol1.PageCount-1;
+end;
+
+procedure TListadoEntidadFrame.Cargarlistado;
+var
+SQL:String;
+SQLFilter:String;
+begin
+
+ SQL:=Entidad_Listado;
+ SQLFilter:=Entidad_Filtrado;
+
+  if Database.ComprobarConexion then
+  begin
+
+    if not Assigned(Trcons) then
+    Trcons:=Database.CrearTransaccion;
+
+    if not Assigned(Cons) then
+    Cons:=Database.CrearQuery(Trcons);
+
+
+        try
+           Cons.SQL.Clear;
+           Cons.SQL.Add(SQL);
+
+           if activocheck.State=tssOn then
+             Cons.ParamByName('pactivo').AsBoolean:=true
+             else
+             Cons.ParamByName('pactivo').AsBoolean:=false;
+
+           Cons.ParamByName('ptipoentidad').AsInteger:=TipoEntidad;
+
+           if buscaedit.Text<>'' then
+           begin
+             Cons.SQL.Add(SQLFilter);
+             Cons.ParamByName('pdocumento').AsString:='%'+UpperCase(buscaedit.Text)+'%';
+             Cons.ParamByName('pnombre').AsString:='%'+UpperCase(buscaedit.Text)+'%';
+             Cons.ParamByName('papellidos').AsString:='%'+UpperCase(buscaedit.Text)+'%';
+             Cons.ParamByName('pempresa').AsString:='%'+UpperCase(buscaedit.Text)+'%';
+             Cons.ParamByName('ptelefono1').AsString:='%'+buscaedit.Text+'%';
+             Cons.ParamByName('ptelefono2').AsString:='%'+buscaedit.Text+'%';
+             Cons.ParamByName('pemail').AsString:='%'+UpperCase(buscaedit.Text)+'%';
+           end;
+
+           Cons.SQL.Add(' order by "id_entidad" desc');
+           Cons.Open();
+           TraducirTexto();
+           CargarDatosEnGrid(Cons,Listadogrid);
+           AjustarAnchoColumnas(Listadogrid);
+           OcultarColumnas(Listadogrid, [0,1,2]); // Oculta las columnas 1 y 2
+
+
+        Except
+          on E:Exception do
+          begin
+          ShowMessage(e.Message);
+          end;
+        end;
+  end;
+
+end;
+
+procedure TListadoEntidadFrame.mostrarfiltros;
+begin
+if Panelfiltros.Height=50 then
+Panelfiltros.Height:=5
+else
+Panelfiltros.Height:=50;
+end;
+
+procedure TListadoEntidadFrame.TraducirTexto;
+begin
+
+  buscaedit.TextHint := AppTraductor.Traducir('ListadoEntidad','TextoBuscar');
+  if assigned(Cons) then begin
+    with Cons do
+    begin
+      FieldByName('nombre').DisplayLabel       := AppTraductor.Traducir('ListadoEntidad','labelNombre');
+      FieldByName('apellidos').DisplayLabel    := AppTraductor.Traducir('ListadoEntidad','labelApellidos');
+      FieldByName('empresa').DisplayLabel      := AppTraductor.Traducir('ListadoEntidad','labelEmpresa');
+      FieldByName('email').DisplayLabel        := AppTraductor.Traducir('ListadoEntidad','labelEmail');
+      FieldByName('observaciones').DisplayLabel:= AppTraductor.Traducir('ListadoEntidad','labelObservaciones');
+      FieldByName('telefono1').DisplayLabel       := AppTraductor.Traducir('ListadoEntidad','labelTelefono1');
+      FieldByName('telefono2').DisplayLabel       := AppTraductor.Traducir('ListadoEntidad','labelTelefono2');
+      FieldByName('id_tarifa').DisplayLabel    := AppTraductor.Traducir('ListadoEntidad','labelIdTarifa');
+      FieldByName('persona_contacto').DisplayLabel      := AppTraductor.Traducir('ListadoEntidad','labelPersonaContacto');
+      FieldByName('url_web').DisplayLabel        := AppTraductor.Traducir('ListadoEntidad','labelUrlWeb');
+      FieldByName('user_login').DisplayLabel:= AppTraductor.Traducir('ListadoEntidad','labelUserLogin');
+      FieldByName('pass_login').DisplayLabel       := AppTraductor.Traducir('ListadoEntidad','labelPassLogin');
+      FieldByName('activo').DisplayLabel    := AppTraductor.Traducir('ListadoEntidad','labelActivo');
+      FieldByName('id_permiso').DisplayLabel        := AppTraductor.Traducir('ListadoEntidad','labelIdPermiso');
+    end;
+  end;
+
+
+end;
+
+end.

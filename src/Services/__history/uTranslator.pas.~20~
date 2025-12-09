@@ -1,0 +1,527 @@
+﻿unit uTranslator;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, System.IniFiles, System.IOUtils,
+  Vcl.StdCtrls, uConfigIni;
+
+type
+  TTranslator = class
+  private
+    FIni: TMemIniFile;
+    FLang: string;
+    function LangFilePath(const Lang: string): string;
+    procedure LoadLang(const Lang: string);
+  public
+    constructor Create(const Lang: string);
+    destructor Destroy; override;
+
+    // Devuelve el texto traducido; si no existe, devuelve Default o la clave
+    function GetText(const Section, Key: string; const Default: string = ''): string;
+
+    // Saber si una clave existe (aunque su valor sea vacío)
+    function ValueExists(const Section, Key: string): Boolean;
+
+    // Cambiar idioma en caliente
+    procedure SetLanguage(const Lang: string);
+    property Language: string read FLang;
+  end;
+
+{ API global simple }
+function T_(const Section, Key: string): string; overload;
+function T_(const Section, Key, Default: string): string; overload;
+procedure UseLanguage(const Lang: string);
+procedure LoadAvailableLanguages(ACombo: TComboBox);
+function Translator: TTranslator;
+
+// === Aplicar traducción al árbol de componentes (Form, Frame, DataModule, etc.) ===
+procedure TranslateTree(Root: TComponent; const Section: string = '');
+
+// === Utilidades para cambio de idioma en caliente (opcional) ===
+procedure TranslateAllOpenUI;
+procedure UseLanguageAndRefresh(const Lang: string);
+
+// === Banderas de exclusión por Tag (útiles para combos llenados desde BBDD, etc.) ===
+const
+  NT_SKIP_ALL   = $1; // No traducir nada del control
+  NT_SKIP_ITEMS = $2; // No traducir Items (listas)
+  NT_SKIP_TEXT  = $4; // No traducir Text (valor seleccionado)
+
+var
+  // Opcional: cambiar la ruta base de idiomas si no quieres la carpeta por defecto
+  TranslationsBasePath: string = ''; // si está vacío: usa carpeta del EXE\idiomas\
+
+implementation
+
+uses
+  System.TypInfo, System.Rtti,
+  Vcl.Forms, Vcl.Controls, Vcl.ComCtrls, Vcl.Menus, Vcl.ActnList,
+  Vcl.ActnMan, Vcl.ExtCtrls, Vcl.DBCtrls;
+
+var
+  GTranslator: TTranslator;
+
+{ ---------- Utilidad local para evitar ambigüedad con StringReplace ---------- }
+
+function ReplaceAll(const S, OldPattern, NewPattern: string): string; inline;
+begin
+  Result := System.SysUtils.StringReplace(S, OldPattern, NewPattern, [rfReplaceAll]);
+end;
+
+{ ------------------------------- TTranslator ------------------------------- }
+
+constructor TTranslator.Create(const Lang: string);
+begin
+  inherited Create;
+  LoadLang(Lang);
+end;
+
+destructor TTranslator.Destroy;
+begin
+  FIni.Free;
+  inherited;
+end;
+
+function TTranslator.LangFilePath(const Lang: string): string;
+var
+  base: string;
+begin
+  if TranslationsBasePath <> '' then
+    base := TranslationsBasePath
+  else
+    base := TPath.Combine(ExtractFilePath(ParamStr(0)), 'idiomas');
+  Result := TPath.Combine(base, Lang + '.ini');
+end;
+
+procedure TTranslator.LoadLang(const Lang: string);
+var
+  FileName: string;
+  SL: TStringList;
+begin
+  FileName := LangFilePath(Lang);
+
+  if not TFile.Exists(FileName) then
+  begin
+    if not SameText(Lang, 'Español') then
+    begin
+      FileName := LangFilePath('Español');
+      if not TFile.Exists(FileName) then
+        raise Exception.CreateFmt('No se encuentra el archivo de idioma: %s', [LangFilePath(Lang)]);
+      FLang := 'Español';
+    end
+    else
+      raise Exception.CreateFmt('No se encuentra el archivo de idioma: %s', [FileName]);
+  end
+  else
+    FLang := Lang;
+
+  FreeAndNil(FIni);
+
+  // Carga en UTF-8 fiable
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName, TEncoding.UTF8);
+    FIni := TMemIniFile.Create('');
+    FIni.SetStrings(SL);
+  finally
+    SL.Free;
+  end;
+end;
+
+function TTranslator.GetText(const Section, Key, Default: string): string;
+begin
+  if Default <> '' then
+    Result := FIni.ReadString(Section, Key, Default)
+  else
+  begin
+    // default vacío para permitir valores vacíos reales
+    Result := FIni.ReadString(Section, Key, '');
+    // Si la clave NO existe, usar la propia Key como fallback (útil para depurar)
+    if (Result = '') and (not ValueExists(Section, Key)) then
+      Result := Key;
+  end;
+end;
+
+function TTranslator.ValueExists(const Section, Key: string): Boolean;
+begin
+  Result := Assigned(FIni) and FIni.ValueExists(Section, Key);
+end;
+
+procedure TTranslator.SetLanguage(const Lang: string);
+begin
+  if not SameText(FLang, Lang) then
+    LoadLang(Lang);
+end;
+
+{ ------------------------------- API global -------------------------------- }
+
+function Translator: TTranslator;
+begin
+  if GTranslator = nil then
+    GTranslator := TTranslator.Create('Español'); // idioma por defecto de arranque
+  Result := GTranslator;
+end;
+
+procedure UseLanguage(const Lang: string);
+begin
+  Translator.SetLanguage(Lang);
+end;
+
+function T_(const Section, Key: string): string;
+begin
+  Result := Translator.GetText(Section, Key);
+end;
+
+function T_(const Section, Key, Default: string): string;
+begin
+  Result := Translator.GetText(Section, Key, Default);
+end;
+
+procedure LoadAvailableLanguages(ACombo: TComboBox);
+var
+  LangFolder, LangCode, LangName: string;
+  Files: TArray<string>;
+  F: string;
+begin
+  if ACombo = nil then Exit;
+
+  ACombo.Items.BeginUpdate;
+  try
+    ACombo.Clear;
+
+    LangFolder := TPath.Combine(ExtractFilePath(ParamStr(0)), 'idiomas');
+    if not TDirectory.Exists(LangFolder) then Exit;
+
+    Files := TDirectory.GetFiles(LangFolder, '*.ini');
+    for F in Files do
+    begin
+      LangCode := TPath.GetFileNameWithoutExtension(F);
+      LangName := LangCode;
+      ACombo.Items.Add(LangName);
+    end;
+
+    ACombo.ItemIndex := ACombo.Items.IndexOf(AppConfig.DefaultLang);
+  finally
+    ACombo.Items.EndUpdate;
+  end;
+end;
+
+{ ----------------------------- Traducción visual --------------------------- }
+
+const
+  _MISS = #1; // sentinela para detectar "no encontrado"
+
+// Forward necesario para KeyBase
+function MenuItemPath(MI: TMenuItem): string;
+
+// Devuelve '' si la clave no existe
+function ReadKey(const Section, CompKey, PropName: string): string;
+begin
+  Result := Translator.GetText(Section, CompKey + '.' + PropName, _MISS);
+  if Result = _MISS then
+    Result := ''; // tratar como no existente
+end;
+
+// Intenta leer la clave y dice si EXISTE (aunque sea '')
+function TryReadKey(const Section, CompKey, PropName: string; out Value: string): Boolean;
+var
+  FullKey: string;
+begin
+  FullKey := CompKey + '.' + PropName;
+  Result := Translator.ValueExists(Section, FullKey);
+  if Result then
+    Value := Translator.GetText(Section, FullKey, ''); // conserva vacío real
+end;
+
+function ShouldSkipTranslate(C: TComponent): Boolean;
+begin
+  Result := (C is TControl) and ((TControl(C).Tag and NT_SKIP_ALL) <> 0);
+end;
+
+function ShouldSkipItems(C: TComponent): Boolean;
+begin
+  Result := (C is TControl) and ((TControl(C).Tag and NT_SKIP_ITEMS) <> 0);
+end;
+
+function ShouldSkipText(C: TComponent): Boolean;
+begin
+  Result := (C is TControl) and ((TControl(C).Tag and NT_SKIP_TEXT) <> 0);
+end;
+
+function IsDataAwareListControl(C: TComponent): Boolean;
+begin
+  Result :=
+    (C is TDBComboBox) or
+    (C is TDBLookupComboBox) or
+    (C is TDBListBox) or
+    (C is TDBLookupListBox);
+end;
+
+// Setea propiedad string POR FUERZA (permite '')
+procedure SetPropAllowEmpty(Comp: TObject; const PropName, Value: string);
+var
+  Ctx: TRttiContext;
+  Typ: TRttiType;
+  Prop: TRttiProperty;
+begin
+  if (Comp = nil) then Exit;
+  Ctx := TRttiContext.Create;
+  try
+    Typ := Ctx.GetType(Comp.ClassType);
+    Prop := Typ.GetProperty(PropName);
+    if (Prop <> nil) and Prop.IsWritable then
+    begin
+      case Prop.PropertyType.TypeKind of
+        tkString, tkLString, tkWString, tkUString:
+          Prop.SetValue(Comp, Value);
+      end;
+    end;
+  finally
+    Ctx.Free;
+  end;
+end;
+
+function KeyBase(C: TComponent): string;
+begin
+  if C is TMenuItem then
+  begin
+    if (TMenuItem(C).Action is TCustomAction) and (TCustomAction(TMenuItem(C).Action).Name <> '') then
+      Exit(TCustomAction(TMenuItem(C).Action).Name);
+    if C.Name <> '' then
+      Exit(C.Name);
+    Exit(ReplaceAll(MenuItemPath(TMenuItem(C)), '&', ''));
+  end;
+
+  if (C <> nil) and (C.Name <> '') then
+    Result := C.Name
+  else
+    Result := C.ClassName;
+end;
+
+function MenuItemPath(MI: TMenuItem): string;
+var
+  Parts: TArray<string>;
+  P: TMenuItem;
+  Txt: string;
+begin
+  SetLength(Parts, 0);
+  P := MI;
+  while P <> nil do
+  begin
+    if (P.Action <> nil) and (P.Action is TCustomAction) and (TCustomAction(P.Action).Name <> '') then
+      Txt := TCustomAction(P.Action).Name
+    else if P.Name <> '' then
+      Txt := P.Name
+    else
+      Txt := ReplaceAll(P.Caption, '&', ''); // fallback
+    Insert(Txt, Parts, 0);
+    P := P.Parent;
+  end;
+  Result := string.Join('.', Parts);
+end;
+
+procedure TranslateOne(C: TComponent; const SectionName: string);
+var
+  K, V, Tmp: string;
+  I: Integer;
+  AL: TActionList;
+  AM: TActionManager;
+  Found: Boolean;
+begin
+  if (C = nil) or ShouldSkipTranslate(C) then Exit;
+
+  K := KeyBase(C);
+
+  // --- Acciones individuales ---
+  if C is TCustomAction then
+  begin
+    Found := TryReadKey(SectionName, K, 'Caption', V);
+    if Found then
+      TCustomAction(C).Caption := V;
+
+    Found := TryReadKey(SectionName, K, 'Hint', V);
+    if Found then
+      TCustomAction(C).Hint := V;
+
+    Exit;
+  end;
+
+  // --- ActionList ---
+  if C is TActionList then
+  begin
+    AL := TActionList(C);
+    for I := 0 to AL.ActionCount - 1 do
+      TranslateOne(AL.Actions[I], SectionName);
+    Exit;
+  end;
+
+  // --- ActionManager ---
+  if C is TActionManager then
+  begin
+    AM := TActionManager(C);
+    for I := 0 to AM.ActionCount - 1 do
+      if AM.Actions[I] <> nil then
+        TranslateOne(AM.Actions[I], SectionName);
+    Exit;
+  end;
+
+  // --- Menús ---
+  if C is TMenuItem then
+  begin
+    if TMenuItem(C).Action = nil then
+    begin
+      Found := TryReadKey(SectionName, K, 'Caption', V);
+      if Found then
+        TMenuItem(C).Caption := V;
+    end;
+
+    for I := 0 to TMenuItem(C).Count - 1 do
+      TranslateOne(TMenuItem(C).Items[I], SectionName);
+    Exit;
+  end;
+
+  // --- Controles con Action ---
+  if (C is TControl) and (TControl(C).Action <> nil) then
+    Exit;
+
+  // --- Propiedades comunes ---
+  Found := TryReadKey(SectionName, K, 'Caption', V);
+  if Found then
+    SetPropAllowEmpty(C, 'Caption', V);
+
+  Found := TryReadKey(SectionName, K, 'Text', V);
+  if Found then
+    SetPropAllowEmpty(C, 'Text', V);
+
+  Found := TryReadKey(SectionName, K, 'Hint', V);
+  if Found then
+    SetPropAllowEmpty(C, 'Hint', V);
+
+  // --- Listas ---
+  if C is TCustomComboBox then
+  begin
+    if not IsDataAwareListControl(C) then
+    begin
+      if not ShouldSkipItems(C) then
+      begin
+        Found := TryReadKey(SectionName, K, 'Items', V);
+        if Found then
+        begin
+          Tmp := ReplaceAll(V, '|', sLineBreak); // V puede ser ''
+          TCustomComboBox(C).Items.Text := Tmp;
+        end;
+      end;
+
+      if not ShouldSkipText(C) then
+      begin
+        Found := TryReadKey(SectionName, K, 'Text', V);
+        if Found then
+          SetPropAllowEmpty(C, 'Text', V);
+      end;
+    end;
+    Exit;
+  end
+  else if C is TCustomListBox then
+  begin
+    if not ShouldSkipItems(C) then
+    begin
+      Found := TryReadKey(SectionName, K, 'Items', V);
+      if Found then
+      begin
+        Tmp := ReplaceAll(V, '|', sLineBreak);
+        TCustomListBox(C).Items.Text := Tmp;
+      end;
+    end;
+    Exit;
+  end;
+
+  // --- RadioGroup ---
+  if C is TRadioGroup then
+  begin
+    for I := 0 to TRadioGroup(C).Items.Count - 1 do
+    begin
+      V := Translator.GetText(SectionName, K + '.Items[' + I.ToString + ']', _MISS);
+      if V <> _MISS then
+        TRadioGroup(C).Items[I] := V;
+    end;
+    Exit;
+  end;
+
+  // --- PageControl ---
+  if C is TPageControl then
+  begin
+    for I := 0 to TPageControl(C).PageCount - 1 do
+    begin
+      V := Translator.GetText(SectionName, K + '.Tabs[' + I.ToString + ']', _MISS);
+      if V <> _MISS then
+        TPageControl(C).Pages[I].Caption := V;
+    end;
+    Exit;
+  end;
+end;
+
+procedure RecurseComponent(C: TComponent; const SectionName: string);
+var
+  I: Integer;
+  WC: TWinControl;
+begin
+  if C = nil then Exit;
+
+  TranslateOne(C, SectionName);
+
+  if C is TWinControl then
+  begin
+    WC := TWinControl(C);
+    for I := 0 to WC.ControlCount - 1 do
+      if WC.Controls[I] is TComponent then
+        RecurseComponent(TComponent(WC.Controls[I]), SectionName);
+  end;
+
+  for I := 0 to C.ComponentCount - 1 do
+    RecurseComponent(C.Components[I], SectionName);
+end;
+
+procedure TranslateTree(Root: TComponent; const Section: string);
+var
+  SectionName: string;
+begin
+  if Root = nil then Exit;
+
+  if Section <> '' then
+    SectionName := Section
+  else if (Root.Name <> '') then
+    SectionName := Root.Name
+  else
+    SectionName := Root.ClassName;
+
+  RecurseComponent(Root, SectionName);
+
+  if (Root is TCustomForm) and (TCustomForm(Root).Menu <> nil) then
+    if TCustomForm(Root).Menu.Items <> nil then
+      RecurseComponent(TCustomForm(Root).Menu.Items, SectionName);
+end;
+
+procedure TranslateAllOpenUI;
+var
+  I: Integer;
+begin
+  for I := 0 to Screen.DataModuleCount - 1 do
+    TranslateTree(Screen.DataModules[I]);
+
+  for I := 0 to Screen.FormCount - 1 do
+    TranslateTree(Screen.Forms[I]);
+end;
+
+procedure UseLanguageAndRefresh(const Lang: string);
+begin
+  UseLanguage(Lang);
+  TranslateAllOpenUI;
+end;
+
+initialization
+finalization
+  FreeAndNil(GTranslator);
+
+end.
+

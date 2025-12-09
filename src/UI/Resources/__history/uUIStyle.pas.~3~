@@ -1,0 +1,58 @@
+﻿unit uUIStyle;
+
+interface
+
+uses
+  System.SysUtils,
+  Vcl.Controls,      // TImageAlignment (si lo necesitas en otros helpers)
+  Vcl.ImgList,       // TImageList
+  Vcl.Buttons;       // TBitBtn
+
+/// Aplica icono desde un ImageList a un TBitBtn y centra (glyph+texto)
+procedure StyleIconBitBtn(ABtn: TBitBtn; AImages: TImageList;
+  const AIconIndex: Integer; AIsDefault: Boolean = False; AIsCancel: Boolean = False;
+  ASpacing: Integer = 6);
+
+/// Variante por nombre del icono (útil con tu dmImages.GetIconIndex)
+procedure StyleIconBitBtnByName(ABtn: TBitBtn; AImages: TImageList;
+  const AIconName: string; AGetIndexFunc: TFunc<string, Integer>;
+  AIsDefault: Boolean = False; AIsCancel: Boolean = False;
+  ASpacing: Integer = 6);
+
+implementation
+
+procedure StyleIconBitBtn(ABtn: TBitBtn; AImages: TImageList;
+  const AIconIndex: Integer; AIsDefault: Boolean; AIsCancel: Boolean;
+  ASpacing: Integer);
+begin
+  // Copiamos el bitmap del ImageList al Glyph del botón
+  ABtn.Glyph.SetSize(AImages.Width, AImages.Height);
+  AImages.GetBitmap(AIconIndex, ABtn.Glyph);
+
+  // Layout moderno
+  ABtn.NumGlyphs := 1;
+  ABtn.Layout    := blGlyphLeft;   // Icono a la izquierda
+  ABtn.Spacing   := ASpacing;      // Separación icono-texto
+  ABtn.Margin    := -1;            // ← centra el conjunto glyph+texto
+
+  // Comportamiento de Enter / Esc si quieres
+  ABtn.Default := AIsDefault;
+  ABtn.Cancel  := AIsCancel;
+end;
+
+procedure StyleIconBitBtnByName(ABtn: TBitBtn; AImages: TImageList;
+  const AIconName: string; AGetIndexFunc: TFunc<string, Integer>;
+  AIsDefault: Boolean; AIsCancel: Boolean; ASpacing: Integer);
+var
+  Idx: Integer;
+begin
+  Idx := -1;
+  if Assigned(AGetIndexFunc) then
+    Idx := AGetIndexFunc(AIconName);
+
+  if Idx >= 0 then
+    StyleIconBitBtn(ABtn, AImages, Idx, AIsDefault, AIsCancel, ASpacing);
+end;
+
+end.
+

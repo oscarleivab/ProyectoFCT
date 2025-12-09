@@ -1,0 +1,130 @@
+unit uDatabaselib;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.WinXPickers,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+  FireDAC.Phys, FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.VCLUI.Wait,
+  Data.DB, FireDAC.Comp.Client,uConfigIni,usession;
+
+Type
+ TClaseDB = class
+ Private
+ DBConexion :TFDConnection;
+ FDPhysPgDriverLink1: TFDPhysPgDriverLink;
+ Public
+ Procedure Crearconexion;
+ Procedure Crearconexiondefault;
+ function ComprobarConexion: Boolean;
+ function ComprobarConexiondefault: Boolean;
+ procedure DestruirConexion;
+ function CrearTransaccion: TFDTransaction;
+ function CrearQuery(TR:TFDTransaction;SQL: string = ''): TFDQuery;
+ procedure DestruirTransaccion(TR: TFDTransaction);
+ procedure DestruirQuery(qGenerica: TFDQuery);
+ end;
+
+var
+  DataBase : TClaseDB;
+  FDPhysPgDriverLink1: TFDPhysPgDriverLink;
+
+implementation
+
+
+procedure TClaseDB.DestruirTransaccion(TR: TFDTransaction);
+begin
+  if Assigned(TR) then
+    FreeAndNil(TR);
+end;
+
+procedure TClaseDB.DestruirQuery(qGenerica: TFDQuery);
+begin
+  if Assigned(qGenerica) then
+  begin
+    if qGenerica.Active then
+      qGenerica.Close;
+    FreeAndNil(qGenerica);
+  end;
+end;
+
+
+procedure TClaseDB.DestruirConexion;
+begin
+
+  if Assigned(DBConexion) then
+  begin
+    if (DBConexion.Connected) then DBConexion.Close;
+  end;
+
+  if Assigned(DBConexion) then FreeAndNil(DBConexion);
+end;
+
+function TClaseDB.ComprobarConexion: Boolean;
+begin
+  try
+    Result := Assigned(DBConexion) and DBConexion.Connected;
+    if not Result then
+    begin
+      DestruirConexion;
+      Crearconexion;
+      Result := DBConexion.Connected;
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+function TClaseDB.ComprobarConexiondefault: Boolean;
+begin
+  try
+    Result := Assigned(DBConexion) and DBConexion.Connected;
+    if not Result then
+    begin
+      DestruirConexion;
+      Crearconexiondefault;
+      Result := DBConexion.Connected;
+    end;
+  except
+    Result := False;
+  end;
+end;
+
+
+function TClaseDB.CrearTransaccion: TFDTransaction;
+begin
+  Result := TFDTransaction.Create(nil);
+  try
+    Result.Connection := DBConexion;
+    Result.Options.ReadOnly:=false;
+    Result.Options.Isolation := xiReadCommitted;
+  except
+    if Assigned(Result) then
+      FreeAndNil(Result);
+  end;
+end;
+
+function TClaseDB.CrearQuery(TR:TFDTransaction;SQL: string = ''): TFDQuery;
+begin
+  Result := TFDQuery.Create(nil);
+  try
+    Result.Connection := DBConexion;
+    Result.Transaction := TR;
+    Result.SQL.Text:= SQL;
+  except
+    if Assigned(Result) then
+      FreeAndNil(Result);
+  end;
+end;
+
+initialization
+  FDPhysPgDriverLink1 := TFDPhysPgDriverLink.Create(nil);
+  FDPhysPgDriverLink1.VendorLib := IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)) + 'Lib\\libpq.dll';
+  DataBase := TClaseDB.Create;
+
+finalization
+   FreeAndNil(FDPhysPgDriverLink1);
+   FreeAndNil(DataBase);
+end.

@@ -1,0 +1,81 @@
+unit uClienteModel;
+
+interface
+
+type
+  TCliente = class
+  private
+    FIdCliente: Integer;
+    FIdTipo: Integer;
+    FIdTipoDocumento: Integer;
+    FDetalleDocumento: string;
+    FCodigoInterno: Integer;
+    FNombre: string;
+    FApellidos: string;
+    FEmpresa: string;
+    FEmail: string;
+    FObservaciones: string;
+    FTelefono1: string;
+    FTelefono2: string;
+    FIdTarifa: Integer;
+    FPersonaContacto: string;
+    FUrlWeb: string;
+    FUserLogin: string;
+    FPassLogin: string;
+    FActivo: Boolean;
+    FIdPermiso: Integer;
+    constructor Create;
+  public
+    procedure Clear;
+    property IdCliente: Integer read FIdCliente write FIdCliente;
+    property IdTipo: Integer read FIdTipo write FIdTipo;
+    property IdTipoDocumento: Integer read FIdTipoDocumento write FIdTipoDocumento;
+    property DetalleDocumento: string read FDetalleDocumento write FDetalleDocumento;
+    property Nombre: string read FNombre write FNombre;
+    property Apellidos: string read FApellidos write FApellidos;
+    property Empresa: string read FEmpresa write FEmpresa;
+    property Email: string read FEmail write FEmail;
+    property Observaciones: string read FObservaciones write FObservaciones;
+    property Telefono1: string read FTelefono1 write FTelefono1;
+    property Telefono2: string read FTelefono2 write FTelefono2;
+    property IdTarifa: Integer read FIdTarifa write FIdTarifa;
+    property PersonaContacto: string read FPersonaContacto write FPersonaContacto;
+    property UrlWeb: string read FUrlWeb write FUrlWeb;
+    property UserLogin: string read FUserLogin write FUserLogin;
+    property PassLogin: string read FPassLogin write FPassLogin;
+    property Activo: Boolean read FActivo write FActivo;
+    property IdPermiso: Integer read FIdPermiso write FIdPermiso;
+  end;
+
+implementation
+
+procedure TCliente.Clear;
+begin
+  FIdCliente := 0;
+  FIdTipo := 0;
+  FIdTipoDocumento := 0;
+  FDetalleDocumento := '';
+  FNombre := '';
+  FApellidos := '';
+  FEmpresa := '';
+  FEmail := '';
+  FObservaciones := '';
+  FTelefono1 := '';
+  FTelefono2 := '';
+  FIdTarifa := 0;
+  FPersonaContacto := '';
+  FUrlWeb := '';
+  FUserLogin := '';
+  FPassLogin := '';
+  FActivo := True;
+  FIdPermiso := 0;
+end;
+
+constructor TCliente.Create;
+begin
+  inherited Create;
+  Clear;   // inicializa todo vacío
+end;
+
+
+end.

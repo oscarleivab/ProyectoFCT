@@ -1,0 +1,29 @@
+unit uUIStyle;
+
+interface
+
+uses
+  System.SysUtils,
+  Vcl.Controls,      // TImageAlignment
+  Vcl.StdCtrls,      // TButton
+  Vcl.ImgList;       // TImageList
+
+procedure SetButtonIcon(ABtn: TButton; AImages: TImageList;
+  const AIconIndex: Integer; AAlign: TImageAlignment = TImageAlignment.iaLeft);
+
+implementation
+
+procedure SetButtonIcon(ABtn: TButton; AImages: TImageList;
+  const AIconIndex: Integer; AAlign: TImageAlignment);
+begin
+  ABtn.Images := AImages;
+  ABtn.ImageIndex := AIconIndex;
+  ABtn.ImageAlignment := AAlign;                 // enum calificado
+  ABtn.ImageMargins.Left := 8;
+  ABtn.ImageMargins.Right := 6;
+  ABtn.ImageMargins.Top := 4;
+  ABtn.ImageMargins.Bottom := 4;
+end;
+
+end.
+

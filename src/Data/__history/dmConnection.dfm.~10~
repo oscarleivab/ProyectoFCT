@@ -1,0 +1,36 @@
+object DataModuleConnection: TDataModuleConnection
+  Height = 316
+  Width = 640
+  object FDConnectionMain: TFDConnection
+    Params.Strings = (
+      'DriverID=PG')
+    LoginPrompt = False
+    Left = 72
+    Top = 24
+  end
+  object FDPhysPgDriverLink1: TFDPhysPgDriverLink
+    Left = 200
+    Top = 24
+  end
+  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    Left = 320
+    Top = 24
+  end
+  object FDConnectionCompany: TFDConnection
+    Left = 456
+    Top = 24
+  end
+  object FDQueryCliente: TFDQuery
+    Connection = FDConnectionCompany
+    SQL.Strings = (
+      'select * from cliente')
+    Left = 72
+    Top = 120
+  end
+  object DataSourceCliente: TDataSource
+    DataSet = FDQueryCliente
+    Left = 72
+    Top = 192
+  end
+end

@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{8477DF6F-2B8A-4EA6-A7D8-8F3F0C43D82D}</ProjectGuid>
+        <ProjectGuid>{2076E23A-87D9-44EB-B408-985E124D2CD3}</ProjectGuid>
         <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectName Condition="'$(ProjectName)'==''">Gevensoft</ProjectName>
-        <TargetedPlatforms>3</TargetedPlatforms>
+        <TargetedPlatforms>2</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>Gevensoft.dpr</MainSource>
     </PropertyGroup>
@@ -73,7 +73,7 @@
         <SanitizedProjectName>Gevensoft</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>vclwinx;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;FireDACCommonODBC;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;FmxTeeUI;bindcompfmx;inetdb;FireDACSqliteDriver;DbxClientDriver;Tee;soapmidas;vclactnband;TeeUI;fmxFireDAC;dbexpress;DBXMySQLDriver;VclSmp;inet;vcltouch;fmxase;dbrtl;Skia.Package.FMX;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;vcldsnap;DBXInterBaseDriver;IndySystem;Skia.Package.VCL;vcldb;vclFireDAC;bindcomp;FireDACCommon;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;adortl;vclimg;FireDACPgDriver;FireDAC;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;fmxobj;bindcompvclsmp;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>vclwinx;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;FireDACCommonODBC;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;Skia.Package.RTL;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;FmxTeeUI;bindcompfmx;inetdb;FireDACSqliteDriver;DbxClientDriver;Tee;soapmidas;vclactnband;TeeUI;fmxFireDAC;dbexpress;DBXMySQLDriver;VclSmp;inet;vcltouch;fmxase;dbrtl;Skia.Package.FMX;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;vcldsnap;DBXInterBaseDriver;IndySystem;PngComponentsD;Skia.Package.VCL;vcldb;vclFireDAC;bindcomp;FireDACCommon;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;adortl;vclimg;FireDACPgDriver;FireDAC;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;fmxobj;bindcompvclsmp;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -82,7 +82,7 @@
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>vclwinx;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;FireDACCommonODBC;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;FmxTeeUI;bindcompfmx;inetdb;FireDACSqliteDriver;DbxClientDriver;Tee;soapmidas;vclactnband;TeeUI;fmxFireDAC;dbexpress;DBXMySQLDriver;VclSmp;inet;vcltouch;fmxase;dbrtl;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;vcldsnap;DBXInterBaseDriver;IndySystem;Skia.Package.VCL;vcldb;vclFireDAC;bindcomp;FireDACCommon;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;adortl;vclimg;FireDACPgDriver;FireDAC;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;fmxobj;bindcompvclsmp;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>vclwinx;fmx;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;FireDACCommonODBC;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;IndyIPClient;dbxcds;vcledge;bindcompvclwinx;FmxTeeUI;bindcompfmx;inetdb;FireDACSqliteDriver;DbxClientDriver;Tee;soapmidas;vclactnband;TeeUI;fmxFireDAC;dbexpress;DBXMySQLDriver;VclSmp;inet;vcltouch;fmxase;dbrtl;fmxdae;TeeDB;FireDACMSAccDriver;CustomIPTransport;vcldsnap;DBXInterBaseDriver;IndySystem;PngComponentsD;Skia.Package.VCL;vcldb;vclFireDAC;bindcomp;FireDACCommon;IndyCore;RESTBackendComponents;bindcompdbx;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;adortl;vclimg;FireDACPgDriver;FireDAC;inetdbxpress;xmlrtl;tethering;bindcompvcl;dsnap;CloudService;fmxobj;bindcompvclsmp;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -106,8 +106,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_ExeOutput>D:\ProyectoFCT\Bin\Debug\</DCC_ExeOutput>
-        <DCC_DcuOutput>D:\ProyectoFCT\Dcu\</DCC_DcuOutput>
+        <DCC_ExeOutput>D:\Gevensoft 2\GevensoftERP\Bin\Debug\</DCC_ExeOutput>
+        <DCC_DcuOutput>D:\Gevensoft 2\GevensoftERP\Dcu\</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -122,60 +122,101 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_ExeOutput>C:\Desasarrollo\GevensoftERP\bin\release\</DCC_ExeOutput>
+        <DCC_DcuOutput>C:\Desasarrollo\GevensoftERP\dcu\</DCC_DcuOutput>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="datamodules\dmAction.pas">
-            <Form>DataModule3</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
+        <DCCReference Include="UI\Shell\fMain.pas">
+            <Form>FrmMain</Form>
         </DCCReference>
-        <DCCReference Include="Data\dmConnection.pas">
-            <Form>W</Form>
-            <DesignClass>TDataModule</DesignClass>
+        <DCCReference Include="UI\Shell\frStatusBar.pas">
+            <Form>FrameStatusBar</Form>
+            <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="datamodules\dmImages.pas">
-            <Form>DataModule2</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TDataModule</DesignClass>
-        </DCCReference>
-        <DCCReference Include="Utils\uDBUtils.pas"/>
         <DCCReference Include="Utils\uConfigIni.pas"/>
-        <DCCReference Include="UI\Login\uLogin.pas">
-            <Form>frmLogin</Form>
+        <DCCReference Include="Data\dmConnection.pas">
+            <Form>DataModuleConnection</Form>
+            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="UI\Inicio\uNuevaEmpresa.pas">
-            <Form>frmNuevaEmpresa</Form>
-        </DCCReference>
-        <DCCReference Include="UI\Config\uConfig.pas">
-            <Form>frmConfig</Form>
-        </DCCReference>
-        <DCCReference Include="UI\Main\uMain.pas">
-            <Form>frmMain</Form>
-        </DCCReference>
-        <DCCReference Include="Utils\uPostgreSQLInstaller.pas"/>
         <DCCReference Include="Utils\uSession.pas"/>
-        <DCCReference Include="Services\uLog.pas"/>
-        <DCCReference Include="Common\uToastHelper.pas"/>
-        <DCCReference Include="UI\Main\FrameBase.pas">
-            <Form>Frame1</Form>
+        <DCCReference Include="Logic\uLoginManager.pas"/>
+        <DCCReference Include="Utils\uConnectionUtils.pas"/>
+        <DCCReference Include="UI\Shell\frLoginOverlay.pas">
+            <Form>FrameLoginOverlay</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="UI\Login\uLoginManager.pas"/>
-        <DCCReference Include="UI\Login\frLoginOverlay.pas">
-            <Form>Frame2</Form>
+        <DCCReference Include="UI\Resources\dmImageResources.pas">
+            <Form>dmImages</Form>
             <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
+            <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="Data\uDatabaselib.pas"/>
+        <DCCReference Include="UI\Resources\dmUIActions.pas">
+            <Form>dmActions</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <DCCReference Include="Services\uTranslator.pas"/>
+        <DCCReference Include="Common\utoashelper.pas"/>
+        <DCCReference Include="UI\Shell\FrameBase.pas">
+            <Form>FrBase</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Shell\faccionusuario.pas">
+            <Form>Dialogouserfrm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="UI\Shell\FormBase.pas">
+            <Form>FBase</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="UI\Resources\uColores.pas"/>
         <DCCReference Include="Common\uFuncionesglobales.pas"/>
+        <DCCReference Include="Data\uDatabaselib.pas"/>
+        <DCCReference Include="UI\List\FrameListado.pas">
+            <Form>ListadoFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\List\ListadoClientes.pas">
+            <Form>ListadoFrameCliente</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <DCCReference Include="Common\uGridHelper.pas"/>
         <DCCReference Include="Data\uSQL.pas"/>
-        <DCCReference Include="Utils\uConnectionUtils.pas"/>
+        <DCCReference Include="Services\uLog.pas"/>
+        <DCCReference Include="UI\Edit\FrameEdit.pas">
+            <Form>FrEdit</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Edit\edCliente.pas">
+            <Form>FrEdCliente</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Edit\edProveedor.pas">
+            <Form>FrEdit1</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\List\ListadoProveedor.pas">
+            <Form>FrBase1</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\List\ListadoLog.pas">
+            <Form>FrListadoLog</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -193,13 +234,13 @@
         <Borland.ProjectType>Application</Borland.ProjectType>
         <BorlandProject>
             <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">Gevensoft.dpr</Source>
+                </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
-                <Source>
-                    <Source Name="MainSource">Gevensoft.dpr</Source>
-                </Source>
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="..\Bin\Debug\Gevensoft.exe" Configuration="Debug" Class="ProjectOutput">
@@ -1172,7 +1213,7 @@
                 <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
-                <Platform value="Win32">True</Platform>
+                <Platform value="Win32">False</Platform>
                 <Platform value="Win64">True</Platform>
             </Platforms>
         </BorlandProject>

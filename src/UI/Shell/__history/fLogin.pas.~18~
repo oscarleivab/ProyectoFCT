@@ -1,0 +1,124 @@
+﻿unit fLogin;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages,
+  System.SysUtils, System.Classes, System.Types, System.UITypes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  FireDAC.Comp.Client,
+  dmConnection, uSession, uLoginManager,uConnectionUtils;
+
+type
+  TFrmLogin = class(TForm)
+    Panelbase: TPanel;
+    Paneliniciosesion: TPanel;
+    labelerroruser: TLabel;
+    botoniniciarsesion: TButton;
+    Passedit: TEdit;
+    conexionbtn: TButton;
+    botonCerrarApp: TButton;
+    empresabox: TComboBox;
+    cbxuser: TComboBox;
+    procedure FormCreate(Sender: TObject);
+    procedure botoniniciarsesionClick(Sender: TObject);
+    procedure botonCerrarAppClick(Sender: TObject);
+    procedure conexionbtnClick(Sender: TObject);
+    procedure empresaboxChange(Sender: TObject);
+    procedure PasseditKeyPress(Sender: TObject; var Key: Char);
+  private
+    function ItemDataAsInteger(ACombo: TComboBox): Integer;
+  public
+  end;
+
+var
+  FrmLogin: TFrmLogin;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  fMain;
+
+{ Utils }
+
+function TFrmLogin.ItemDataAsInteger(ACombo: TComboBox): Integer;
+begin
+  if (ACombo.ItemIndex < 0) or (ACombo.ItemIndex >= ACombo.Items.Count) then
+    Exit(0);
+  Result := Integer(NativeInt(ACombo.Items.Objects[ACombo.ItemIndex]));
+end;
+
+{ Lifecycle }
+
+procedure TFrmLogin.FormCreate(Sender: TObject);
+begin
+  labelerroruser.Visible := False;
+  // Conecta BD principal y carga empresas
+  DataModuleConnection.ConnectToMainDatabase;
+  TLoginManager.LoadCompanies(empresabox.Items);
+
+  if empresabox.Items.Count > 0 then
+  begin
+    empresabox.ItemIndex := 0;
+    empresaboxChange(nil); // esto conectará a la BD empresa y cargará empleados
+  end;
+end;
+
+
+{ Events }
+
+procedure TFrmLogin.empresaboxChange(Sender: TObject);
+var
+  CompanyId: Integer;
+  CompanyName: string;
+begin
+  CompanyId := ItemDataAsInteger(empresabox);
+  TLoginManager.ConnectCompanyAndLoadEmployees(CompanyId, cbxuser.Items, CompanyName);
+
+  AppSession.CompanyId   := CompanyId;
+  AppSession.CompanyName := CompanyName;
+
+  if cbxuser.Items.Count > 0 then
+    cbxuser.ItemIndex := 0;
+end;
+
+procedure TFrmLogin.PasseditKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    Key := #0;
+    botoniniciarsesionClick(Sender);
+  end;
+end;
+
+procedure TFrmLogin.botonCerrarAppClick(Sender: TObject);
+begin
+  ModalResult := mrCancel;
+end;
+
+procedure TFrmLogin.conexionbtnClick(Sender: TObject);
+begin
+   if TConnectionUtils.TestConnection(DataModuleConnection.FDConnectionMain) then
+    MessageDlg('Conexión OK con la base principal.', mtInformation, [mbOK], 0)
+  else
+    MessageDlg('Error de conexión con la base principal.', mtError, [mbOK], 0);
+end;
+
+procedure TFrmLogin.botoniniciarsesionClick(Sender: TObject);
+var
+  EmployeeId: Integer;
+begin
+  labelerroruser.Visible := False;
+
+  EmployeeId := ItemDataAsInteger(cbxuser);
+
+  if TLoginManager.ValidateEmployee(EmployeeId, Passedit.Text) then
+    ModalResult := mrOk
+  else
+    labelerroruser.Visible := True;
+end;
+
+end.
+

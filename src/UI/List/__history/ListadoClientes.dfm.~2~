@@ -1,0 +1,5 @@
+inherited ListadoFrameCliente: TListadoFrameCliente
+  inherited Listadogrid: TStringGrid
+    ExplicitTop = 122
+  end
+end

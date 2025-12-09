@@ -1,0 +1,183 @@
+unit dmConnection;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Comp.Client, FireDAC.Stan.Def, FireDAC.Stan.Param,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Stan.Intf, FireDAC.Phys,
+  FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.UI.Intf, FireDAC.VCLUI.Wait,
+  uConfigIni, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.Phys.Intf,
+  FireDAC.Stan.Pool, Data.DB, FireDAC.Comp.UI;
+
+type
+  TDataModuleConnection = class(TDataModule)
+    FDConnectionMain: TFDConnection;
+    FDPhysPgDriverLink1: TFDPhysPgDriverLink;
+    FDGUIxWaitCursor1: TFDGUIxWaitCursor;
+    FDConnectionCompany: TFDConnection;
+  public
+    procedure ConnectToMainDatabase;
+    function EnsureMainConnected(out AErr: string): Boolean;
+    procedure OpenQueryWithReconnect(Q: TFDQuery);
+    procedure ConnectToCompanyDatabase(ACompanyId: Integer; out ACompanyName: string);
+    function IsConnected: Boolean;
+  end;
+
+var
+  DataModuleConnection: TDataModuleConnection;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+function TDataModuleConnection.EnsureMainConnected(out AErr: string): Boolean;
+begin
+  Result := True;
+  AErr := '';
+  try
+    if not FDConnectionMain.Connected then
+      FDConnectionMain.Open;
+
+    // Verifica que de verdad responde el servidor
+    FDConnectionMain.Ping;
+  except
+    on E: Exception do
+    begin
+      // un intento de reconexión “limpia”
+      try
+        FDConnectionMain.Close;
+        FDConnectionMain.Open;
+        FDConnectionMain.Ping;
+      except
+        on E2: Exception do
+        begin
+          AErr := E2.Message;
+          Result := False;
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure TDataModuleConnection.OpenQueryWithReconnect(Q: TFDQuery);
+var
+  Err: string;
+  Attempt: Integer;
+begin
+  Try
+    // Asegura conexión antes de abrir
+    if not EnsureMainConnected(Err) then
+      raise Exception.Create('No hay conexión con la base de datos. ' + Err);
+
+    for Attempt := 1 to 2 do
+    try
+      Q.Open;
+      Exit; // éxito
+    except
+      on E: Exception do
+      begin
+        // Si es el primer intento, prueba a reconectar y reintentar
+        if Attempt = 1 then
+        begin
+          // “reset” de la conexión y reintento
+          FDConnectionMain.Close;
+          FDConnectionMain.Open;
+          FDConnectionMain.Ping;
+          Continue;
+        end;
+        // Segundo fallo: propaga
+        raise;
+      end;
+    end;
+  Except
+   T_('Errores','errorbdprincial')
+  End;
+end;
+
+procedure TDataModuleConnection.ConnectToMainDatabase;
+var
+  DLLPath: string;
+begin
+
+  // --- Ruta de las DLL ---
+  DLLPath := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)) + 'dll');
+  FDPhysPgDriverLink1.VendorHome := '';                    // dejar vacío
+  FDPhysPgDriverLink1.VendorLib  := DLLPath + 'libpq.dll'; // ruta completa
+
+  with FDConnectionMain do
+  begin
+    Close;
+    Params.Clear;
+    Params.DriverID := 'PG';
+    Params.Add('Server=' + AppConfig.Host);
+    Params.Add('Port=' + AppConfig.Port.ToString);
+    Params.Add('Database=' + AppConfig.Database);
+    Params.Add('User_Name=' + AppConfig.User);
+    Params.Add('Password=' + AppConfig.Pass);
+    Params.Add('CharacterSet=UTF8');
+    LoginPrompt := False;
+
+    try
+      Connected := True;
+    except
+      on E: Exception do
+        raise Exception.CreateFmt('Error al conectar con la base principal: %s', [E.Message]);
+    end;
+  end;
+end;
+
+function TDataModuleConnection.IsConnected: Boolean;
+begin
+  Result := Assigned(FDConnectionMain) and FDConnectionMain.Connected;
+end;
+
+procedure TDataModuleConnection.ConnectToCompanyDatabase(ACompanyId: Integer; out ACompanyName: string);
+var
+  Q: TFDQuery;
+  Srv, DB, Usr, Pwd: string;
+  Prt: Integer;
+begin
+  ACompanyName := '';
+
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := FDConnectionMain;
+    Q.SQL.Text :=
+      'select host, port, bdname, userbd, passbd, empresaname '+
+      'from empresa where id = :id and activa = true';
+    Q.ParamByName('id').AsInteger := ACompanyId;
+    Q.Open;
+    if Q.IsEmpty then
+      raise Exception.Create('Empresa no encontrada o inactiva.');
+
+    Srv := Q.FieldByName('host').AsString;
+    Prt := Q.FieldByName('port').AsInteger;
+    DB  := Q.FieldByName('bdname').AsString;
+    Usr := Q.FieldByName('userbd').AsString;
+    Pwd := Q.FieldByName('passbd').AsString;
+    ACompanyName := Q.FieldByName('empresaname').AsString;
+  finally
+    Q.Free;
+  end;
+
+  with FDConnectionCompany do
+  begin
+    Close;
+    Params.Clear;
+    Params.DriverID := 'PG';
+    Params.Add('Server=' + Srv);
+    Params.Add('Port=' + Prt.ToString);
+    Params.Add('Database=' + DB);
+    Params.Add('User_Name=' + Usr);
+    Params.Add('Password=' + Pwd);
+    Params.Add('CharacterSet=UTF8');
+    LoginPrompt := False;
+    Connected := True;
+    // opcional: ExecSQL('select 1');
+  end;
+end;
+
+
+end.

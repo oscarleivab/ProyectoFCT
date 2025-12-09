@@ -1,0 +1,31 @@
+unit frStatusBar;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Graphics,Vcl.Forms;
+
+type
+  TframeStatusBar = class(TFrame)
+    pnlBackground: TPanel;
+    lblUser: TLabel;
+    lblCompany: TLabel;
+    lblConnection: TLabel;
+    lblVersion: TLabel;
+  public
+    procedure UpdateStatus(const AUser, ACompany, AStatus, AVersion: string);
+  end;
+
+implementation
+
+{$R *.dfm}
+
+procedure TframeStatusBar.UpdateStatus(const AUser, ACompany, AStatus, AVersion: string);
+begin
+  lblUser.Caption := 'Usuario: ' + AUser;
+  lblCompany.Caption := 'Empresa: ' + ACompany;
+  lblConnection.Caption := 'Estado: ' + AStatus;
+  lblVersion.Caption := 'Versión: ' + AVersion;
+end;
+
+end.

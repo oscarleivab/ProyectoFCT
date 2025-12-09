@@ -1,0 +1,28 @@
+unit FrameEdit;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FrameBase, Vcl.StdCtrls, Vcl.ExtCtrls;
+
+type
+  TFrEdit = class(TFrBase)
+    paneltop: TPanel;
+    Buttonguardar: TButton;
+    Buttonnuevo: TButton;
+    Buttonsalir: TButton;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrEdit: TFrEdit;
+
+implementation
+
+{$R *.dfm}
+
+end.

@@ -1,0 +1,63 @@
+unit uConfigIni;
+
+interface
+
+uses
+  System.SysUtils, System.IniFiles, System.IOUtils;
+
+type
+  TAppConfig = class
+  private
+    FHost: string;
+    FPort: Integer;
+    FDatabase: string;
+    FUser: string;
+    FPass: string;
+    FDefaultLang: string;
+  public
+    procedure LoadConfig;
+    property Host: string read FHost;
+    property Port: Integer read FPort;
+    property Database: string read FDatabase;
+    property User: string read FUser;
+    property Pass: string read FPass;
+    property DefaultLang: string read FDefaultLang;
+  end;
+
+var
+  AppConfig: TAppConfig;
+
+implementation
+
+{ TAppConfig }
+
+procedure TAppConfig.LoadConfig;
+var
+  Ini: TIniFile;
+  PathIni: string;
+begin
+  PathIni := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ini\config.ini');
+
+  if not FileExists(PathIni) then
+    raise Exception.CreateFmt('No se encontró el archivo de configuración: %s', [PathIni]);
+
+  Ini := TIniFile.Create(PathIni);
+  try
+    FHost := Ini.ReadString('Conexion', 'varHost', 'localhost');
+    FPort := Ini.ReadInteger('Conexion', 'varPort', 5432);
+    FDatabase := Ini.ReadString('Conexion', 'varDatabase', '');
+    FUser := Ini.ReadString('Conexion', 'varUser', '');
+    FPass := Ini.ReadString('Conexion', 'varPass', '');
+    FDefaultLang := Ini.ReadString('Conexion', 'varPass', '');
+  finally
+    Ini.Free;
+  end;
+end;
+
+initialization
+  AppConfig := TAppConfig.Create;
+
+finalization
+  AppConfig.Free;
+
+end.
