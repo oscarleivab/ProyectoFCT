@@ -3,9 +3,9 @@
 
 # 📂 Flujo del programa
 
-[Documentación_ProyectoFCT_Gevensoft.odt](https://github.com/user-attachments/files/24089226/Documentacion_ProyectoFCT_Gevensoft.odt)
-[Documentación_ProyectoFCT_Gevensoft.docx](https://github.com/user-attachments/files/24089225/Documentacion_ProyectoFCT_Gevensoft.docx)
-[Documentación_ProyectoFCT_Gevensoft.pdf](https://github.com/user-attachments/files/24089224/Documentacion_ProyectoFCT_Gevensoft.pdf)
+[Documentación_ProyectoFCT_Gevensoft.odt](https://github.com/user-attachments/files/24089226/Documentacion_ProyectoFCT_Gevensoft.odt)<br>
+[Documentación_ProyectoFCT_Gevensoft.docx](https://github.com/user-attachments/files/24089225/Documentacion_ProyectoFCT_Gevensoft.docx)<br>
+[Documentación_ProyectoFCT_Gevensoft.pdf](https://github.com/user-attachments/files/24089224/Documentacion_ProyectoFCT_Gevensoft.pdf)<br>
 
 # 🎥 Ejecución del programa
 Dejo un enlace con lo que sería la primera versión del programa. Tiene que ser un enlace a YouTube porque GitHub no me dejaba subirlo por pesar demasiado.
