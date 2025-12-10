@@ -1,12 +1,11 @@
 # 💫 Acerca:
 🙋‍♂️ Óscar Marian Leiva Bielka<br>🧑‍🤝‍🧑 Exposición junto: Jose Rubén Romero Gonzalez y Pablo Caro Salvador<br>💼 2º DAM<br>💻 Proyecto FCT - Gevensoft<br>🔩 Realizado en Delphi
 
-# 📂 Flujo del programa
-Al ejecutar por primera vez el programa comprueba si PostgreSQL (la base de datos con la que se trabaja) esta instalada o no. En el caso de que no lo este empieza una instalación de esta en el equipo. Una vez finalizada la instalación comprueba si se encuentra el archivo .ini donde esta la información de la base de datos principal del programa; al tratarse de la primera ejecución este archivo es normal que no este en el directorio del programa por ello lo crea le asigna los distintos valores de conexión a la base de datos y posteriormente inicia el primer formulario del programa uNuevaEmpresa.<br>
+# 📂 Ayuda para ver la versión más reciente del proyecto
+Como he dicho en el comentario de la moodle para ver la opción más actualizada simplemente es cambiar a la última versión de la rama en este caso las ramas de este repositorio son "cambios-1", "cambios-2",... siendo la 2 la más reciente.<br>
+<img width="930" height="551" alt="image" src="https://github.com/user-attachments/assets/56a8a28d-6659-4b5c-b745-f11616c93b1f" /><br>
+Adjunto una imagen para ayudar a encontrar y poder cambiar a las distintas ramas del proyecto.
 
-<img width="389" height="321" alt="Captura de pantalla 2025-11-17 145757" src="https://github.com/user-attachments/assets/27fac1b1-bdd5-4862-b4fb-9a476bdd9a43" />
-
-Este primer formulario se encarga de añadir empresas del usuario a la base de datos principal, el usuario solo tendrá que especificar el nombre de la empresa, nombre de la base de datos y datos de inicio de sesión (usuario y contraseña). Cuando se de a aceptar primero se comprueba si se encuentra la base de datos principal, el caso de que no sea así se creará y posteriormente se creará la del usuario introduciendo todos los datos de inicio de sesión en la base de datos principal. <br>
 
 # 🎥 Ejecución del programa
 Dejo un enlace con lo que sería la primera versión del programa. Tiene que ser un enlace a YouTube porque GitHub no me dejaba subirlo por pesar demasiado.
