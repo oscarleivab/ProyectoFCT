@@ -1,7 +1,7 @@
 # 💫 Acerca:
 🙋‍♂️ Óscar Marian Leiva Bielka<br>🧑‍🤝‍🧑 Exposición junto: Jose Rubén Romero Gonzalez y Pablo Caro Salvador<br>💼 2º DAM<br>💻 Proyecto FCT - Gevensoft<br>🔩 Realizado en Delphi
 
-# 📂 Flujo del programa
+# 📂 Archivos de la documentación
 
 [Documentación_ProyectoFCT_Gevensoft.odt](https://github.com/user-attachments/files/24089226/Documentacion_ProyectoFCT_Gevensoft.odt)<br>
 [Documentación_ProyectoFCT_Gevensoft.docx](https://github.com/user-attachments/files/24089225/Documentacion_ProyectoFCT_Gevensoft.docx)<br>
