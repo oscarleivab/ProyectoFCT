@@ -5,11 +5,14 @@ inherited ListadoFrame: TListadoFrame
   ExplicitHeight = 676
   object panelbusquedavanzada: TPanel [0]
     AlignWithMargins = True
-    Left = 3
-    Top = 10
-    Width = 876
+    Left = 0
+    Top = 5
+    Width = 882
     Height = 46
-    Margins.Top = 10
+    Margins.Left = 0
+    Margins.Top = 5
+    Margins.Right = 0
+    Margins.Bottom = 0
     Align = alTop
     BevelOuter = bvNone
     Caption = 'paneltop'
@@ -19,7 +22,7 @@ inherited ListadoFrame: TListadoFrame
     StyleName = 'Windows'
     object buscaedit: TEdit
       AlignWithMargins = True
-      Left = 164
+      Left = 159
       Top = 10
       Width = 406
       Height = 26
@@ -33,7 +36,7 @@ inherited ListadoFrame: TListadoFrame
     end
     object botonbuscar: TButton
       AlignWithMargins = True
-      Left = 583
+      Left = 578
       Top = 3
       Width = 40
       Height = 40
@@ -49,7 +52,7 @@ inherited ListadoFrame: TListadoFrame
     end
     object botonborrarfiltro: TButton
       AlignWithMargins = True
-      Left = 631
+      Left = 626
       Top = 3
       Width = 40
       Height = 40
@@ -65,7 +68,7 @@ inherited ListadoFrame: TListadoFrame
     end
     object botonfiltrar: TButton
       AlignWithMargins = True
-      Left = 679
+      Left = 674
       Top = 3
       Width = 40
       Height = 40
@@ -81,11 +84,11 @@ inherited ListadoFrame: TListadoFrame
     end
     object Botonnuevo: TButton
       AlignWithMargins = True
-      Left = 15
+      Left = 10
       Top = 3
       Width = 40
       Height = 40
-      Margins.Left = 15
+      Margins.Left = 10
       Action = dmActions.actAdd
       Align = alLeft
       ImageAlignment = iaCenter
@@ -97,7 +100,7 @@ inherited ListadoFrame: TListadoFrame
     end
     object Botoneditar: TButton
       AlignWithMargins = True
-      Left = 63
+      Left = 58
       Top = 3
       Width = 40
       Height = 40
@@ -113,12 +116,12 @@ inherited ListadoFrame: TListadoFrame
     end
     object botonsalir: TButton
       AlignWithMargins = True
-      Left = 821
+      Left = 832
       Top = 3
       Width = 40
       Height = 40
       Margins.Left = 5
-      Margins.Right = 15
+      Margins.Right = 10
       Action = dmActions.actClose
       Align = alRight
       ImageAlignment = iaCenter
@@ -128,7 +131,7 @@ inherited ListadoFrame: TListadoFrame
     end
     object btnborrar: TButton
       AlignWithMargins = True
-      Left = 111
+      Left = 106
       Top = 3
       Width = 40
       Height = 40
@@ -145,12 +148,14 @@ inherited ListadoFrame: TListadoFrame
   end
   object Panelfiltros: TPanel [1]
     AlignWithMargins = True
-    Left = 10
-    Top = 62
-    Width = 862
+    Left = 0
+    Top = 51
+    Width = 882
     Height = 7
-    Margins.Left = 10
-    Margins.Right = 10
+    Margins.Left = 0
+    Margins.Top = 0
+    Margins.Right = 0
+    Margins.Bottom = 0
     Align = alTop
     BevelOuter = bvNone
     Caption = 'paneltop'
@@ -158,21 +163,110 @@ inherited ListadoFrame: TListadoFrame
     ParentBackground = False
     ShowCaption = False
     TabOrder = 1
+    Visible = False
     StyleName = 'Windows'
   end
   object DBGridListado: TDBGrid [2]
-    Left = 0
-    Top = 72
-    Width = 882
-    Height = 604
+    AlignWithMargins = True
+    Left = 61
+    Top = 68
+    Width = 811
+    Height = 598
+    Margins.Left = 10
+    Margins.Top = 10
+    Margins.Right = 10
+    Margins.Bottom = 10
     Align = alClient
     DataSource = DataSource
+    DrawingStyle = gdsGradient
+    FixedColor = 15849882
+    GradientEndColor = 16382457
+    GradientStartColor = 16382457
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+    ReadOnly = True
     TabOrder = 2
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDrawColumnCell = DBGridListadoDrawColumnCell
+  end
+  object Menulateral: TPanel [3]
+    AlignWithMargins = True
+    Left = 5
+    Top = 68
+    Width = 46
+    Height = 608
+    Margins.Left = 5
+    Margins.Top = 10
+    Margins.Right = 0
+    Margins.Bottom = 0
+    Align = alLeft
+    BevelOuter = bvNone
+    Caption = 'paneltop'
+    ParentColor = True
+    ShowCaption = False
+    TabOrder = 3
+    Visible = False
+    StyleName = 'Windows'
+    object Botonnuevo2: TButton
+      AlignWithMargins = True
+      Left = 0
+      Top = 0
+      Width = 46
+      Height = 40
+      Margins.Left = 0
+      Margins.Top = 0
+      Margins.Right = 0
+      Margins.Bottom = 0
+      Action = dmActions.actAdd
+      Align = alTop
+      ImageAlignment = iaCenter
+      Images = dmImages.VirtualImageList1
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      StyleName = 'Windows'
+    end
+    object Botoneditar2: TButton
+      AlignWithMargins = True
+      Left = 0
+      Top = 40
+      Width = 46
+      Height = 40
+      Margins.Left = 0
+      Margins.Top = 0
+      Margins.Right = 0
+      Margins.Bottom = 0
+      Action = dmActions.actEdit
+      Align = alTop
+      ImageAlignment = iaCenter
+      Images = dmImages.VirtualImageList1
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 1
+      StyleName = 'Windows'
+    end
+    object btnborrar2: TButton
+      AlignWithMargins = True
+      Left = 0
+      Top = 80
+      Width = 46
+      Height = 40
+      Margins.Left = 0
+      Margins.Top = 0
+      Margins.Right = 0
+      Margins.Bottom = 0
+      Action = dmActions.actDelete
+      Align = alTop
+      ImageAlignment = iaCenter
+      Images = dmImages.VirtualImageList1
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 2
+      StyleName = 'Windows'
+    end
   end
   inherited FDQuery: TFDQuery
     Connection = DataModuleConnection.FDConnectionCompany

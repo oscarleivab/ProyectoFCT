@@ -10,7 +10,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.VCLUI.Wait,
   Data.DB, FireDAC.Comp.Client, FireDAC.Phys.IBDef, FireDAC.Phys.IBBase,
-  FireDAC.Phys.IB, FireDAC.Stan.Param, FireDAC.DatS,
+  FireDAC.Phys.IB, FireDAC.Stan.Param, FireDAC.DatS,  IdHashMessageDigest,IdGlobal,
   FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Grids, Vcl.ExtCtrls,
   Vcl.Buttons, Datasnap.Provider, Datasnap.DBClient, Vcl.DBGrids,Vcl.DBCtrls, Vcl.ComCtrls, Vcl.Mask,System.Hash;
 

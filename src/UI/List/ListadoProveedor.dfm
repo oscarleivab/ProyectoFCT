@@ -1,2 +1,0 @@
-inherited ListadoFrameProveedor: TListadoFrameProveedor
-end

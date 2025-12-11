@@ -5,7 +5,7 @@ interface
 {$WARN SYMBOL_PLATFORM OFF}
 
 uses
-  Classes, SyncObjs, SysUtils, DateUtils,  System.Zip, Forms, Winapi.Windows,
+  Classes, SyncObjs, SysUtils, DateUtils, System.Zip, Forms, Winapi.Windows,
   Data.DB, StrUtils, dmConnection, uDatabaselib, FireDAC.Comp.Client, FireDAC.Stan.Def, FireDAC.Stan.Param,
   FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Stan.Intf, FireDAC.Phys,
   FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.UI.Intf, FireDAC.VCLUI.Wait,
@@ -39,11 +39,12 @@ type
     Tipo: TTipoMensaje;
     Texto: String;
     NivelLog: string;
-    TipoMBD : smallint; // GrabarInfo: 0; GrabarError: 1;)
+    TipoMBD : smallint; // GrabarInfo: 0; GrabarError: 1;
     Fecha: TDateTime;
     SufijoFichero: String;
 
-    USER :string; // usuario que generó el log
+    USER :string;        // usuario que generó el log
+    IdEmpleado: Integer; // id empleado que generó el log
 
     // nuevos tipos de datos para la base BDLOG
     TipoDoc: string;
@@ -53,7 +54,6 @@ type
 
   THiloLogs = class(TThread)
   private
-    { private declarations }
     LastLogFile: string;
     SeccionCritica: TCriticalSection;
     ColaMensajes: array of TMensaje;
@@ -67,25 +67,23 @@ type
     function GetLastLogFile: string;
     procedure ComprimeLogTxt(Fecha: TDateTime);
   protected
-    { protected declarations }
     procedure Execute; override;
   public
-    { public declarations }
     RutaLogs: string;
     constructor Create(CreateSuspended: Boolean);
     destructor Destroy; override;
     procedure Add(Mensaje: String; Tipo: TTipoMensaje; NivelLog: string = '';
-      Tipombd:smallint=-1; SufijoFicheroLog: String = '';
+      Tipombd: smallint=-1; SufijoFicheroLog: String = '';
       TipoDoc: string = ''; IdDoc: Integer = 0);
 
     class procedure FinalizarHiloLogs(const ESPERAR_TERMINO_THREADS_SEG: cardinal = 10; const SLEEP_MS: cardinal = 100);
   end;
 
-procedure DBLog(Mensaje: string; Tipombd: Smallint; TipoDoc: string = ''; IdDoc: Integer = 0); // Añade un error a la base de datos
-function  CompactaDBLog(Dias: Integer = 10): Boolean;  // Borra logs antiguos de la base de datos
-procedure TxtLog(Mensaje: string); // Añade mensaje de log al fichero
-procedure LogE(Mensaje: string);   // Añade mensaje de error al log
-procedure LogD(Mensaje: string);   // Añade mensaje de debug al log
+procedure DBLog(Mensaje: string; Tipombd: Smallint; TipoDoc: string = ''; IdDoc: Integer = 0);
+function  CompactaDBLog(Dias: Integer = 10): Boolean;
+procedure TxtLog(Mensaje: string);
+procedure LogE(Mensaje: string);
+procedure LogD(Mensaje: string);
 
 implementation
 
@@ -100,25 +98,21 @@ end;
 
 procedure DBLog(Mensaje: string; Tipombd: Smallint; TipoDoc: string = ''; IdDoc: Integer = 0);
 begin
-  // Añadimos a la cola de logs de la base de datos
   HiloLogs.Add(Mensaje, tmLogDB, '', Tipombd, '', TipoDoc, IdDoc);
 end;
 
 procedure TxtLog(Mensaje: string);
 begin
-  // Añadimos a la cola de logs normales
   HiloLogs.Add(Mensaje, tmLog);
 end;
 
 procedure LogE(Mensaje: string);
 begin
-  // Log de error
   HiloLogs.Add(Mensaje, tmLog, NIVEL_ERROR);
 end;
 
 procedure LogD(Mensaje: string);
 begin
-  // Log de debug
   HiloLogs.Add(Mensaje, tmLog, NIVEL_DEBUG);
 end;
 
@@ -158,7 +152,6 @@ end;
 
 destructor THiloLogs.Destroy;
 begin
-  // Terminamos de procesar la cola de mensajes antes de destruir el hilo
   try
     try
       ProcesarTodaLaCola;
@@ -167,7 +160,6 @@ begin
         FreeAndNil(SeccionCritica);
     end;
   except
-    // Intencionadamente en blanco
   end;
 end;
 
@@ -175,7 +167,6 @@ procedure THiloLogs.Add(Mensaje: String; Tipo: TTipoMensaje; NivelLog: string = 
   Tipombd: smallint = -1; SufijoFicheroLog: String = '';
   TipoDoc: string = ''; IdDoc: Integer = 0);
 begin
-  // Añade un mensaje a la cola de logs
   if Assigned(SeccionCritica) then begin
     SeccionCritica.Acquire;
     try
@@ -185,11 +176,17 @@ begin
       ColaMensajes[High(ColaMensajes)].NivelLog := NivelLog;
       ColaMensajes[High(ColaMensajes)].Fecha := Now;
       ColaMensajes[High(ColaMensajes)].tipombd := Tipombd;
-      ColaMensajes[High(ColaMensajes)].USER := AppSession.UserName; // asigna automáticamente el usuario actual
+
+      // Usuario y empleado automáticamente
+      ColaMensajes[High(ColaMensajes)].USER := AppSession.UserName;
+
+
       ColaMensajes[High(ColaMensajes)].SufijoFichero := SufijoFicheroLog;
       ColaMensajes[High(ColaMensajes)].TipoDoc := TipoDoc;
       ColaMensajes[High(ColaMensajes)].IdDoc := IdDoc;
-      ColaMensajes[High(ColaMensajes)].FechaDoc := Now; // asigna la fecha actual automáticamente
+      ColaMensajes[High(ColaMensajes)].FechaDoc := Now;
+
+      ColaMensajes[High(ColaMensajes)].IdEmpleado := AppSession.UserId;
     finally
       SeccionCritica.Release;
     end;
@@ -225,20 +222,20 @@ var
   TR: TFDTransaction;
   spLOG: TFDQuery;
 begin
-  // Inserta un mensaje en la tabla LOGBD de la base de datos
   SeccionCriticaEscrituraEnLog.Acquire;
   try
     TR := CrearTransaccion;
     spLOG := CrearQuery(TR);
     try
       try
-        spLOG.SQL.Add('INSERT INTO LOGBD(tipo, observaciones, "USER", tipodoc, iddoc, fechahora)');
-        spLOG.SQL.Add('VALUES (:TIPO, :OBSERVACIONES, :USER, :TIPODOC, :IDDOC, :FECHAHORA)');
+        spLOG.SQL.Add('INSERT INTO LOGBD(tipo, observaciones, "USER", id_empleado, tipodoc, iddoc, fechahora)');
+        spLOG.SQL.Add('VALUES (:TIPO, :OBSERVACIONES, :USER, :IDEMPLEADO, :TIPODOC, :IDDOC, :FECHAHORA)');
 
         spLOG.Transaction.StartTransaction;
         spLOG.ParamByName('TIPO').AsInteger := Mensaje.tipombd;
         spLOG.ParamByName('OBSERVACIONES').AsString := LeftStr(Mensaje.Texto, 255);
         spLOG.ParamByName('USER').AsString := Mensaje.USER;
+        spLOG.ParamByName('IDEMPLEADO').AsInteger := Mensaje.IdEmpleado;
         spLOG.ParamByName('TIPODOC').AsString := Mensaje.TipoDoc;
         spLOG.ParamByName('IDDOC').AsInteger := Mensaje.IdDoc;
 
@@ -269,14 +266,12 @@ end;
 procedure THiloLogs.Execute;
 begin
   inherited;
-  // Ejecuta el hilo de procesamiento de logs
   while Assigned(Self) and not Terminated do begin
     try
       try
         if Length(ColaMensajes) > 0 then
           ProcesarTodaLaCola;
       except
-        // Por si acaso, para no detener el programa
       end;
     finally
       Sleep(300);
@@ -326,7 +321,6 @@ var
   i: Integer;
   RutaBackup: string;
 begin
-  // Comprueba si se debe comprimir logs antiguos y mover a backup
   SeccionCriticaEscrituraEnLog.Acquire;
   try
     MesActual := MonthOf(Fecha);
@@ -365,7 +359,7 @@ begin
             ZipFile.Free;
           end;
 
-          LastLogFile := '';  // comenzamos nuevo mes
+          LastLogFile := '';
         end;
       except
       end;
@@ -383,13 +377,11 @@ begin
     with Mensaje do begin
       if Mensaje.Tipo = tmLogDB then
       begin
-        // Procesamos el mensaje para la BBDD
         InsertarMensajeDB(Mensaje);
       end
       else
       begin
-        // Procesamos el mensaje para el fichero de texto log
-        ComprimeLogTxt(Fecha); // Comprobamos si debemos comprimir los log por cambio de mes
+        ComprimeLogTxt(Fecha);
 
         if Pos('Log\', RutaLogs) <= 0 then
           RutaLogs := ExtractFilePath(Application.ExeName) + 'Log\';
@@ -436,7 +428,6 @@ begin
       end;
     end;
   except
-    // Intencionadamente en blanco. Simplemente evitamos la excepción
   end;
 end;
 
@@ -458,8 +449,8 @@ begin
 
       qEjecutarSQL.SQL.Clear;
       qEjecutarSQL.SQL.Add('DELETE FROM LOGBD');
-      qEjecutarSQL.SQL.Add('WHERE ');
-      qEjecutarSQL.SQL.Add('  (LOGBD.FECHAHORA < ' + QuotedStr(FormatDateTime('mm/dd/yyyy', Fecha)) + ' )');
+      qEjecutarSQL.SQL.Add('WHERE ' +
+        '(LOGBD.FECHAHORA < ' + QuotedStr(FormatDateTime('mm/dd/yyyy', Fecha)) + ' )');
       qEjecutarSQL.ExecSQL;
 
       if qEjecutarSQL.Transaction.Active then
@@ -468,7 +459,7 @@ begin
       Result := True;
     except
       on E: Exception do begin
-        add('[CompactaLogDB] - ' + E.Message,tmLog); // Añadimos mensaje al log txt
+        add('[CompactaLogDB] - ' + E.Message,tmLog);
         if qEjecutarSQL.Transaction.Active then
           qEjecutarSQL.Transaction.Rollback;
       end;

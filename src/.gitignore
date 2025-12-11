@@ -1,0 +1,9 @@
+# Evitar backups automáticos de Delphi
+__history/
+__history/*
+
+# Cachés del IDE de Delphi
+*.identcache
+*.dproj.local
+*.local
+

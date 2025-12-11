@@ -14,7 +14,6 @@ object FrameLoginOverlay: TFrameLoginOverlay
     ParentBackground = False
     TabOrder = 0
     StyleName = 'Windows'
-    ExplicitTop = 3
     object PanelCard: TPanel
       Left = 180
       Top = 144

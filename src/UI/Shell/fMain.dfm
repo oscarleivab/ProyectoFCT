@@ -32,7 +32,7 @@ object FrmMain: TFrmMain
       ImageIndex = -1
       ParentDoubleBuffered = False
       object panelescritorio: TPanel
-        Left = 0
+        Left = 3
         Top = 16
         Width = 609
         Height = 401
@@ -43,15 +43,15 @@ object FrmMain: TFrmMain
           Top = 161
           Width = 120
           Height = 60
-          Caption = 'Empleado'
+          Action = dmActions.ActEmpleado
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
           Font.Name = 'Segoe UI'
           Font.Style = []
           ImageAlignment = iaTop
-          ImageIndex = 9
           ImageMargins.Top = 5
+          Images = dmImages.VirtualImageList1
           ParentFont = False
           TabOrder = 0
           StyleName = 'Windows'
@@ -61,15 +61,15 @@ object FrmMain: TFrmMain
           Top = 227
           Width = 120
           Height = 60
-          Caption = 'Permisos'
+          Action = dmActions.ActPermisos
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
           Font.Name = 'Segoe UI'
           Font.Style = []
           ImageAlignment = iaTop
-          ImageIndex = 10
           ImageMargins.Top = 5
+          Images = dmImages.VirtualImageList1
           ParentFont = False
           TabOrder = 1
           StyleName = 'Windows'
@@ -79,7 +79,7 @@ object FrmMain: TFrmMain
           Top = 95
           Width = 120
           Height = 60
-          Action = dmActions.ActProveedor
+          Action = dmActions.ActProveedores
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
@@ -87,6 +87,7 @@ object FrmMain: TFrmMain
           Font.Style = []
           ImageAlignment = iaTop
           ImageMargins.Top = 5
+          Images = dmImages.VirtualImageList1
           ParentFont = False
           TabOrder = 2
           StyleName = 'Windows'
@@ -337,22 +338,22 @@ object FrmMain: TFrmMain
           TabOrder = 16
           OnClick = Button3Click
         end
-        object Button4: TButton
+        object btnRegistros: TButton
           Left = 446
           Top = 95
           Width = 120
           Height = 60
-          Caption = 'Prueba dbgrid'
+          Action = dmActions.ActRegistros
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ImageAlignment = iaTop
+          ImageMargins.Top = 5
+          Images = dmImages.VirtualImageList1
+          ParentFont = False
           TabOrder = 17
-          OnClick = Button4Click
-        end
-        object Button5: TButton
-          Left = 446
-          Top = 29
-          Width = 120
-          Height = 60
-          Action = dmActions.actLog
-          TabOrder = 18
           StyleName = 'Windows'
         end
       end

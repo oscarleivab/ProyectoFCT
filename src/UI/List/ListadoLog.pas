@@ -1,4 +1,4 @@
-unit ListadoLog;
+ï»¿unit ListadoLog;
 
 interface
 
@@ -6,10 +6,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FrameListado, Vcl.Grids,
   Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, System.Generics.Collections,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
-  FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
-  FireDAC.Comp.Client, Vcl.DBGrids, FrameBase, uLog;
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error,
+  FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
+  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBGrids,
+  FrameBase, uLog;
 
 type
   TFrListadoLog = class(TListadoFrame)
@@ -17,13 +17,10 @@ type
     chkERROR: TCheckBox;
   private
     procedure CargarListado(filtro: string); override;
-    //procedure EditarRegistro(id: Integer); override;
-    //procedure EliminarRegistro(id: Integer); override;
   protected
     procedure Loaded; override;
   public
-    procedure doSearch; override;
-    procedure doFilter; override;
+    //procedure doFilter; override;
   end;
 
 var
@@ -36,16 +33,11 @@ uses
 
 {$R *.dfm}
 
-
-
-{ ------------------------------------------- }
-{  CARGAR LISTADO DE LOGBD                    }
-{ ------------------------------------------- }
-
 procedure TFrListadoLog.CargarListado(filtro: string);
 var
   tiposSeleccionados: TStringList;
   i: Integer;
+  tipoCond: string;
 begin
   tiposSeleccionados := TStringList.Create;
   try
@@ -59,27 +51,41 @@ begin
       // Filtro por observaciones
       if filtro.Trim <> '' then
       begin
-        SQL.Add('  AND observaciones ILIKE :f');
-        ParamByName('f').AsString := '%' + filtro.Trim + '%';
+        SQL.Add('  AND observaciones ILIKE :filtro');
+        ParamByName('filtro').AsString := '%' + filtro.Trim + '%';
       end;
 
       // Filtro por tipo usando checkboxes
       tiposSeleccionados.Clear;
       if chkINFO.Checked then tiposSeleccionados.Add('0');
       if chkERROR.Checked then tiposSeleccionados.Add('1');
-      // si más checkboxes, solo añadirlos aquí
+
       if tiposSeleccionados.Count > 0 then
-        SQL.Add('  AND tipo IN (' + tiposSeleccionados.CommaText + ')');
+      begin
+        // Construimos la clÃ¡usula IN correctamente para nÃºmeros
+        tipoCond := '';
+        for i := 0 to tiposSeleccionados.Count - 1 do
+        begin
+          if i > 0 then
+            tipoCond := tipoCond + ',';
+          tipoCond := tipoCond + tiposSeleccionados[i];
+        end;
+        SQL.Add('  AND tipo IN (' + tipoCond + ')');
+      end;
 
       SQL.Add('ORDER BY id ASC');
       Open;
+
+      FDQuery.FieldByName('id').DisplayLabel := T_('TFrListadoLog','detalle_documento');
     end;
+
+    HideGridColumns(DBGridListado, ['id','tipo']);
+
+    AutoSizeDBGridColumns(DBGridListado, 200);
   finally
     tiposSeleccionados.Free;
   end;
 end;
-
-
 
 procedure TFrListadoLog.Loaded;
 begin
@@ -87,21 +93,30 @@ begin
   Botonnuevo.Visible := False;
   Botoneditar.Visible := False;
   btnborrar.Visible := False;
+  Panelfiltros.Height := 5;
   TranslateTree(Self, '');
 end;
 
+//procedure TFrListadoLog.doFilter;
+//const
+//  ALTURA_PANEL_OCULTO = 5;
+//  ALTURA_PANEL_VISIBLE = 64;
+//begin
+//  if Panelfiltros.Height <= ALTURA_PANEL_OCULTO then
+//  begin
+//    Panelfiltros.Height := ALTURA_PANEL_VISIBLE;
+//    Panelfiltros.Visible := True;
+//  end
+//  else
+//  begin
+//    Panelfiltros.Height := ALTURA_PANEL_OCULTO;
+//    Panelfiltros.Visible := False;
+//  end;
+//
+//  // Forzar que se actualice la UI
+//  Panelfiltros.Update;
+//  Panelfiltros.Repaint;
+//end;
 
-procedure TFrListadoLog.doSearch;
-begin
-  CargarListado(buscaedit.Text);
-end;
-
-procedure TFrListadoLog.doFilter;
-begin
-  if Panelfiltros.Height < 50 then
-    Panelfiltros.Height := 64  // mostrar panel
-  else
-    Panelfiltros.Height := 5;   // ocultar panel
-end;
 end.
 

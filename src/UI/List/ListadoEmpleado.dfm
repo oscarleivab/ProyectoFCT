@@ -1,0 +1,2 @@
+inherited ListadoFrameEmpleado: TListadoFrameEmpleado
+end

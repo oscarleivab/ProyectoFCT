@@ -1,0 +1,2 @@
+inherited ListadoFrameDatosBanco: TListadoFrameDatosBanco
+end

@@ -5,6 +5,7 @@ object FrBase: TFrBase
   Height = 480
   TabOrder = 0
   object FDQuery: TFDQuery
+    UpdateOptions.AutoIncFields = 'id'
     SQL.Strings = (
       '')
     Left = 552

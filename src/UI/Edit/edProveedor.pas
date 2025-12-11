@@ -8,13 +8,14 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.Mask, Vcl.DBCtrls, Vcl.WinXCtrls, dmConnection,uTranslator;
+  Vcl.Mask, Vcl.DBCtrls, Vcl.WinXCtrls, dmConnection, uTranslator, Vcl.Grids,
+  Vcl.DBGrids, ListadoDirecciones, ListadoDatosBanco, vcl.ComCtrls,uFuncionesglobales;
 
 type
   TFrEdProveedor = class(TFrEdit)
     ScrollBox1: TScrollBox;
     Panel5: TPanel;
-    GroupBox1: TGroupBox;
+    GroupDatosfiscales: TGroupBox;
     labelnombre: TLabel;
     labelapellidos: TLabel;
     labelempresa: TLabel;
@@ -25,14 +26,18 @@ type
     DBapellidos: TDBEdit;
     DBempresa: TDBEdit;
     DBdetalle_documento: TDBEdit;
-    DBid_tipo: TDBEdit;
+    DBid: TDBEdit;
+    DBComboTipodoc: TDBLookupComboBox;
     GroupBox2: TGroupBox;
     labeltarifa: TLabel;
     labelpermiso: TLabel;
-    DBid_permiso: TDBEdit;
+    labelactivo: TLabel;
     DBactivo: TDBCheckBox;
-    GroupBox3: TGroupBox;
-    GroupBox4: TGroupBox;
+    DBComboPermisos: TDBLookupComboBox;
+    DBComboTarifa: TDBLookupComboBox;
+    GroupBoxDirecciones: TGroupBox;
+    paneldirecciones: TPanel;
+    GroupDatoscontacto: TGroupBox;
     labeltelefono1: TLabel;
     labeltelefono2: TLabel;
     labelcontacto: TLabel;
@@ -44,85 +49,80 @@ type
     GroupBox5: TGroupBox;
     DBobservaciones: TDBMemo;
     GroupBox6: TGroupBox;
+    panelDatosBanco: TPanel;
     GroupBox7: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     DBuser_login: TDBEdit;
-    DBpass_login: TDBEdit;
     DBurl_web: TDBEdit;
-    DBdirecciones: TDBMemo;
-    DBdatos_bancarios: TDBMemo;
-    DBid_tipo_documento: TComboBox;
-    DBid_tarifa_aplicada: TComboBox;
-    procedure DBComboChange(Sender: TObject);
-    procedure DBComboEnter(Sender: TObject);
+    EditPassword: TEdit;
+    DataSourceTipodoc: TDataSource;
+    DataSourcePermisos: TDataSource;
+    FDQueryTipodoc: TFDQuery;
+    FDQueryPermisos: TFDQuery;
+    FDQueryTarifa: TFDQuery;
+    DataSourceTarifa: TDataSource;
+    DataSourceDirecciones: TDataSource;
+    FDQueryDirecciones: TFDQuery;
+   
+    procedure EditPasswordChange(Sender: TObject);  // <-- Asegúrate de tener este panel en el DFM
   private
+    Listadodirecciones: TListadoFrameDirecciones;
+    ListadoDatosBanco: TListadoFrameDatosBanco;
     procedure VincularControles;
-    procedure CargarCombos;
-    procedure MostrarValores;
+    Procedure CargarPermisos;
+    Procedure CargarTarifas;
+    Procedure CargarTipoDoc;
+    Function ValidarCampos:boolean; Override;
+    procedure cargarListadoDirecciones(id:integer);
+    Procedure cargarframedirecciones(ID:Integer);
+    Procedure cargarframeDatosBanco(ID: Integer);
   public
-    procedure Cargardatos(Id: Integer); override;
+    Procedure Cargardatos(Id: Integer); Override;
+    procedure NuevoRegistro; Override;
+    procedure doSave; Override;
   end;
-
-var
-  FrEdProveedor: TFrEdProveedor;
 
 implementation
 
-uses fmain;
+uses
+  fmain;
 
 {$R *.dfm}
 
-const
-  TipoDocumentoText: array[1..4] of string = ('DNI', 'NIE', 'PASAPORTE', 'CIF');
-  TarifaText: array[1..2] of string = ('Tarifa 1', 'Tarifa 2');
-
-procedure TFrEdProveedor.CargarCombos;
+procedure TFrEdProveedor.doSave;
 var
-  i: Integer;
+  IdProveedor: Integer;
 begin
-  // Tipo documento
-  DBid_tipo_documento.Items.Clear;
-  for i := Low(TipoDocumentoText) to High(TipoDocumentoText) do
-    DBid_tipo_documento.Items.Add(TipoDocumentoText[i]);
 
-  // Tarifa aplicada
-  DBid_tarifa_aplicada.Items.Clear;
-  for i := Low(TarifaText) to High(TarifaText) do
-    DBid_tarifa_aplicada.Items.Add(TarifaText[i]);
+ if FDQuery.State in dsEditModes then
+  begin
+    // Si el usuario ha escrito algo en el edit, significa que quiere cambiar el password
+    if EditPassword.Text <> '' then
+      FDQuery.FieldByName('pass_login').AsString := GetSHA256(EditPassword.Text);
+  end;
+
+  inherited;
+
+  // Si sigue en edición, es que no se ha llegado a hacer Post (falló validación)
+  if FDQuery.State in dsEditModes then
+    Exit;
+
+  IdProveedor := DBId.Field.AsInteger;
+
+  if Assigned(Listadodirecciones) then
+    Listadodirecciones.cargarlistadoentidad(IdProveedor, 'PROVEEDORES');
+
+  if Assigned(ListadoDatosBanco) then
+    ListadoDatosBanco.CargarListadoEntidad(IdProveedor, 'PROVEEDORES');
+
 end;
 
-procedure TFrEdProveedor.DBComboChange(Sender: TObject);
+procedure TFrEdProveedor.EditPasswordChange(Sender: TObject);
 begin
-  if not (FDQuery.State in [dsEdit, dsInsert]) then
-    FDQuery.Edit;
-
-  if Sender = DBid_tipo_documento then
-    FDQuery.FieldByName('id_tipo_documento').AsInteger := DBid_tipo_documento.ItemIndex + 1
-  else if Sender = DBid_tarifa_aplicada then
-    FDQuery.FieldByName('id_tarifa_aplicada').AsInteger := DBid_tarifa_aplicada.ItemIndex + 1;
-end;
-
-procedure TFrEdProveedor.MostrarValores;
-begin
-  // Tipo documento
-  if not FDQuery.FieldByName('id_tipo_documento').IsNull then
-    DBid_tipo_documento.ItemIndex := FDQuery.FieldByName('id_tipo_documento').AsInteger - 1
-  else
-    DBid_tipo_documento.ItemIndex := -1;
-
-  // Tarifa aplicada
-  if not FDQuery.FieldByName('id_tarifa_aplicada').IsNull then
-    DBid_tarifa_aplicada.ItemIndex := FDQuery.FieldByName('id_tarifa_aplicada').AsInteger - 1
-  else
-    DBid_tarifa_aplicada.ItemIndex := -1;
-end;
-
-
-procedure TFrEdProveedor.DBComboEnter(Sender: TObject);
-begin
-  if FDQuery.Active and (FDQuery.State = dsBrowse) then
+  inherited;
+  if not (FDQuery.State in dsEditModes) then
     FDQuery.Edit;
 end;
 
@@ -130,82 +130,261 @@ procedure TFrEdProveedor.VincularControles;
 var
   I: Integer;
   Ed: TDBEdit;
-  Memo: TDBMemo;
   FieldName: string;
 begin
-  // Recorremos todos los componentes para enlazar automáticamente
+  // Recorremos TODOS los componentes del formulario
   for I := 0 to ComponentCount - 1 do
   begin
     if Components[I] is TDBEdit then
     begin
       Ed := TDBEdit(Components[I]);
+
+      // Esperamos nombres tipo: DBid, DBnombre, DBapellidos, etc.
       if SameText(Copy(Ed.Name, 1, 2), 'DB') then
       begin
-        FieldName := Copy(Ed.Name, 3, MaxInt);
-        if Assigned(FDQuery.FindField(FieldName)) then
-          Ed.DataField := FieldName;
-      end;
-    end;
+        // Quitamos el "DB" del principio para obtener el nombre del campo
+        FieldName := Copy(Ed.Name, 3, MaxInt);  // "DBnombre" -> "nombre"
 
-    if Components[I] is TDBMemo then
-    begin
-      Memo := TDBMemo(Components[I]);
-      if SameText(Copy(Memo.Name, 1, 2), 'DB') then
-      begin
-        FieldName := Copy(Memo.Name, 3, MaxInt);
+        // Si el campo existe en el dataset, lo enlazamos
         if Assigned(FDQuery.FindField(FieldName)) then
-          Memo.DataField := FieldName;
+        begin
+          Ed.DataField  := FieldName;
+        end;
       end;
     end;
+  end;
+
+  DBActivo.DataField := 'activo';
+  DBobservaciones.DataField := 'observaciones';
+
+  // Vincular permisos
+  DBComboPermisos.DataField := 'id_permiso';
+  DBComboPermisos.KeyField  := 'id';
+  DBComboPermisos.ListField := 'nombre';
+
+  // Vincular tarifas
+  DBComboTarifa.DataField := 'id_tarifa';
+  DBComboTarifa.KeyField  := 'id';
+  DBComboTarifa.ListField := 'nombre';
+
+  // Vincular tipo de documento
+  DBComboTipodoc.DataField := 'id_tipo_documento';
+  DBComboTipodoc.KeyField  := 'id';
+  DBComboTipodoc.ListField := 'nombre';
+end;
+
+procedure TFrEdProveedor.NuevoRegistro;
+begin
+  FDQuery.Close;
+  FDQuery.Sql.Clear;
+  // Solo queremos la estructura, sin registros
+  FDQuery.SQL.Text := 'SELECT * FROM proveedores WHERE 1 = 0';
+  FDQuery.Open;
+
+  // Crear registro nuevo
+  FDQuery.Append;  // ahora State = dsInsert
+
+  FDQuery.FieldByName('activo').AsBoolean := False;
+  FDQuery.FieldByName('id_tarifa').AsInteger := 1;
+  FDQuery.FieldByName('id_permiso').AsInteger := 1;
+  FDQuery.FieldByName('id_tipo_documento').AsInteger := 1;
+
+  // 🔹 Actualizar el título de la pestaña
+    // 🔹 Cambiar el nombre de la pestaña donde está este frame
+  if Parent is TTabSheet then
+    TTabSheet(Parent).Caption := 'Nuevo Proveedores';
+end;
+
+Procedure TFrEdProveedor.CargarPermisos;
+begin
+  with FDQueryPermisos do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT ');
+    SQL.Add('id,');
+    SQL.Add('nombre');
+    SQL.Add('FROM permisos');
+    SQL.Add('ORDER BY nombre');
+    Open;
   end;
 end;
 
-procedure TFrEdProveedor.Cargardatos(Id: Integer);
+Function TFrEdProveedor.ValidarCampos:boolean;
 begin
-  // Asignar conexión
-  FDQuery.Connection := DataModuleConnection.FDConnectionCompany;
-  FDQuery.Close;
+  Result := True;
 
-  // Nuevo registro
-  if Id = 0 then
+  // Validar campo obligatorio: permiso
+  if (FDQuery.FieldByName('id_permiso').IsNull) or
+     (FDQuery.FieldByName('id_permiso').AsInteger < 1) then
   begin
-    FDQuery.SQL.Text := 'SELECT * FROM proveedores WHERE 1=0';
-    FDQuery.Open;
-    FDQuery.Append;
-
-    FDQuery.FieldByName('activo').AsBoolean := True;
-    FDQuery.FieldByName('id_tipo_documento').AsInteger := 1;
-    FDQuery.FieldByName('id_tarifa_aplicada').AsInteger := 1;
-  end
-  else
-  begin
-    // Editar registro existente
-    FDQuery.SQL.Text := 'SELECT * FROM proveedores WHERE id = :pid_proveedor';
-    FDQuery.ParamByName('pid_proveedor').AsInteger := Id;
-    FDQuery.Open;
+    MostrarToast(T_('info','combopermiso'), 'warning');
+    DBComboPermisos.SetFocus;
+    Exit(False);
   end;
 
-  // Vincular DataSource
-  DataSource.DataSet := FDQuery;
+  // Validar campo obligatorio: tarifa
+  if (FDQuery.FieldByName('id_tarifa').IsNull) or
+     (FDQuery.FieldByName('id_tarifa').AsInteger < 1) then
+  begin
+    MostrarToast(T_('info','combotarifa'), 'warning');
+    DBCombotarifa.SetFocus;
+    Exit(False);
+  end;
 
-  // Llenar combos
-  CargarCombos;
+  // Validar que hay al menos nombre / apellidos / empresa
+  if (FDQuery.FieldByName('nombre').AsString = '') and
+     (FDQuery.FieldByName('apellidos').AsString = '') and
+     (FDQuery.FieldByName('empresa').AsString = '') then
+  begin
+    MostrarToast(T_('info','faltandatos'), 'warning');
+    Dbnombre.SetFocus;
+    Exit(False);
+  end;
 
-  // Mostrar valores correctamente
-  MostrarValores;
+    if (Length(Trim(EditPassword.Text)) < 6) and (EditPassword.Text<>'')  then
+  begin
+    MostrarToast(T_('info','validacionpass'), 'warning');
+    EditPassword.SetFocus;
+    Exit(False);
+  end;
+end;
 
-  // Vincular DBEdit/DBMemo automáticamente
+Procedure TFrEdProveedor.CargarTarifas;
+begin
+  with FDQueryTarifa do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT ');
+    SQL.Add('id,');
+    SQL.Add('nombre');
+    SQL.Add('FROM Tarifa');
+    SQL.Add('ORDER BY nombre');
+    Open;
+  end;
+end;
+
+Procedure TFrEdProveedor.CargarTipoDoc;
+begin
+  with FDQueryTipoDoc do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add('SELECT ');
+    SQL.Add('id,');
+    SQL.Add('nombre');
+    SQL.Add('FROM tipo_documento_identidad');
+    SQL.Add('ORDER BY nombre');
+    Open;
+  end;
+end;
+
+Procedure TFrEdProveedor.Cargardatos(Id: Integer);
+begin
+  DataSource.OnStateChange := DataSourceStateChange;
+
+  CargarPermisos;
+  CargarTarifas;
+  CargarTipoDoc;
+
+  if Id <> 0 then
+  begin
+    with FDQuery do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add('SELECT ');
+      SQL.Add('id,');
+      SQL.Add('id_tipo_documento,');
+      SQL.Add('detalle_documento,');
+      SQL.Add('nombre,');
+      SQL.Add('apellidos,');
+      SQL.Add('empresa,');
+      SQL.Add('email,');
+      SQL.Add('observaciones,');
+      SQL.Add('telefono1,');
+      SQL.Add('telefono2,');
+      SQL.Add('id_tarifa, ');
+      SQL.Add('persona_contacto,');
+      SQL.Add('url_web,');
+      SQL.Add('user_login, ');
+      SQL.Add('pass_login,');
+      SQL.Add('activo,');
+      SQL.Add('id_permiso  ');
+      SQL.Add('FROM proveedores');
+      SQL.Add('WHERE (id = :pid_proveedor)');
+      ParamByName('pid_proveedor').AsInteger := ID;
+      Open;
+    end;
+    Buttonguardar.Enabled := False;
+  end
+  else
+    NuevoRegistro;
+
   VincularControles;
 
-  // Configurar checkbox PostgreSQL
-  DBactivo.DataSource := DataSource;
-  DBactivo.DataField := 'activo';
-  DBactivo.ValueChecked := 't';
-  DBactivo.ValueUnchecked := 'f';
+  // Cargar subframes
+  cargarframedirecciones(Id);
+  cargarframeDatosBanco(Id);
+end;
 
-  // Hacer readonly el id_tipo (se genera automáticamente)
-  DBid_tipo.ReadOnly := False;
-  MostrarToast(T_('Cargado correctamente', 'errorbdprincipal'), 'success')
+Procedure TFrEdProveedor.cargarframedirecciones(ID:integer);
+begin
+  if Assigned(ListadoDirecciones) then
+  begin
+    ListadoDirecciones.Free;
+    ListadoDirecciones := nil;
+  end;
+
+  ListadoDirecciones := TListadoFrameDirecciones.Create(Self);
+  Listadodirecciones.Parent := Paneldirecciones;
+  Listadodirecciones.Align := alClient;
+  Listadodirecciones.panelbusquedavanzada.Visible := False;
+  Listadodirecciones.Menulateral.Visible := True;
+  Listadodirecciones.cargarlistadoentidad(ID, 'PROVEEDOR');
+end;
+
+Procedure TFrEdProveedor.cargarframeDatosBanco(ID: Integer);
+begin
+  if Assigned(ListadoDatosBanco) then
+  begin
+    ListadoDatosBanco.Free;
+    ListadoDatosBanco := nil;
+  end;
+
+  ListadoDatosBanco := TListadoFrameDatosBanco.Create(Self);
+  ListadoDatosBanco.Parent := panelDatosBanco;
+  ListadoDatosBanco.Align := alClient;
+  ListadoDatosBanco.panelbusquedavanzada.Visible := False;
+  ListadoDatosBanco.Menulateral.Visible := True;
+  ListadoDatosBanco.CargarListadoEntidad(ID, 'PROVEEDOR');
+end;
+
+procedure TFrEdProveedor.cargarListadoDirecciones(id:integer);
+begin
+  if Id <> 0 then
+  begin
+    with FDQueryDirecciones do
+    begin
+      SQL.Clear;
+      SQL.Add('SELECT ');
+      SQL.Add('  id,');
+      SQL.Add('  id_entidad,');
+      SQL.Add('  detalle,');
+      SQL.Add('  direccion,');
+      SQL.Add('  poblacion,');
+      SQL.Add('  provincia,');
+      SQL.Add('  pais,');
+      SQL.Add('  cp');
+      SQL.Add('FROM datos_direccion');
+      SQL.Add('WHERE (id = :pid)');
+      ParamByName('pid').AsInteger := id;
+      SQL.Add('ORDER BY id');
+      Open;
+    end;
+  end;
 end;
 
 end.
+

@@ -1,33 +1,37 @@
 inherited FrEdProveedor: TFrEdProveedor
-  Width = 899
-  Height = 788
-  ExplicitWidth = 899
-  ExplicitHeight = 788
+  Width = 943
+  Height = 707
+  ExplicitWidth = 943
+  ExplicitHeight = 707
   inherited paneltop: TPanel
-    Width = 899
-    ExplicitWidth = 899
+    Width = 943
+    ExplicitLeft = -72
+    ExplicitTop = 10
+    ExplicitWidth = 752
     inherited Buttonsalir: TButton
-      Left = 834
-      ExplicitLeft = 834
+      Left = 878
     end
   end
   object ScrollBox1: TScrollBox [1]
     Left = 0
     Top = 65
-    Width = 899
-    Height = 723
+    Width = 943
+    Height = 642
+    VertScrollBar.Position = 271
     Align = alClient
     BevelInner = bvNone
     BevelOuter = bvNone
     BorderStyle = bsNone
     ParentBackground = True
     TabOrder = 1
+    ExplicitWidth = 640
+    ExplicitHeight = 415
     object Panel5: TPanel
       AlignWithMargins = True
       Left = 15
-      Top = 0
-      Width = 848
-      Height = 847
+      Top = -271
+      Width = 892
+      Height = 913
       Margins.Left = 15
       Margins.Top = 0
       Margins.Right = 15
@@ -36,16 +40,17 @@ inherited FrEdProveedor: TFrEdProveedor
       BevelEdges = [beBottom]
       BevelOuter = bvNone
       TabOrder = 0
-      object GroupBox1: TGroupBox
+      object GroupDatosfiscales: TGroupBox
         Left = 0
         Top = 0
-        Width = 848
+        Width = 892
         Height = 117
         Align = alTop
         Caption = 'Datos Fiscales'
         Ctl3D = True
         ParentCtl3D = False
         TabOrder = 0
+        ExplicitWidth = 862
         object labelnombre: TLabel
           Left = 299
           Top = 24
@@ -120,30 +125,30 @@ inherited FrEdProveedor: TFrEdProveedor
           DataSource = DataSource
           TabOrder = 3
         end
-        object DBid_tipo: TDBEdit
+        object DBid: TDBEdit
           Left = 95
           Top = 21
           Width = 138
           Height = 23
           DataSource = DataSource
+          ReadOnly = True
           TabOrder = 4
         end
-        object DBid_tipo_documento: TComboBox
+        object DBComboTipodoc: TDBLookupComboBox
           Left = 95
           Top = 50
           Width = 138
           Height = 23
-          Style = csDropDownList
+          DataSource = DataSource
+          ListSource = DataSourceTipodoc
           TabOrder = 5
-          OnChange = DBComboChange
-          OnEnter = DBComboEnter
         end
       end
       object GroupBox2: TGroupBox
         AlignWithMargins = True
         Left = 0
-        Top = 717
-        Width = 852
+        Top = 817
+        Width = 892
         Height = 84
         Margins.Left = 0
         Margins.Top = 10
@@ -151,7 +156,7 @@ inherited FrEdProveedor: TFrEdProveedor
         Align = alTop
         Caption = 'Tarifa y permisos'
         TabOrder = 1
-        ExplicitWidth = 848
+        ExplicitWidth = 862
         object labeltarifa: TLabel
           Left = 10
           Top = 42
@@ -166,61 +171,71 @@ inherited FrEdProveedor: TFrEdProveedor
           Height = 15
           Caption = 'Permisos'
         end
-        object DBid_permiso: TDBEdit
-          Left = 422
-          Top = 39
-          Width = 219
-          Height = 23
+        object labelactivo: TLabel
+          Left = 746
+          Top = 43
+          Width = 34
+          Height = 15
+          BiDiMode = bdRightToLeft
+          Caption = 'Activo'
+          ParentBiDiMode = False
+        end
+        object DBactivo: TDBCheckBox
+          Left = 786
+          Top = 42
+          Width = 17
+          Height = 17
           DataSource = DataSource
           TabOrder = 0
         end
-        object DBactivo: TDBCheckBox
-          Left = 696
+        object DBComboPermisos: TDBLookupComboBox
+          Left = 422
           Top = 40
-          Width = 97
-          Height = 17
-          Caption = 'Activado'
+          Width = 243
+          Height = 23
           DataSource = DataSource
+          ListSource = DataSourcePermisos
           TabOrder = 1
         end
-        object DBid_tarifa_aplicada: TComboBox
-          Left = 120
+        object DBComboTarifa: TDBLookupComboBox
+          Left = 95
           Top = 40
-          Width = 208
+          Width = 243
           Height = 23
-          Style = csDropDownList
+          DataSource = DataSource
+          ListSource = DataSourceTarifa
           TabOrder = 2
-          OnChange = DBComboChange
-          OnEnter = DBComboEnter
         end
       end
-      object GroupBox3: TGroupBox
+      object GroupBoxDirecciones: TGroupBox
         AlignWithMargins = True
         Left = 0
         Top = 245
-        Width = 852
-        Height = 105
+        Width = 892
+        Height = 160
         Margins.Left = 0
         Margins.Top = 10
         Margins.Right = 0
         Align = alTop
         Caption = 'Direcciones'
         TabOrder = 2
-        ExplicitWidth = 848
-        object DBdirecciones: TDBMemo
-          Left = 3
-          Top = 16
-          Width = 846
-          Height = 86
-          DataSource = DataSource
+        ExplicitWidth = 862
+        object paneldirecciones: TPanel
+          Left = 2
+          Top = 17
+          Width = 888
+          Height = 141
+          Align = alClient
+          BevelOuter = bvNone
           TabOrder = 0
+          ExplicitWidth = 858
         end
       end
-      object GroupBox4: TGroupBox
+      object GroupDatoscontacto: TGroupBox
         AlignWithMargins = True
         Left = 0
         Top = 127
-        Width = 852
+        Width = 892
         Height = 105
         Margins.Left = 0
         Margins.Top = 10
@@ -228,7 +243,7 @@ inherited FrEdProveedor: TFrEdProveedor
         Align = alTop
         Caption = 'Datos de contacto'
         TabOrder = 3
-        ExplicitWidth = 848
+        ExplicitWidth = 862
         object labeltelefono1: TLabel
           Left = 10
           Top = 39
@@ -293,8 +308,8 @@ inherited FrEdProveedor: TFrEdProveedor
       object GroupBox5: TGroupBox
         AlignWithMargins = True
         Left = 0
-        Top = 363
-        Width = 852
+        Top = 418
+        Width = 892
         Height = 105
         Margins.Left = 0
         Margins.Top = 10
@@ -302,48 +317,58 @@ inherited FrEdProveedor: TFrEdProveedor
         Align = alTop
         Caption = 'Observaciones'
         TabOrder = 4
-        ExplicitWidth = 848
+        ExplicitWidth = 862
         object DBobservaciones: TDBMemo
           AlignWithMargins = True
-          Left = 5
-          Top = 20
-          Width = 838
-          Height = 80
+          Left = 7
+          Top = 17
+          Width = 878
+          Height = 81
+          Margins.Left = 5
+          Margins.Top = 0
+          Margins.Right = 5
+          Margins.Bottom = 5
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
           BorderStyle = bsNone
+          Color = 16382457
           DataSource = DataSource
           TabOrder = 0
+          ExplicitWidth = 848
         end
       end
       object GroupBox6: TGroupBox
         AlignWithMargins = True
         Left = 0
-        Top = 481
-        Width = 852
-        Height = 105
+        Top = 526
+        Width = 892
+        Height = 160
         Margins.Left = 0
-        Margins.Top = 10
+        Margins.Top = 0
         Margins.Right = 0
         Align = alTop
         Caption = 'Datos Bancarios'
         TabOrder = 5
-        ExplicitWidth = 848
-        object DBdatos_bancarios: TDBMemo
-          Left = 3
-          Top = 16
-          Width = 842
-          Height = 86
-          DataSource = DataSource
+        ExplicitWidth = 862
+        object panelDatosBanco: TPanel
+          Left = 2
+          Top = 17
+          Width = 888
+          Height = 141
+          Align = alClient
+          BevelOuter = bvNone
           TabOrder = 0
+          ExplicitLeft = 10
+          ExplicitTop = -63
+          ExplicitWidth = 887
         end
       end
       object GroupBox7: TGroupBox
         AlignWithMargins = True
         Left = 0
-        Top = 599
-        Width = 852
+        Top = 699
+        Width = 892
         Height = 105
         Margins.Left = 0
         Margins.Top = 10
@@ -351,7 +376,7 @@ inherited FrEdProveedor: TFrEdProveedor
         Align = alTop
         Caption = 'Accesos Login'
         TabOrder = 6
-        ExplicitWidth = 848
+        ExplicitWidth = 862
         object Label1: TLabel
           Left = 10
           Top = 41
@@ -381,23 +406,79 @@ inherited FrEdProveedor: TFrEdProveedor
           DataSource = DataSource
           TabOrder = 0
         end
-        object DBpass_login: TDBEdit
-          Left = 543
-          Top = 38
-          Width = 298
-          Height = 23
-          DataSource = DataSource
-          TabOrder = 1
-        end
         object DBurl_web: TDBEdit
           Left = 95
           Top = 67
           Width = 746
           Height = 23
           DataSource = DataSource
+          TabOrder = 1
+        end
+        object EditPassword: TEdit
+          Left = 536
+          Top = 38
+          Width = 305
+          Height = 23
+          PasswordChar = '*'
           TabOrder = 2
         end
       end
     end
+  end
+  inherited FDQuery: TFDQuery
+    Left = 736
+    Top = 16
+  end
+  inherited DataSource: TDataSource
+    Left = 704
+    Top = 16
+  end
+  object DataSourceTipodoc: TDataSource
+    DataSet = FDQueryTipodoc
+    Left = 152
+    Top = 16
+  end
+  object DataSourcePermisos: TDataSource
+    DataSet = FDQueryPermisos
+    Left = 240
+    Top = 16
+  end
+  object FDQueryTipodoc: TFDQuery
+    Connection = DataModuleConnection.FDConnectionCompany
+    SQL.Strings = (
+      '')
+    Left = 312
+    Top = 16
+  end
+  object FDQueryPermisos: TFDQuery
+    Connection = DataModuleConnection.FDConnectionCompany
+    SQL.Strings = (
+      '')
+    Left = 368
+    Top = 16
+  end
+  object FDQueryTarifa: TFDQuery
+    Connection = DataModuleConnection.FDConnectionCompany
+    SQL.Strings = (
+      '')
+    Left = 440
+    Top = 16
+  end
+  object DataSourceTarifa: TDataSource
+    DataSet = FDQueryTarifa
+    Left = 496
+    Top = 24
+  end
+  object DataSourceDirecciones: TDataSource
+    DataSet = FDQueryDirecciones
+    Left = 544
+    Top = 24
+  end
+  object FDQueryDirecciones: TFDQuery
+    Connection = DataModuleConnection.FDConnectionCompany
+    SQL.Strings = (
+      '')
+    Left = 600
+    Top = 24
   end
 end

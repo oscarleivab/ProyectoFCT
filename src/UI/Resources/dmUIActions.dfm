@@ -52,8 +52,26 @@ object dmActions: TdmActions
                 ImageName = 'apagar'
               end>
             Caption = '&Menu'
-            ImageIndex = 0
-            ImageName = 'apagar'
+            ImageIndex = 13
+            ImageName = 'menu'
+          end
+          item
+            Items = <
+              item
+                Action = ActEmpleado
+                Caption = '&Empleados'
+                ImageIndex = 12
+                ImageName = 'empleado'
+              end
+              item
+                Action = ActCliente
+                Caption = '&Clientes'
+                ImageIndex = 4
+                ImageName = 'cliente'
+              end>
+            Caption = '&Entidad'
+            ImageIndex = 4
+            ImageName = 'cliente'
           end>
         ActionBar = FrmMain.MenuPrincipalBar1
       end>
@@ -62,10 +80,11 @@ object dmActions: TdmActions
     Top = 40
     StyleName = 'Platform Default'
     object ActCliente: TAction
-      Category = 'Entidad1'
+      Category = 'Entidad'
       Caption = 'Clientes'
       ImageIndex = 4
       ImageName = 'cliente'
+      OnExecute = ActClienteExecute
     end
     object actLogin: TAction
       Caption = 'Conectar'
@@ -131,13 +150,33 @@ object dmActions: TdmActions
       ImageName = 'save'
       OnExecute = actSaveExecute
     end
-    object ActProveedor: TAction
-      Category = 'Entidad1'
-      Caption = 'Proveedor'
+    object ActEmpleado: TAction
+      Category = 'Entidad'
+      Caption = 'Empleados'
+      ImageIndex = 12
+      ImageName = 'empleado'
+      OnExecute = ActEmpleadoExecute
     end
-    object actLog: TAction
-      Category = 'Entidad1'
+    object ActRegistros: TAction
+      Category = 'Entidad'
       Caption = 'Registros'
+      ImageIndex = 16
+      ImageName = 'albaran'
+      OnExecute = ActRegistrosExecute
+    end
+    object ActPermisos: TAction
+      Category = 'Entidad'
+      Caption = 'Permisos'
+      ImageIndex = 14
+      ImageName = 'permiso'
+      OnExecute = ActPermisosExecute
+    end
+    object ActProveedores: TAction
+      Category = 'Entidad'
+      Caption = 'Proveedores'
+      ImageIndex = 15
+      ImageName = 'proveedor'
+      OnExecute = ActProveedoresExecute
     end
   end
 end

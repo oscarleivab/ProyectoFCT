@@ -3,69 +3,150 @@ unit uGridHelper;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.WinXPickers,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
-  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
-  FireDAC.Phys, FireDAC.Phys.PG, FireDAC.Phys.PGDef, FireDAC.VCLUI.Wait,
-  Data.DB, FireDAC.Comp.Client, FireDAC.Phys.IBDef, FireDAC.Phys.IBBase,
-  FireDAC.Phys.IB, FireDAC.Stan.Param, FireDAC.DatS,
-  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, Vcl.Grids, Vcl.ExtCtrls,
-  Vcl.Buttons, Datasnap.Provider, Datasnap.DBClient, Vcl.DBGrids,Vcl.DBCtrls, Vcl.ComCtrls, Vcl.Mask,System.Hash,
-  System.Generics.Collections,
-  uTranslator;
+  System.SysUtils, System.Classes, Vcl.DBGrids, Data.DB,uTranslator, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client;
 
-procedure AjustarAnchoColumnas(Grid: TStringGrid);
-procedure OcultarColumnas(Grid: TStringGrid; Columnas: array of Integer);
+{ Ajusta el ancho de cada columna según el contenido.
+  MaxRows define cuántas filas como máximo se usan para calcular el tamaño
+  (para evitar recorrer datasets enormes). }
+procedure AutoSizeDBGridColumns(AGrid: TDBGrid; MaxRows: Integer = 200);
+
+{ Ajusta todas las columnas para que ocupen el ancho del grid a partes iguales }
+procedure FitColumnsToGrid(AGrid: TDBGrid);
+
+{ Asigna anchos fijos a las columnas:
+  SetGridColumnWidths(DBGridListado, [60, 120, 150, 200]); }
+procedure SetGridColumnWidths(AGrid: TDBGrid; const Widths: array of Integer);
+
+{ Oculta columnas del DBGrid según nombre de campo }
+procedure HideGridColumns(AGrid: TDBGrid; const FieldNames: array of string);
+
+procedure SetTranslatedDisplayLabels(Q: TFDQuery; const GrupoTraduccion: string);
 
 implementation
 
-procedure AjustarAnchoColumnas(Grid: TStringGrid);
+uses
+  Vcl.Graphics, System.Math;
+
+procedure AutoSizeDBGridColumns(AGrid: TDBGrid; MaxRows: Integer = 200);
 var
-  Col, Row, MaxWidth: Integer;
-  Texto: string;
+  I, W, MaxW, RowCount: Integer;
+  DS: TDataSet;
+  Bmk: TBookmark;
 begin
-  for Col := 0 to Grid.ColCount - 1 do
-  begin
-    MaxWidth := Grid.Canvas.TextWidth(Grid.Cells[Col, 0]) + 10; // Ancho del encabezado
-    for Row := 1 to Grid.RowCount - 1 do
+  if (AGrid = nil) or (AGrid.DataSource = nil) then
+    Exit;
+
+  DS := AGrid.DataSource.DataSet;
+  if (DS = nil) or (not DS.Active) or DS.IsEmpty then
+    Exit;
+
+  AGrid.Canvas.Font := AGrid.Font;
+
+  DS.DisableControls;
+  Bmk := DS.GetBookmark;
+  try
+    DS.First;
+    RowCount := 0;
+
+    for I := 0 to AGrid.Columns.Count - 1 do
     begin
-      Texto := Grid.Cells[Col, Row];
-      if Grid.Canvas.TextWidth(Texto) + 10 > MaxWidth then
-        MaxWidth := Grid.Canvas.TextWidth(Texto) + 10;
+      // Ancho mínimo según el título
+      MaxW := AGrid.Canvas.TextWidth(AGrid.Columns[I].Title.Caption + '  ');
+
+      DS.First;
+      RowCount := 0;
+      while (not DS.Eof) and (RowCount < MaxRows) do
+      begin
+        if AGrid.Columns[I].Field <> nil then
+        begin
+          W := AGrid.Canvas.TextWidth(AGrid.Columns[I].Field.DisplayText + '  ');
+          MaxW := Max(MaxW, W);
+        end;
+        Inc(RowCount);
+        DS.Next;
+      end;
+
+      AGrid.Columns[I].Width := MaxW + 10; // margen extra
     end;
-    Grid.ColWidths[Col] := MaxWidth;
+
+    if DS.BookmarkValid(Bmk) then
+      DS.GotoBookmark(Bmk)
+    else
+      DS.First;
+  finally
+    DS.FreeBookmark(Bmk);
+    DS.EnableControls;
   end;
 end;
 
-procedure OcultarColumnas(Grid: TStringGrid; Columnas: array of Integer);
+procedure FitColumnsToGrid(AGrid: TDBGrid);
 var
-  i: Integer;
+  I, TotalClientWidth, ColWidth: Integer;
 begin
-  for i := Low(Columnas) to High(Columnas) do
-    Grid.ColWidths[Columnas[i]] := 0;
+  if (AGrid = nil) or (AGrid.Columns.Count = 0) then
+    Exit;
+
+  TotalClientWidth := AGrid.ClientWidth;
+
+  // Un pequeño margen para evitar scroll horizontal por 1px
+  ColWidth := TotalClientWidth div AGrid.Columns.Count;
+
+  for I := 0 to AGrid.Columns.Count - 1 do
+    AGrid.Columns[I].Width := ColWidth - 2;
 end;
 
-procedure CargarDatosEnGrid(Query: TFDQuery; Grid: TStringGrid);
+procedure SetGridColumnWidths(AGrid: TDBGrid; const Widths: array of Integer);
 var
-  i, row: Integer;
+  I, Count: Integer;
 begin
-  // Configurar las columnas del StringGrid
-  Grid.ColCount := Query.FieldCount;
-  for i := 0 to Query.FieldCount - 1 do
-    Grid.Cells[i, 0] := Uppercase(Query.Fields[i].DisplayName);
+  if (AGrid = nil) then
+    Exit;
 
-  // Configurar las filas del StringGrid
-  Grid.RowCount := Query.RecordCount + 1;
-  row := 1;
-  Query.First;
-  while not Query.Eof do
+  Count := Min(AGrid.Columns.Count, Length(Widths));
+  for I := 0 to Count - 1 do
+    AGrid.Columns[I].Width := Widths[I];
+end;
+
+procedure HideGridColumns(AGrid: TDBGrid; const FieldNames: array of string);
+var
+  I, J: Integer;
+begin
+  if (AGrid = nil) then
+    Exit;
+
+  for I := 0 to AGrid.Columns.Count - 1 do
   begin
-    for i := 0 to Query.FieldCount - 1 do
-      Grid.Cells[i, row] := Query.Fields[i].AsString;
-    Inc(row);
-    Query.Next;
+    for J := 0 to High(FieldNames) do
+    begin
+      if SameText(AGrid.Columns[I].FieldName, FieldNames[J]) then
+      begin
+        AGrid.Columns[I].Visible := False;
+        Break;
+      end;
+    end;
   end;
 end;
+
+procedure SetTranslatedDisplayLabels(Q: TFDQuery; const GrupoTraduccion: string);
+var
+  I: Integer;
+  F: TField;
+begin
+  if (Q = nil) or (not Q.Active) then
+    Exit;
+
+  for I := 0 to Q.Fields.Count - 1 do
+  begin
+    F := Q.Fields[I];
+
+    // T_(Seccion, Clave) -> si no existe, devuelve la propia clave (FieldName)
+    F.DisplayLabel := T_(GrupoTraduccion, F.FieldName);
+  end;
+end;
+
 
 end.
+

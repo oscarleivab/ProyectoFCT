@@ -7,8 +7,8 @@ uses
   Vcl.Controls,dmImageResources, Vcl.Forms, Vcl.Dialogs, frStatusBar, frLoginOverlay, uLoginManager, uSession, dmConnection,
   Vcl.StdCtrls,uTranslator, Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.ComCtrls,
   System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, uLog,
-  Vcl.ToolWin, Vcl.ActnCtrls, Vcl.ActnMenus, uConfigIni, System.UITypes,utoashelper,FormBase,FrameBase,ListadoClientes,
-  ListadoProveedor, ListadoLog, FrameListado;
+  Vcl.ToolWin, Vcl.ActnCtrls, Vcl.ActnMenus, uConfigIni, System.UITypes,utoashelper,FormBase,FrameBase,FrameListado,ListadoClientes,ListadoEmpleado,
+  ListadoLog, ListadoPermisos, ListadoProveedores;
 
 type
   TFrmMain = class(TFBase)
@@ -34,12 +34,10 @@ type
     MenuPrincipalBar1: TActionMainMenuBar;
     btncliente: TButton;
     Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
+    btnRegistros: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
   private
 
     //Objetos
@@ -51,7 +49,7 @@ type
     procedure HideLoginOverlay;
     procedure HookLoginEvents;
     procedure HideMainMenuBar(const AHide: Boolean);
-    procedure abrirlistado(Tipo:integer);
+
 
     //Acciones
     Procedure EnlazarAcciones;
@@ -59,10 +57,7 @@ type
     procedure OnLogOutEnter(Sender: TObject);
     procedure OnApagar(Sender: TObject);
     procedure OnEmpresaChange(Sender: TObject);
-    procedure OnAbrirCliente(Sender: TObject);
     procedure OnIdiomaChange(Sender: TObject);
-    procedure OnAbrirProveedor(Sender: TObject);
-    procedure OnAbrirLog(Sender: TObject);
 
 
     //Operaciones
@@ -71,10 +66,12 @@ type
     procedure ApplySessionToUI;
 
   public
-    function ActiveFrame: TFrBase;
+    procedure abrirlistadoCliente;
+    procedure abrirlistadoEmpleado;
+    procedure abrirlistadoRegistros;
+    procedure abrirlistadoPermisos;
+    procedure abrirlistadoProveedores;
     Procedure EliminarSheet;
-    procedure RefrescarSheet(const ANombrePestana: string;id:Integer);
-    procedure RefrescarFrame(const ANombreFrame: string; AId: Integer);
 
   end;
 
@@ -84,64 +81,7 @@ var
 
 implementation
 
-uses
-  pruebadbgrid;
-
-
 {$R *.dfm}
-
-procedure TFrmMain.RefrescarSheet(const ANombrePestana: string;id:Integer);
-var
-  I: Integer;
-  Tab: TTabSheet;
-  F: TListadoFrame;
-begin
-  for I := 0 to PageControl1.PageCount - 1 do
-  begin
-    Tab := PageControl1.Pages[I];
-
-    // Compara por caption o por name
-    if SameText(Tab.Name, ANombrePestana) then
-    begin
-      // Verificar que la pestaña tiene un frame dentro
-      if (Tab.ControlCount > 0) and (Tab.Controls[0] is TFrame) then
-      begin
-        F := TListadoFrame(Tab.Controls[0]);
-
-        F.ActualizarRegistro(id);
-
-        Exit;
-      end;
-    end;
-  end;
-end;
-
-procedure TFrmMain.RefrescarFrame(const ANombreFrame: string; AId: Integer);
-var
-  I: Integer;
-  Tab: TTabSheet;
-  F: TFrame;
-begin
-  for I := 0 to PageControl1.PageCount - 1 do
-  begin
-    Tab := PageControl1.Pages[I];
-
-    if (Tab.ControlCount > 0) and (Tab.Controls[0] is TFrame) then
-    begin
-      F := TFrame(Tab.Controls[0]);
-
-      // Buscar por nombre de frame
-      if SameText(F.Name, ANombreFrame) then
-      begin
-        // Si ese frame es algún tipo de listado, se le puede pedir ActualizarRegistro
-        if F is TListadoFrame then
-          TListadoFrame(F).ActualizarRegistro(AId);
-
-        Exit;
-      end;
-    end;
-  end;
-end;
 
 procedure TFrmMain.FormCreate(Sender: TObject);
 begin
@@ -177,51 +117,6 @@ begin
   dmActions.actLogin.OnExecute  := OnLoginEnter;   // “Entrar” del overlay
   dmActions.actLogOut.OnExecute  := OnLogOutEnter;   // “Salir” del Main
   dmActions.actApagar.OnExecute := OnApagar;   // “Apagar” del overlay (cierra app)
-  dmActions.actCliente.OnExecute := OnAbrirCliente;
-  dmActions.actProveedor.OnExecute := OnAbrirProveedor;
-  dmActions.actLog.OnExecute := OnAbrirLog;
-end;
-
-function FindFrameInControl(AControl: TWinControl): TFrBase;
-var
-  I: Integer;
-  ctrl: TControl;
-  sub: TFrBase;
-begin
-  Result := nil;
-
-  if AControl = nil then
-    Exit;
-
-  for I := 0 to AControl.ControlCount - 1 do
-  begin
-    ctrl := AControl.Controls[I];
-
-    // Si es un frame TFrBase, lo devolvemos
-    if ctrl is TFrBase then
-      Exit(TFrBase(ctrl));
-
-    // Si es un contenedor, buscamos dentro
-    if ctrl is TWinControl then
-    begin
-      sub := FindFrameInControl(TWinControl(ctrl));
-      if sub <> nil then
-        Exit(sub);
-    end;
-  end;
-end;
-
-function TfrmMain.ActiveFrame: TFrBase;
-var
-  pg: TTabSheet;
-begin
-  Result := nil;
-
-  pg := PageControl1.ActivePage;
-  if pg = nil then
-    Exit;
-
-  Result := FindFrameInControl(pg);
 end;
 
 Procedure TFrmMain.Cargarempresaslogin;
@@ -257,15 +152,7 @@ begin
   inherited;
   //Dblog('Error al crear la base de datos inicial',conERROR,AppSession.UserId.ToString);
   //TxtLog('Error al crear la base de datos inicial');
-  //DBLog('Error al procesar la factura', conError, tipoFACT, idFACT);
-  TxtLog('Error');
-  DBLog('Error al procesar la factura', conINFO, tipoINFO, idINFO);
-end;
-
-procedure TFrmMain.Button4Click(Sender: TObject);
-begin
-  inherited;
-  form1.show;
+  DBLog('Se ha guardado correctamente el registro.', conINFO, tipoINFO, idINFO);
 end;
 
 procedure TFrmMain.HideMainMenuBar(const AHide: Boolean);
@@ -383,73 +270,115 @@ begin
  Cargarempresaslogin;
 end;
 
-procedure TFrmMain.OnAbrirCliente(Sender: TObject);
-begin
- abrirlistado(0);
-end;
-
-procedure TFrmMain.OnAbrirProveedor(Sender: TObject);
-begin
-  abrirlistado(1);
-end;
-
-procedure TFrmMain.OnAbrirLog(Sender: TObject);
-begin
-  abrirlistado(2);
-end;
-
-procedure TFrmMain.abrirlistado(Tipo:integer);
+procedure TFrmMain.abrirlistadoCliente;
 var
   ListadoCliente: TListadoFrameCliente;
-  ListadoProveedor: TListadoFrameProveedor;
-  ListadoLog: TFrListadoLog;
   nuevaTab: TTabSheet;
-  nombreTab: string;
 begin
-  if Tipo = 0 then
-    nombreTab := 'Clientes'
-  else if Tipo = 1 then
-    nombreTab := 'Proveedores'
-  else if Tipo = 2 then
-    nombreTab := 'Log';
-
-  if not sheetcreada(nombreTab) then
+  if not sheetcreada('Clientes') then
   begin
     nuevaTab := TTabSheet.Create(PageControl1);
-    nuevaTab.Name := 'TabSheet' + nombreTab;
-    nuevaTab.Caption := nombreTab;
+    nuevaTab.name := 'TabSheetClientes';
+    nuevaTab.ImageIndex:=1;
+    TranslateTree(nuevaTab,'FrmMain');
+
+    // Se le asigna el "TPageControl"
     nuevaTab.PageControl := PageControl1;
-
-    case Tipo of
-      0: begin
-           // CLIENTES
-           ListadoCliente := TListadoFrameCliente.Create(nuevaTab);
-           ListadoCliente.Parent := nuevaTab;
-           ListadoCliente.Align := alClient;
-           ListadoCliente.doSearch;
-         end;
-
-      1: begin
-           // PROVEEDORES
-           ListadoProveedor := TListadoFrameProveedor.Create(nuevaTab);
-           ListadoProveedor.Parent := nuevaTab;
-           ListadoProveedor.Align := alClient;
-           ListadoProveedor.doSearch;
-         end;
-
-      2: begin
-           // LOG
-           ListadoLog := TFrListadoLog.Create(nuevaTab);
-           ListadoLog.Parent := nuevaTab;
-           ListadoLog.Align := alClient;
-           ListadoLog.doSearch;
-         end;
-    end;
-
-    PageControl1.ActivePage := nuevaTab;
+    ListadoCliente := TListadoFrameCliente.Create(nuevaTab);
+    ListadoCliente.Parent := nuevaTab;
+    ListadoCliente.Align := Alclient;
+    ListadoCliente.doSearch;
+    PageControl1.ActivePageIndex := PageControl1.PageCount - 1;
   end;
 end;
 
+procedure TFrmMain.abrirlistadoProveedores;
+var
+  ListadoProveedor: TListadoFrameProveedores;
+  nuevaTab: TTabSheet;
+begin
+  if not sheetcreada('Proveedores') then
+  begin
+    nuevaTab := TTabSheet.Create(PageControl1);
+    nuevaTab.name := 'TabSheetProveedores';
+    nuevaTab.ImageIndex:=1;
+    TranslateTree(nuevaTab,'FrmMain');
+
+    // Se le asigna el "TPageControl"
+    nuevaTab.PageControl := PageControl1;
+    ListadoProveedor := TListadoFrameProveedores.Create(nuevaTab);
+    ListadoProveedor.Parent := nuevaTab;
+    ListadoProveedor.Align := Alclient;
+    ListadoProveedor.doSearch;
+    PageControl1.ActivePageIndex := PageControl1.PageCount - 1;
+  end;
+end;
+
+procedure TFrmMain.abrirlistadoPermisos;
+var
+  ListadoPermisos: TListadoFramePermisos;
+  nuevaTab: TTabSheet;
+begin
+  if not sheetcreada('Permisos') then
+  begin
+    nuevaTab := TTabSheet.Create(PageControl1);
+    nuevaTab.name := 'TabSheetPermisos';
+    nuevaTab.ImageIndex:=1;
+    TranslateTree(nuevaTab,'FrmMain');
+
+    // Se le asigna el "TPageControl"
+    nuevaTab.PageControl := PageControl1;
+    ListadoPermisos := TListadoFramePermisos.Create(nuevaTab);
+    ListadoPermisos.Parent := nuevaTab;
+    ListadoPermisos.Align := Alclient;
+    ListadoPermisos.doSearch;
+    PageControl1.ActivePageIndex := PageControl1.PageCount - 1;
+  end;
+end;
+
+ procedure TFrmMain.abrirlistadoEmpleado;
+var
+  ListadoEmpleado: TListadoFrameEmpleado;
+  nuevaTab: TTabSheet;
+begin
+  if not sheetcreada('Empleados') then
+  begin
+    nuevaTab := TTabSheet.Create(PageControl1);
+    nuevaTab.name := 'TabSheetEmpleado';
+    nuevaTab.ImageIndex:=1;
+    TranslateTree(nuevaTab,'FrmMain');
+
+    // Se le asigna el "TPageControl"
+    nuevaTab.PageControl := PageControl1;
+    ListadoEmpleado := TListadoFrameEmpleado.Create(nuevaTab);
+    ListadoEmpleado.Parent := nuevaTab;
+    ListadoEmpleado.Align := Alclient;
+    ListadoEmpleado.doSearch;
+    PageControl1.ActivePageIndex := PageControl1.PageCount - 1;
+  end;
+end;
+
+procedure TFrmMain.abrirlistadoRegistros;
+var
+  ListadoRegistros: TFrListadoLog;
+  nuevaTab: TTabSheet;
+begin
+  if not sheetcreada('Registros') then
+  begin
+    nuevaTab := TTabSheet.Create(PageControl1);
+    nuevaTab.name := 'TabSheetRegistros';
+    nuevaTab.ImageIndex:=1;
+    TranslateTree(nuevaTab,'FrmMain');
+
+    // Se le asigna el "TPageControl"
+    nuevaTab.PageControl := PageControl1;
+    ListadoRegistros := TFrListadoLog.Create(nuevaTab);
+    ListadoRegistros.Parent := nuevaTab;
+    ListadoRegistros.Align := Alclient;
+    ListadoRegistros.doSearch;
+    PageControl1.ActivePageIndex := PageControl1.PageCount - 1;
+  end;
+end;
 
 function TFrmMain.sheetcreada(namesheet: string): Boolean;
 var
@@ -493,6 +422,36 @@ begin
     PageControl1.ActivePage := nil;
 end;
 
+function FindFrameByNameInControl(AParent: TWinControl; const AName: string): TFrame;
+var
+  I: Integer;
+  C: TControl;
+  SubFrame: TFrame;
+begin
+  Result := nil;
+  if AParent = nil then
+    Exit;
+
+  for I := 0 to AParent.ControlCount - 1 do
+  begin
+    C := AParent.Controls[I];
+
+    // Si es un frame, comprobamos el nombre
+    if C is TFrame then
+    begin
+      if SameText(C.Name, AName) then
+        Exit(TFrame(C));
+    end;
+
+    // Si es contenedor, buscamos dentro (recursivo)
+    if C is TWinControl then
+    begin
+      SubFrame := FindFrameByNameInControl(TWinControl(C), AName);
+      if SubFrame <> nil then
+        Exit(SubFrame);
+    end;
+  end;
+end;
 
 procedure TFrmMain.OnApagar(Sender: TObject);
 begin

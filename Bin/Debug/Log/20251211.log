@@ -1,0 +1,9 @@
+10:45:53.769 Error al crear la base de datos inicial [USER: Administrador 1 Fernandez Lorca]
+10:45:53.782 [Error al grabar DBLog -> [FireDAC][Phys][PG][libpq] ERROR: column "USER" of relation "logbd" does not exist]: Error al crear la base de datos inicial USER: Administrador 1 Fernandez Lorca [USER: Administrador 1 Fernandez Lorca]
+11:06:16.715 Error al crear la base de datos inicial [USER: Administrador 1 Fernandez Lorca]
+11:28:32.749 [Error al grabar DBLog -> [FireDAC][Phys][PG][libpq] ERROR: column "tipodoc" is of type integer but expression is of type character varying.
+You will need to rewrite or cast the expression.]: Se ha guardado correctamente el registro. USER: Administrador 1 Fernandez Lorca [USER: Administrador 1 Fernandez Lorca]
+11:29:07.052 [Error al grabar DBLog -> [FireDAC][Phys][PG][libpq] ERROR: la columna «tipodoc» es de tipo integer pero la expresión es de tipo character varying.
+Necesitará reescribir la expresión o aplicarle una conversión de tipo.]: Se ha guardado correctamente el registro. USER: Administrador 1 Fernandez Lorca [USER: Administrador 1 Fernandez Lorca]
+11:34:49.235 [Error al grabar DBLog -> [FireDAC][Phys][PG][libpq] ERROR: column "tipodoc" is of type integer but expression is of type character varying.
+You will need to rewrite or cast the expression.]: Se ha guardado correctamente el registro. USER: Administrador 1 Fernandez Lorca [USER: Administrador 1 Fernandez Lorca]

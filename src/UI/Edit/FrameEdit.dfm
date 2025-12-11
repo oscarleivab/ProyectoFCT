@@ -64,4 +64,7 @@ inherited FrEdit: TFrEdit
       StyleName = 'Windows'
     end
   end
+  inherited FDQuery: TFDQuery
+    Connection = DataModuleConnection.FDConnectionCompany
+  end
 end

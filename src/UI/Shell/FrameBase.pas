@@ -1,4 +1,4 @@
-unit FrameBase;
+Ôªøunit FrameBase;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   utoashelper,Vcl.ComCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option,
   FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client,uTranslator,uInterfaces;
 
 type
   TFrBase = class(TFrame)
@@ -16,11 +16,12 @@ type
     DataSource: TDataSource;
   private
     { Private declarations }
+    FOrigen: IListadoRefrescable;
 
   public
     { Public declarations }
     Dialogouserfrm: TDialogouserfrm;
-    FrameOrigen: String;
+    property Origen: IListadoRefrescable read FOrigen write FOrigen;
     procedure doClose; Virtual;
     procedure doFilter; Virtual;
     procedure doClearFilter; Virtual;
@@ -29,13 +30,17 @@ type
     procedure doEdit; Virtual;
     procedure doSave; Virtual;
     procedure doDelete; Virtual;
+    procedure doRefresh; Virtual;
     procedure liberarObjetos;
   protected
     FToastManager: TToastManager;
 
+    function GetIdFieldName: string; virtual;
     procedure MostrarToast(const Texto: string; Tipo: string = 'success');
     procedure Loaded; override;
+    Function Validarcampos:boolean; Virtual;
     destructor Destroy; override;
+
 
     { Public declarations }
 
@@ -55,10 +60,21 @@ begin
   inherited;
 end;
 
+Function TFrBase.Validarcampos:boolean;
+begin
+Result:=true;
+end;
+
 procedure TFrBase.doSearch;
 begin
 //
 end;
+
+procedure TFrBase.doRefresh;
+begin
+//
+end;
+
 
 procedure TFrBase.doFilter;
 begin
@@ -77,14 +93,20 @@ end;
 
 procedure TFrBase.doSave;
 begin
-//
  if FDQuery.State in dsEditModes then
  begin
-    FDQuery.Post;     // Guarda en memoria y ejecuta el UPDATE
 
-    //refresca y posiciona si tiene listado, el resgistro que hemos guardado
-    if FrameOrigen<>'' then
-    FrmMain.RefrescarFrame(FrameOrigen, FDQuery.FieldByName('id').AsInteger);
+    if ValidarCampos then begin
+
+      FDQuery.Post;     // Guarda en memoria y ejecuta el UPDATE
+      //refresca y posiciona si tiene listado, el resgistro que hemos guardado
+        // Usamos la interfaz, sin conocer el objeto real
+      if (Assigned(FOrigen)) and (GetIdFieldName<>'') then
+        FOrigen.ActualizarRegistro(FDQuery.FieldByName(GetIdFieldName).AsInteger);
+
+      MostrarToast(T_('info','saveok'), 'ok');
+    end;
+
  end;
 end;
 
@@ -104,24 +126,24 @@ var
 begin
   LParent := Parent;
 
-  // 1) El frame est· dentro de una pestaÒa del PageControl principal
+  // 1) El frame est√° dentro de una pesta√±a del PageControl principal
   if (LParent is TTabSheet) and
      (TTabSheet(LParent).PageControl = FrmMain.PageControl1) then
   begin
     FrmMain.EliminarSheet;
-    Exit; // despuÈs de esto, Self probablemente ya est· destruido
+    Exit; // despu√©s de esto, Self probablemente ya est√° destruido
   end;
 
-  // 2) El frame est· dentro de un panel contenedor din·mico
+  // 2) El frame est√° dentro de un panel contenedor din√°mico
   if (LParent is TPanel) then
   begin
-    // Si el panel se creÛ din·micamente para este frame y es su Owner:
-    // TPanel.Free liberar· tambiÈn el frame
+    // Si el panel se cre√≥ din√°micamente para este frame y es su Owner:
+    // TPanel.Free liberar√° tambi√©n el frame
     LParent.Free;
     Exit;
   end;
 
-  // 3) Caso genÈrico / fallback (por si alg˙n dÌa lo pones suelto en un form)
+  // 3) Caso gen√©rico / fallback (por si alg√∫n d√≠a lo pones suelto en un form)
   Free;
 end;
 
@@ -137,14 +159,21 @@ end;
 procedure TFrBase.Loaded;
 begin
   inherited;
+  TranslateTree(Self,''); //traducir el form completo
   FToastManager := TToastManager.Create(Self);
   Dialogouserfrm := TDialogouserfrm.Create(Self);
+  FDQuery.UpdateOptions.AutoIncFields := GetIdFieldName; // ‚Üê importante
 end;
 
 procedure TFrBase.MostrarToast(const Texto: string; Tipo: string = 'success');
 begin
   if Assigned(FToastManager) then
     FToastManager.Show(Texto, Tipo);
+end;
+
+function TFrBase.GetIdFieldName: string;
+begin
+  Result := 'id'; // valor por defecto, la mayor√≠a de tablas
 end;
 
 end.

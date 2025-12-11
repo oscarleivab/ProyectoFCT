@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes,System.StrUtils, Data.DB,
   FireDAC.Comp.Client, FireDAC.Stan.Param,
-  dmConnection, uSession,uDatabaselib;
+  dmConnection, uSession,uDatabaselib,uFuncionesGlobales;
 
 type
   TLoginManager = class
@@ -80,7 +80,7 @@ begin
 
     while not Q.Eof do
     begin
-      // Mostramos user_login; guardamos id_empleado en Objects
+      // Mostramos user_login; guardamos id en Objects
       ATarget.AddObject(
         Q.FieldByName('user_login').AsString,
         TObject(NativeInt(Q.FieldByName('id').AsInteger))
@@ -99,7 +99,7 @@ var
   Q: TFDQuery;
   PassDB, UserLogin, Nombre, Apellidos: string;
 begin
-  Result := False;
+  Result := false;
   if (AEmployeeId = 0) or (APassword = '') then Exit;
 
   Q := TFDQuery.Create(nil);
@@ -121,7 +121,7 @@ begin
     Apellidos := Q.FieldByName('apellidos').AsString;
 
     // TODO: migrar a hash (bcrypt/argon2). De momento: texto plano, case-sensitive.
-    if APassword = PassDB then
+    if (APassword) = PassDB then
     begin
       AppSession.UserId      := AEmployeeId;
       AppSession.UserName    := IfThen(Trim(Nombre + ' ' + Apellidos) <> '',

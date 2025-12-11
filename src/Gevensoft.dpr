@@ -28,9 +28,18 @@ uses
   uLog in 'Services\uLog.pas',
   FrameEdit in 'UI\Edit\FrameEdit.pas' {FrEdit: TFrame},
   edCliente in 'UI\Edit\edCliente.pas' {FrEdCliente: TFrame},
-  edProveedor in 'UI\Edit\edProveedor.pas' {FrEdit1: TFrame},
-  ListadoProveedor in 'UI\List\ListadoProveedor.pas' {FrBase1: TFrame},
-  ListadoLog in 'UI\List\ListadoLog.pas' {FrListadoLog: TFrame};
+  ListadoDirecciones in 'UI\List\ListadoDirecciones.pas' {ListadoFrameDirecciones: TFrame},
+  edDireccion in 'UI\Edit\edDireccion.pas' {FrEditDireccion: TFrame},
+  uinterfaces in 'Common\uinterfaces.pas',
+  ListadoDatosBanco in 'UI\List\ListadoDatosBanco.pas' {ListadoFrameDatosBanco: TFrame},
+  edDatosBanco in 'UI\Edit\edDatosBanco.pas' {FrEdDatosBanco: TFrame},
+  ListadoEmpleado in 'UI\List\ListadoEmpleado.pas' {ListadoFrameEmpleado: TFrame},
+  edEmpleado in 'UI\Edit\edEmpleado.pas' {FrEdEmpleado: TFrame},
+  ListadoLog in 'UI\List\ListadoLog.pas' {FrListadoLog: TFrame},
+  ListadoPermisos in 'UI\List\ListadoPermisos.pas' {ListadoFramePermisos: TFrame},
+  edPermisos in 'UI\Edit\edPermisos.pas' {FrEdit1: TFrame},
+  edProveedor in 'UI\Edit\edProveedor.pas' {FrEdProveedor: TFrame},
+  ListadoProveedores in 'UI\List\ListadoProveedores.pas' {ListadoFrameProveedor: TFrame};
 
 {$R *.res}
 

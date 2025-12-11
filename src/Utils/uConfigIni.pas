@@ -36,16 +36,43 @@ procedure TAppConfig.LoadConfig;
 var
   SL: TStringList;
   IniMem: TMemIniFile;
-  PathIni: string;
+  PathIni, DirIni: string;
+  UTF8Enc: TEncoding;
 begin
-  PathIni := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ini\config.ini');
+  DirIni := TPath.Combine(ExtractFilePath(ParamStr(0)), 'ini');
+  PathIni := TPath.Combine(DirIni, 'config.ini');
 
+  // Crear carpeta "ini" si no existe
+  if not TDirectory.Exists(DirIni) then
+    TDirectory.CreateDirectory(DirIni);
+
+  // Si NO existe el archivo, crearlo con valores por defecto
   if not TFile.Exists(PathIni) then
-    raise Exception.CreateFmt('No se encontró el archivo de configuración: %s', [PathIni]);
+  begin
+    SL := TStringList.Create;
+    UTF8Enc := TUTF8Encoding.Create(False); // sin BOM
+    try
+      SL.Add('[Conexion]');
+      SL.Add('varHost=localhost');
+      SL.Add('varPort=5432');
+      SL.Add('varDatabase=bdgevensoftbase');
+      SL.Add('varUser=postgres');
+      SL.Add('varPass=2003');
+      SL.Add('');
+      SL.Add('[Lang]');
+      SL.Add('defaultlang=Español');
+
+      SL.SaveToFile(PathIni, UTF8Enc);
+    finally
+      UTF8Enc.Free;
+      SL.Free;
+    end;
+  end;
+
+  // === Cargar el archivo de configuración ===
 
   SL := TStringList.Create;
   try
-    // Leer el INI en UTF-8
     SL.LoadFromFile(PathIni, TEncoding.UTF8);
 
     IniMem := TMemIniFile.Create('');
@@ -54,17 +81,19 @@ begin
 
       FHost        := IniMem.ReadString('Conexion', 'varHost', 'localhost');
       FPort        := IniMem.ReadInteger('Conexion', 'varPort', 5432);
-      FDatabase    := IniMem.ReadString('Conexion', 'varDatabase', '');
-      FUser        := IniMem.ReadString('Conexion', 'varUser', '');
-      FPass        := IniMem.ReadString('Conexion', 'varPass', '');
-      FDefaultLang := IniMem.ReadString('Lang', 'defaultlang', '');
+      FDatabase    := IniMem.ReadString('Conexion', 'varDatabase', 'bdgevensoftbase');
+      FUser        := IniMem.ReadString('Conexion', 'varUser', 'postgres');
+      FPass        := IniMem.ReadString('Conexion', 'varPass', '2003');
+      FDefaultLang := IniMem.ReadString('Lang',      'defaultlang', 'Español');
     finally
       IniMem.Free;
     end;
+
   finally
     SL.Free;
   end;
 end;
+
 
 procedure TAppConfig.SaveConfig;
 var

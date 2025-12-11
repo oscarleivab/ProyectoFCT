@@ -106,8 +106,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_ExeOutput>D:\Gevensoft 2\GevensoftERP\Bin\Debug\</DCC_ExeOutput>
-        <DCC_DcuOutput>D:\Gevensoft 2\GevensoftERP\Dcu\</DCC_DcuOutput>
+        <DCC_ExeOutput>D:\Gevensoft 3\GevensoftERP\Bin\Debug\</DCC_ExeOutput>
+        <DCC_DcuOutput>D:\Gevensoft 3\GevensoftERP\Dcu\</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -202,18 +202,59 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="UI\Edit\edProveedor.pas">
-            <Form>FrEdit1</Form>
+        <DCCReference Include="UI\List\ListadoDirecciones.pas">
+            <Form>ListadoFrameDirecciones</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="UI\List\ListadoProveedor.pas">
-            <Form>FrBase1</Form>
+        <DCCReference Include="UI\Edit\edDireccion.pas">
+            <Form>FrEditDireccion</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Common\uinterfaces.pas"/>
+        <DCCReference Include="UI\List\ListadoDatosBanco.pas">
+            <Form>ListadoFrameDatosBanco</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Edit\edDatosBanco.pas">
+            <Form>FrEdDatosBanco</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\List\ListadoEmpleado.pas">
+            <Form>ListadoFrameEmpleado</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Edit\edEmpleado.pas">
+            <Form>FrEdEmpleado</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="UI\List\ListadoLog.pas">
             <Form>FrListadoLog</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\List\ListadoPermisos.pas">
+            <Form>ListadoFramePermisos</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Edit\edPermisos.pas">
+            <Form>FrEdit1</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\Edit\edProveedor.pas">
+            <Form>FrEdProveedor</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="UI\List\ListadoProveedores.pas">
+            <Form>ListadoFrameProveedor</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>

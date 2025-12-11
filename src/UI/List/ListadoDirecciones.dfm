@@ -1,0 +1,2 @@
+inherited ListadoFrameDirecciones: TListadoFrameDirecciones
+end
