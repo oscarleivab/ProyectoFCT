@@ -28,6 +28,8 @@ inherited ListadoFrameCliente: TListadoFrameCliente
   inherited Menulateral: TPanel
     Top = 67
     Height = 609
+    ExplicitTop = 67
+    ExplicitHeight = 609
   end
   inherited FDQuery: TFDQuery
     Left = 528

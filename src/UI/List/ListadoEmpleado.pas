@@ -21,10 +21,11 @@ type
     procedure CargarListado(filtro: string); override;
     procedure EditarRegistro(id: Integer); override;
     function CanDeleteRecord(AId: Integer; out AReason: string): Boolean; override;
-
     procedure CargarCombos;
+
   public
     constructor Create(AOwner: TComponent); override;
+    procedure AplicarPermisos; override;
   end;
 
 var
@@ -33,9 +34,17 @@ var
 implementation
 
 uses
-  fMain, uTranslator, uGridHelper;
+  fMain, uTranslator, uGridHelper, uSession;
 
 {$R *.dfm}
+
+procedure TListadoFrameEmpleado.AplicarPermisos;
+begin
+  BotonNuevo.Enabled  := AppSession.UserPermissions.CrearEmpleado;
+  BotonEditar.Enabled := AppSession.UserPermissions.EditarEmpleado;
+  botonFiltrar.Visible := AppSession.UserPermissions.ListarEmpleado;
+end;
+
 
 constructor TListadoFrameEmpleado.Create(AOwner: TComponent);
 begin

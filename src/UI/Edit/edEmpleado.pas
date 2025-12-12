@@ -155,14 +155,19 @@ begin
   DBobservaciones.DataField := 'observaciones';
 
   // Vincular permisos
-  DBComboPermisos.DataField := 'id_permiso';
-  DBComboPermisos.KeyField  := 'id';
-  DBComboPermisos.ListField := 'nombre';
+  DBComboPermisos.DataSource := DataSource;          // dataset principal (empleado)
+  DBComboPermisos.DataField  := 'id_permiso';
+  DBComboPermisos.ListSource := DataSourcePermisos; // dataset de lookup (permisos)
+  DBComboPermisos.KeyField   := 'id';
+  DBComboPermisos.ListField  := 'nombre';
 
   // Vincular tipo de documento
-  DBComboTipodoc.DataField := 'id_tipo_documento';
-  DBComboTipodoc.KeyField  := 'id';
-  DBComboTipodoc.ListField := 'nombre';
+  DBComboTipodoc.DataSource := DataSource;
+  DBComboTipodoc.DataField  := 'id_tipo_documento';
+  DBComboTipodoc.ListSource := DataSourceTipodoc;
+  DBComboTipodoc.KeyField   := 'id';
+  DBComboTipodoc.ListField  := 'nombre';
+
 end;
 
 procedure TFrEdEmpleado.NuevoRegistro;
@@ -286,8 +291,9 @@ begin
       SQL.Add('WHERE (id = :pid_empleado)');
       ParamByName('pid_empleado').AsInteger := ID;
       Open;
+
+      Edit;
     end;
-    Buttonguardar.Enabled := False;
   end
   else
     NuevoRegistro;

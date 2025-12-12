@@ -34,10 +34,12 @@ type
     procedure DBGridListadoDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
+    FListadoTipo: string; // 'Cliente', 'Proveedor', 'Empleado'
     procedure FDQueryAfterOpen(DataSet: TDataSet);
     { Private declarations }
   public
     { Public declarations }
+    property ListadoTipo: string read FListadoTipo write FListadoTipo;
     procedure ActualizarRegistro(AId: Integer);
     function CanDeleteRecord(AId: Integer; out AReason: string): Boolean; Virtual;
     procedure CargarListado(filtro:string); Virtual;
@@ -50,6 +52,7 @@ type
     procedure doDelete; override;
     procedure doRefresh; override;
     procedure doFilter; override;
+    procedure AplicarPermisos; virtual;
 
   Protected
     procedure Loaded; override;
@@ -63,11 +66,16 @@ var
 implementation
 
 uses
- fMain, uTranslator, uGridHelper;
+ fMain, uTranslator, uGridHelper, uSession;
 
 {$R *.dfm}
 
 { TListadoFrame }
+
+procedure TListadoFrame.AplicarPermisos;
+begin
+//
+end;
 
 procedure TListadoFrame.doSearch;
 begin
@@ -171,6 +179,7 @@ end;
 procedure TListadoFrame.Loaded;
 begin
   inherited;
+  AplicarPermisos;
   Panelfiltros.Height:=5;
 
   if Assigned(FDQuery) then
@@ -189,7 +198,6 @@ begin
   DBGridListado.StyleElements := [];
   // o, si quieres dejar bordes y demás:
   // DBGrid1.StyleElements := DBGrid1.StyleElements - [seClient];
-
 end;
 
 function TListadoFrame.GetGrupoTraduccion: string;

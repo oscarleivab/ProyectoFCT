@@ -28,7 +28,7 @@ inherited ListadoFrameProveedores: TListadoFrameProveedores
   inherited Menulateral: TPanel
     Top = 131
     Height = 545
-    ExplicitTop = 67
-    ExplicitHeight = 609
+    ExplicitTop = 131
+    ExplicitHeight = 545
   end
 end

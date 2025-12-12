@@ -285,6 +285,7 @@ begin
     // Se le asigna el "TPageControl"
     nuevaTab.PageControl := PageControl1;
     ListadoCliente := TListadoFrameCliente.Create(nuevaTab);
+    ListadoCliente.AplicarPermisos;
     ListadoCliente.Parent := nuevaTab;
     ListadoCliente.Align := Alclient;
     ListadoCliente.doSearch;
@@ -307,6 +308,7 @@ begin
     // Se le asigna el "TPageControl"
     nuevaTab.PageControl := PageControl1;
     ListadoProveedor := TListadoFrameProveedores.Create(nuevaTab);
+    ListadoProveedor.AplicarPermisos;
     ListadoProveedor.Parent := nuevaTab;
     ListadoProveedor.Align := Alclient;
     ListadoProveedor.doSearch;
@@ -351,6 +353,7 @@ begin
     // Se le asigna el "TPageControl"
     nuevaTab.PageControl := PageControl1;
     ListadoEmpleado := TListadoFrameEmpleado.Create(nuevaTab);
+    ListadoEmpleado.AplicarPermisos;
     ListadoEmpleado.Parent := nuevaTab;
     ListadoEmpleado.Align := Alclient;
     ListadoEmpleado.doSearch;

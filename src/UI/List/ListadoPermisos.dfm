@@ -91,5 +91,7 @@ inherited ListadoFramePermisos: TListadoFramePermisos
   inherited Menulateral: TPanel
     Top = 61
     Height = 615
+    ExplicitTop = 61
+    ExplicitHeight = 615
   end
 end

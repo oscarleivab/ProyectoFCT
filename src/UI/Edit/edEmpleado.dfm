@@ -344,7 +344,6 @@ inherited FrEdEmpleado: TFrEdEmpleado
         Align = alTop
         Caption = 'Accesos Login'
         TabOrder = 6
-        ExplicitLeft = 2
         object Label1: TLabel
           Left = 10
           Top = 41

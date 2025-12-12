@@ -28,5 +28,7 @@ inherited ListadoFrameEmpleado: TListadoFrameEmpleado
   inherited Menulateral: TPanel
     Top = 67
     Height = 609
+    ExplicitTop = 67
+    ExplicitHeight = 609
   end
 end

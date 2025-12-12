@@ -27,6 +27,7 @@ type
 
   public
     constructor Create(AOwner: TComponent); override;
+    procedure AplicarPermisos; override;
   end;
 
 var
@@ -35,9 +36,16 @@ var
 implementation
 
 uses
-  fMain, uTranslator, uGridHelper;
+  fMain, uTranslator, uGridHelper, uSession;
 
 {$R *.dfm}
+
+procedure TListadoFrameCliente.AplicarPermisos;
+begin
+  BotonNuevo.Enabled  := AppSession.UserPermissions.CrearCliente;
+  BotonEditar.Enabled := AppSession.UserPermissions.EditarCliente;
+  botonFiltrar.Visible := AppSession.UserPermissions.ListarCliente;
+end;
 
 { ---------------------------------------------------------------
   CONSTRUCTOR - carga los combos al crear el frame
@@ -47,7 +55,6 @@ begin
   inherited Create(AOwner);
   CargarCombos;
 end;
-
 
 { ---------------------------------------------------------------
   CARGA DE COMBOS

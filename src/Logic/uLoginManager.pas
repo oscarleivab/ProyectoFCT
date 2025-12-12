@@ -18,6 +18,9 @@ type
 
     // Valida empleado (en BD de empresa)
     class function ValidateEmployee(AEmployeeId: Integer; const APassword: string): Boolean;
+
+    // Valida los permisos de los usuarios
+    class procedure LoadUserPermissions(AUserId: Integer);
   end;
 
 implementation
@@ -121,18 +124,75 @@ begin
     Apellidos := Q.FieldByName('apellidos').AsString;
 
     // TODO: migrar a hash (bcrypt/argon2). De momento: texto plano, case-sensitive.
-    if (APassword) = PassDB then
+    if GetSHA256(APassword) = PassDB then
     begin
       AppSession.UserId      := AEmployeeId;
       AppSession.UserName    := IfThen(Trim(Nombre + ' ' + Apellidos) <> '',
                                        Trim(Nombre + ' ' + Apellidos),
                                        UserLogin);
+
+      TLoginManager.LoadUserPermissions(AEmployeeId);
       Result := True;
     end;
   finally
     Q.Free;
   end;
 end;
+
+class procedure TLoginManager.LoadUserPermissions(AUserId: Integer);
+var
+  Q: TFDQuery;
+  PermisosId: Integer;
+begin
+  FillChar(AppSession.UserPermissions, SizeOf(AppSession.UserPermissions), 0);
+
+  // 1) Obtener id_permisos del empleado
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := DataModuleConnection.FDConnectionCompany;
+    Q.SQL.Text := 'SELECT id_permiso FROM empleado WHERE id = :id';
+    Q.ParamByName('id').AsInteger := AUserId;
+    DataModuleConnection.OpenQueryWithReconnect(Q);
+
+    if Q.IsEmpty then
+      Exit;
+
+    PermisosId := Q.FieldByName('id_permiso').AsInteger;
+  finally
+    Q.Free;
+  end;
+
+  // 2) Cargar permisos usando id_permisos
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := DataModuleConnection.FDConnectionCompany;
+    Q.SQL.Text := 'SELECT * FROM permisos WHERE id = :id';
+    Q.ParamByName('id').AsInteger := PermisosId;
+    DataModuleConnection.OpenQueryWithReconnect(Q);
+
+    if not Q.IsEmpty then
+    begin
+      with AppSession.UserPermissions do
+      begin
+        CrearCliente     := Q.FieldByName('ccrearcliente').AsBoolean;
+        EditarCliente    := Q.FieldByName('ceditarcliente').AsBoolean;
+        ListarCliente    := Q.FieldByName('clistarcliente').AsBoolean;
+
+        CrearProveedor   := Q.FieldByName('ccrearproveedor').AsBoolean;
+        EditarProveedor  := Q.FieldByName('ceditarproveedor').AsBoolean;
+        ListarProveedor  := Q.FieldByName('clistarproveedor').AsBoolean;
+
+        CrearEmpleado    := Q.FieldByName('ccrearempleado').AsBoolean;
+        EditarEmpleado   := Q.FieldByName('ceditarempleado').AsBoolean;
+        ListarEmpleado   := Q.FieldByName('clistarempleado').AsBoolean;
+      end;
+    end;
+  finally
+    Q.Free;
+  end;
+end;
+
+
 
 end.
 
