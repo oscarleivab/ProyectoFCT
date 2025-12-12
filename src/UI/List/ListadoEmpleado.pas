@@ -13,11 +13,18 @@ uses
 
 type
   TListadoFrameEmpleado = class(TListadoFrame)
+    cboPermisos: TComboBox;
+    cboTipoDocumento: TComboBox;
+    procedure cboPermisosChange(Sender: TObject);
+    procedure cboTipoDocumentoChange(Sender: TObject);
   private
     procedure CargarListado(filtro: string); override;
     procedure EditarRegistro(id: Integer); override;
     function CanDeleteRecord(AId: Integer; out AReason: string): Boolean; override;
+
+    procedure CargarCombos;
   public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 var
@@ -30,28 +37,54 @@ uses
 
 {$R *.dfm}
 
+constructor TListadoFrameEmpleado.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  CargarCombos;
+end;
+
+procedure TListadoFrameEmpleado.CargarCombos;
+var
+  Q: TFDQuery;
+begin
+  // === Tipo Documento ===
+  cboTipoDocumento.Items.Clear;
+  cboTipoDocumento.Items.AddObject('Filtrar por documento', TObject(0));     // sin filtro
+  cboTipoDocumento.Items.AddObject('DNI', TObject(1));  // <-- ajusta IDs reales
+  cboTipoDocumento.Items.AddObject('CIF', TObject(2));  // <-- ajusta IDs reales
+
+  // === Permisos ===
+  cboPermisos.Items.Clear;
+  cboPermisos.Items.AddObject('Filtrar por permisos', TObject(0)); // sin filtro
+
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := FDQuery.Connection;
+    Q.SQL.Text := 'SELECT id, nombre FROM permisos WHERE activo = TRUE ORDER BY nombre';
+    Q.Open;
+
+    while not Q.Eof do
+    begin
+      cboPermisos.Items.AddObject(
+        Q.FieldByName('nombre').AsString,
+        TObject(Q.FieldByName('id').AsInteger)
+      );
+      Q.Next;
+    end;
+
+  finally
+    Q.Free;
+  end;
+end;
+
 procedure TListadoFrameEmpleado.CargarListado(filtro: string);
 begin
   with FDQuery do
   begin
     SQL.Clear;
-    SQL.Add('SELECT ');
-    SQL.Add('  id,');
-    SQL.Add('  id_tipo_documento,');
-    SQL.Add('  detalle_documento,');
-    SQL.Add('  nombre,');
-    SQL.Add('  apellidos,');
-    SQL.Add('  empresa,');
-    SQL.Add('  email,');
-    SQL.Add('  observaciones,');
-    SQL.Add('  telefono1,');
-    SQL.Add('  telefono2,');
-    SQL.Add('  persona_contacto,');
-    SQL.Add('  url_web,');
-    SQL.Add('  user_login,');
-    SQL.Add('  pass_login,');
-    SQL.Add('  activo,');
-    SQL.Add('  id_permiso');
+    SQL.Add('SELECT id, id_tipo_documento, detalle_documento, nombre, apellidos, empresa,');
+    SQL.Add('email, observaciones, telefono1, telefono2, persona_contacto, url_web,');
+    SQL.Add('user_login, pass_login, activo, id_permiso');
     SQL.Add('FROM empleado');
 
     if not filtro.IsEmpty then
@@ -70,25 +103,48 @@ begin
       SQL.Add('   OR unaccent(telefono2) ILIKE unaccent(:filtro)');
       SQL.Add('   OR unaccent(persona_contacto) ILIKE unaccent(:filtro)');
       SQL.Add(')');
-
+      SQL.Add('AND 1=1');
       ParamByName('filtro').AsString := '%' + filtro.Trim + '%';
+    end
+    else
+      SQL.Add('WHERE 1=1');
+
+    // FILTRO TIPO DOCUMENTO (INTEGER)
+    if cboTipoDocumento.ItemIndex > 0 then
+    begin
+      SQL.Add('AND id_tipo_documento = :tipodoc');
+      ParamByName('tipodoc').AsInteger :=
+        Integer(cboTipoDocumento.Items.Objects[cboTipoDocumento.ItemIndex]);
+    end;
+
+    // FILTRO PERMISOS (INTEGER)
+    if cboPermisos.ItemIndex > 0 then
+    begin
+      SQL.Add('AND id_permiso = :permiso');
+      ParamByName('permiso').AsInteger :=
+        Integer(cboPermisos.Items.Objects[cboPermisos.ItemIndex]);
     end;
 
     SQL.Add('ORDER BY id');
-
     Open;
-
-    // Ajusta el texto que quieras para la cabecera
-    FDQuery.FieldByName('id').DisplayLabel :=
-      T_('ListadoEmpleado', 'detalle_documento');
   end;
 
-  // Ocultamos campos que no quieras ver en el grid
   HideGridColumns(DBGridListado,
-    ['id', 'id_tipo_documento', 'observaciones', 'pass_login', 'id_permiso', 'activo']);
+    ['id','id_tipo_documento','observaciones','pass_login','id_permiso','activo']);
 
-  // Ajuste automático según contenido (hasta 200 filas)
   AutoSizeDBGridColumns(DBGridListado, 200);
+end;
+
+procedure TListadoFrameEmpleado.cboPermisosChange(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFrameEmpleado.cboTipoDocumentoChange(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
 end;
 
 procedure TListadoFrameEmpleado.EditarRegistro(id: Integer);

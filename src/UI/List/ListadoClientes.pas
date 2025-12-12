@@ -3,20 +3,30 @@
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FrameListado, Vcl.Grids, Vcl.StdCtrls,
-  Vcl.ComCtrls, Vcl.ExtCtrls, System.Generics.Collections,FireDAC.Stan.Intf,
-  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
-  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBGrids,edCliente,uInterfaces;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  FrameListado, Vcl.Grids, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls,
+  System.Generics.Collections, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.DBGrids, edCliente,
+  uInterfaces;
 
 type
   TListadoFrameCliente = class(TListadoFrame)
+    cboTipoDocumento: TComboBox;
+    cboPermisos: TComboBox;
+    procedure cboPermisosChange(Sender: TObject);
+    procedure cboTipoDocumentoChange(Sender: TObject);
+
   private
-    procedure CargarListado(filtro:string); override;
+    procedure CargarCombos;         // NUEVO
+    procedure CargarListado(filtro: string); override;
     procedure EditarRegistro(id: Integer); override;
-    function CanDeleteRecord(AId: Integer; out AReason: string): Boolean; Override;
+    function CanDeleteRecord(AId: Integer; out AReason: string): Boolean; override;
+
   public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 var
@@ -29,71 +39,149 @@ uses
 
 {$R *.dfm}
 
-procedure TListadoFrameCliente.cargarlistado(filtro:string);
+{ ---------------------------------------------------------------
+  CONSTRUCTOR - carga los combos al crear el frame
+  --------------------------------------------------------------- }
+constructor TListadoFrameCliente.Create(AOwner: TComponent);
 begin
+  inherited Create(AOwner);
+  CargarCombos;
+end;
 
-  with FDQuery do begin
+
+{ ---------------------------------------------------------------
+  CARGA DE COMBOS
+  --------------------------------------------------------------- }
+procedure TListadoFrameCliente.CargarCombos;
+var
+  Q: TFDQuery;
+begin
+  { ---- Combo Tipo de documento ---- }
+  cboTipoDocumento.Items.Clear;
+  cboTipoDocumento.Items.AddObject('Filtrar por documento', TObject(0));       // Sin filtro
+  cboTipoDocumento.Items.AddObject('DNI', TObject(1));
+  cboTipoDocumento.Items.AddObject('CIF', TObject(2));
+
+  { ---- Combo Permisos ---- }
+  cboPermisos.Items.Clear;
+  cboPermisos.Items.Add('Filtrar por permisos');            // Sin filtro
+
+  Q := TFDQuery.Create(nil);
+  try
+    Q.Connection := FDQuery.Connection;
+    Q.SQL.Text := 'SELECT id, nombre FROM permisos WHERE activo = TRUE ORDER BY nombre';
+    Q.Open;
+
+    while not Q.Eof do
+    begin
+      // Guardamos ID en Items.Objects
+      cboPermisos.Items.AddObject(
+        Q.FieldByName('nombre').AsString,
+        TObject(Q.FieldByName('id').AsInteger)
+      );
+      Q.Next;
+    end;
+
+  finally
+    Q.Free;
+  end;
+end;
+
+
+{ ---------------------------------------------------------------
+  CARGA DEL LISTADO (con filtros)
+  --------------------------------------------------------------- }
+procedure TListadoFrameCliente.CargarListado(filtro: string);
+begin
+  with FDQuery do
+  begin
     SQL.Clear;
     SQL.Add('SELECT ');
-      SQL.Add('id,');
-      SQL.Add('id_tipo_documento,');
-      SQL.Add('detalle_documento,');
-      SQL.Add('nombre,');
-      SQL.Add('apellidos,');
-      SQL.Add('empresa,');
-      SQL.Add('email,');
-      SQL.Add('observaciones,');
-      SQL.Add('telefono1,');
-      SQL.Add('telefono2,');
-      SQL.Add('id_tarifa, ');
-      SQL.Add('persona_contacto,');
-      SQL.Add('url_web,');
-      SQL.Add('user_login, ');
-      SQL.Add('pass_login,');
-      SQL.Add('activo,');
-      SQL.Add('id_permiso  ');
+    SQL.Add('id, id_tipo_documento, detalle_documento, nombre, apellidos, empresa,');
+    SQL.Add('email, observaciones, telefono1, telefono2, id_tarifa, persona_contacto,');
+    SQL.Add('url_web, user_login, pass_login, activo, id_permiso');
     SQL.Add('FROM cliente');
 
+    // ---------------------------------------
+    // FILTRO POR TEXTO
+    // ---------------------------------------
     if not filtro.IsEmpty then
     begin
       SQL.Add('WHERE (');
-      SQL.Add('      unaccent(CAST(id AS TEXT)) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(detalle_documento) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(nombre) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(apellidos) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(nombre || '' '' || apellidos) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(apellidos || '' '' || nombre) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(empresa) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(email) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(observaciones) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(telefono1) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(telefono2) ILIKE unaccent(:filtro)');
-      SQL.Add('   OR unaccent(persona_contacto) ILIKE unaccent(:filtro)');
+      SQL.Add('  unaccent(CAST(id AS TEXT)) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(detalle_documento) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(nombre) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(apellidos) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(nombre || '' '' || apellidos) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(apellidos || '' '' || nombre) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(empresa) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(email) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(observaciones) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(telefono1) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(telefono2) ILIKE unaccent(:filtro)');
+      SQL.Add('  OR unaccent(persona_contacto) ILIKE unaccent(:filtro)');
       SQL.Add(')');
+      SQL.Add('AND 1 = 1'); // permite añadir más filtros
 
       ParamByName('filtro').AsString := '%' + filtro.Trim + '%';
+    end
+    else
+    begin
+      SQL.Add('WHERE 1 = 1');
+    end;
+
+    // ---------------------------------------
+    // FILTRO POR TIPO DE DOCUMENTO
+    // ---------------------------------------
+    if cboTipoDocumento.ItemIndex > 0 then
+    begin
+      SQL.Add('AND id_tipo_documento = :tipodoc');
+      ParamByName('tipodoc').AsInteger :=
+        Integer(cboTipoDocumento.Items.Objects[cboTipoDocumento.ItemIndex]);
+    end;
+
+
+    // ---------------------------------------
+    // FILTRO POR PERMISOS (por ID)
+    // ---------------------------------------
+    if cboPermisos.ItemIndex > 0 then
+    begin
+      SQL.Add('AND id_permiso = :permiso');
+      ParamByName('permiso').AsInteger :=
+        Integer(cboPermisos.Items.Objects[cboPermisos.ItemIndex]);
     end;
 
     SQL.Add('ORDER BY id');
 
     Open;
 
-    FDQuery.FieldByName('id').DisplayLabel := T_('Listadocliente','detalle_documento');
+    HideGridColumns(DBGridListado,
+      ['id', 'id_tipo_documento', 'observaciones', 'pass_login',
+       'id_tarifa', 'id_permiso', 'activo']);
+
+    AutoSizeDBGridColumns(DBGridListado, 200);
   end;
-
-  HideGridColumns(DBGridListado, ['id','id_tipo_documento', 'observaciones','pass_login','id_tarifa','id_permiso','activo']);
-
-    // Ajuste automático según contenido (hasta 200 filas)
-  AutoSizeDBGridColumns(DBGridListado, 200);
-
 end;
 
+procedure TListadoFrameCliente.cboPermisosChange(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
 
+procedure TListadoFrameCliente.cboTipoDocumentoChange(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+{ ---------------------------------------------------------------
+  EDITAR REGISTRO
+  --------------------------------------------------------------- }
 procedure TListadoFrameCliente.EditarRegistro(id: Integer);
 var
   Cliente: TFrEdCliente;
   nuevaTab: TTabSheet;
-  stexto:String;
 begin
   nuevaTab := TTabSheet.Create(frmMain.Pagecontrol1);
   nuevaTab.PageControl := frmMain.PageControl1;
@@ -101,12 +189,12 @@ begin
   if id = 0 then
     nuevaTab.Caption := 'Nuevo Cliente'
   else
-  nuevaTab.Caption := Copy(
-  Trim(Format('%s %s %s',
-    [FDQuery.FieldByName('Nombre').AsString,
-     FDQuery.FieldByName('Apellidos').AsString,
-     FDQuery.FieldByName('Empresa').AsString])),
-      1, 15)+'...';
+    nuevaTab.Caption := Copy(
+      Trim(Format('%s %s %s',
+        [FDQuery.FieldByName('Nombre').AsString,
+         FDQuery.FieldByName('Apellidos').AsString,
+         FDQuery.FieldByName('Empresa').AsString])),
+       1,15) + '...';
 
   Cliente := TFrEdCliente.Create(nuevaTab);
   Cliente.Parent := nuevaTab;
@@ -120,6 +208,9 @@ begin
 end;
 
 
+{ ---------------------------------------------------------------
+  VALIDAR BORRADO DEL CLIENTE
+  --------------------------------------------------------------- }
 function TListadoFrameCliente.CanDeleteRecord(AId: Integer; out AReason: string): Boolean;
 var
   Q: TFDQuery;
@@ -132,17 +223,14 @@ begin
   try
     Q.Connection := FDQuery.Connection;
 
-    // 1) ¿Tiene direcciones asociadas?
+    // ¿Tiene direcciones asociadas?
     Q.SQL.Text :=
-      'SELECT COUNT(*) AS total ' +
-      'FROM datos_direccion ' +
-      'WHERE id_entidad = :id ' +
-      '  AND tabla = ''CLIENTE''';
-
+      'SELECT COUNT(*) AS total FROM datos_direccion ' +
+      'WHERE id_entidad = :id AND tabla = ''CLIENTE''';
     Q.ParamByName('id').AsInteger := AId;
     Q.Open;
-    Count := Q.FieldByName('total').AsInteger;
 
+    Count := Q.FieldByName('total').AsInteger;
     if Count > 0 then
     begin
       Result := False;
@@ -150,18 +238,15 @@ begin
       Exit;
     end;
 
-    // 2) ¿Tiene datos bancarios asociados?
+    // ¿Tiene datos bancarios?
     Q.Close;
     Q.SQL.Text :=
-      'SELECT COUNT(*) AS total ' +
-      'FROM datos_banco ' +
-      'WHERE id_entidad = :id ' +
-      '  AND tabla = ''CLIENTE''';
-
+      'SELECT COUNT(*) AS total FROM datos_banco ' +
+      'WHERE id_entidad = :id AND tabla = ''CLIENTE''';
     Q.ParamByName('id').AsInteger := AId;
     Q.Open;
-    Count := Q.FieldByName('total').AsInteger;
 
+    Count := Q.FieldByName('total').AsInteger;
     if Count > 0 then
     begin
       Result := False;
@@ -172,8 +257,6 @@ begin
   finally
     Q.Free;
   end;
-
-  // Si llegamos aquí: no tiene ni direcciones ni datos bancarios → se puede borrar
 end;
 
 end.

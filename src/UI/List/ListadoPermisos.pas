@@ -12,6 +12,24 @@ uses
 
 type
   TListadoFramePermisos = class(TListadoFrame)
+    chkCrearCliente: TCheckBox;
+    chkEditarCliente: TCheckBox;
+    chkListarCliente: TCheckBox;
+    chkCrearProveedor: TCheckBox;
+    chkEditarProveedor: TCheckBox;
+    chkListarProveedor: TCheckBox;
+    chkCrearEmpleado: TCheckBox;
+    chkEditarEmpleado: TCheckBox;
+    chkListarEmpleado: TCheckBox;
+    procedure chkCrearClienteClick(Sender: TObject);
+    procedure chkCrearEmpleadoClick(Sender: TObject);
+    procedure chkCrearProveedorClick(Sender: TObject);
+    procedure chkEditarClienteClick(Sender: TObject);
+    procedure chkEditarEmpleadoClick(Sender: TObject);
+    procedure chkEditarProveedorClick(Sender: TObject);
+    procedure chkListarClienteClick(Sender: TObject);
+    procedure chkListarEmpleadoClick(Sender: TObject);
+    procedure chkListarProveedorClick(Sender: TObject);
   private
     procedure CargarListado(filtro: string); override;
     procedure EditarRegistro(id: Integer); override;
@@ -40,38 +58,47 @@ begin
   begin
     Close;
     SQL.Clear;
-    SQL.Add('SELECT ');
-    SQL.Add('   id AS ID, ');
-    SQL.Add('   nombre, ');
-    SQL.Add('   ccrearcliente, ');
-    SQL.Add('   ceditarcliente, ');
-    SQL.Add('   clistarcliente, ');
-    SQL.Add('   ccrearproveedor, ');
-    SQL.Add('   ceditarproveedor, ');
-    SQL.Add('   clistarproveedor, ');
-    SQL.Add('   ccrearempleado, ');
-    SQL.Add('   ceditarempleado, ');
-    SQL.Add('   clistarempleado, ');
-    SQL.Add('   activo ');
+    SQL.Add('SELECT id AS ID, nombre, ccrearcliente, ceditarcliente, clistarcliente,');
+    SQL.Add('       ccrearproveedor, ceditarproveedor, clistarproveedor,');
+    SQL.Add('       ccrearempleado, ceditarempleado, clistarempleado, activo');
     SQL.Add('FROM permisos');
+    SQL.Add('WHERE 1=1');
 
+    // filtro de texto
     if not filtro.Trim.IsEmpty then
     begin
-      SQL.Add('WHERE (');
-      SQL.Add('      CAST(id AS VARCHAR) ILIKE :filtro');
-      SQL.Add('   OR nombre ILIKE :filtro');
-      SQL.Add(')');
+      SQL.Add('  AND (CAST(id AS VARCHAR) ILIKE :filtro OR nombre ILIKE :filtro)');
       ParamByName('filtro').AsString := '%' + filtro.Trim + '%';
     end;
+
+    // filtros por checkboxes
+    if chkCrearCliente.Checked then
+      SQL.Add('  AND ccrearcliente = TRUE');
+    if chkEditarCliente.Checked then
+      SQL.Add('  AND ceditarcliente = TRUE');
+    if chkListarCliente.Checked then
+      SQL.Add('  AND clistarcliente = TRUE');
+    if chkCrearProveedor.Checked then
+      SQL.Add('  AND ccrearproveedor = TRUE');
+    if chkEditarProveedor.Checked then
+      SQL.Add('  AND ceditarproveedor = TRUE');
+    if chkListarProveedor.Checked then
+      SQL.Add('  AND clistarproveedor = TRUE');
+    if chkCrearEmpleado.Checked then
+      SQL.Add('  AND ccrearempleado = TRUE');
+    if chkEditarEmpleado.Checked then
+      SQL.Add('  AND ceditarempleado = TRUE');
+    if chkListarEmpleado.Checked then
+      SQL.Add('  AND clistarempleado = TRUE');
 
     SQL.Add('ORDER BY id');
     Open;
 
     HideGridColumns(DBGridListado, ['id']);
-
     AutoSizeDBGridColumns(DBGridListado, 200);
   end;
 end;
+
 
 procedure TListadoFramePermisos.EditarRegistro(id: Integer);
 var
@@ -128,6 +155,60 @@ end;
 procedure TListadoFramePermisos.doDelete;
 begin
   EliminarRegistro(FDQuery.FieldByName('id').AsInteger);
+end;
+
+procedure TListadoFramePermisos.chkCrearClienteClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkCrearEmpleadoClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkCrearProveedorClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkEditarClienteClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkEditarEmpleadoClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkEditarProveedorClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkListarClienteClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkListarEmpleadoClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TListadoFramePermisos.chkListarProveedorClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
 end;
 
 procedure TListadoFramePermisos.doAdd;
