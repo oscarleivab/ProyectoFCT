@@ -24,8 +24,8 @@ const
   conERROR = 1;
   // constantes para asignar los valores a los datos introducidos a la base de datos y que solo se tenga que cambiar aqui
   //factura:
-  idFACT = 123;
-  tipoFACT = 'FACT';
+  idERROR = 123;
+  tipoERROR = 'ERROR';
   //info
   idINFO = 201;
   tipoINFO = 'INFO';

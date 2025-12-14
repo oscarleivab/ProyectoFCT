@@ -93,8 +93,8 @@ object FrmMain: TFrmMain
           StyleName = 'Windows'
         end
         object botonFacturaSimp: TButton
-          Left = 320
-          Top = 29
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Factura Simplificada'
@@ -109,11 +109,12 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 3
+          Visible = False
           StyleName = 'Windows'
         end
         object botonPedido: TButton
-          Left = 184
-          Top = 95
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Pedido'
@@ -127,11 +128,12 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 4
+          Visible = False
           StyleName = 'Windows'
         end
         object botonPresupuesto: TButton
-          Left = 184
-          Top = 29
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Presupuesto'
@@ -145,11 +147,12 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 5
+          Visible = False
           StyleName = 'Windows'
         end
         object botonFactura: TButton
-          Left = 184
-          Top = 227
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Factura'
@@ -163,11 +166,12 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 6
+          Visible = False
           StyleName = 'Windows'
         end
         object botonAlbaran: TButton
-          Left = 184
-          Top = 161
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Albar'#225'n'
@@ -182,6 +186,7 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 7
+          Visible = False
           StyleName = 'Windows'
         end
         object botonConfiguracion: TButton
@@ -239,8 +244,8 @@ object FrmMain: TFrmMain
           StyleName = 'Windows'
         end
         object botonServicios: TButton
-          Left = 320
-          Top = 95
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Servicios'
@@ -254,11 +259,12 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 11
+          Visible = False
           StyleName = 'Windows'
         end
         object botonGastos: TButton
-          Left = 320
-          Top = 227
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Gastos'
@@ -272,11 +278,12 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 12
+          Visible = False
           StyleName = 'Windows'
         end
         object botonEstadisticas: TButton
-          Left = 320
-          Top = 161
+          Left = 446
+          Top = 293
           Width = 120
           Height = 60
           Caption = 'Estadisticas'
@@ -290,6 +297,7 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 13
+          Visible = False
           StyleName = 'Windows'
         end
         object Button1: TButton
@@ -309,6 +317,7 @@ object FrmMain: TFrmMain
           ImageMargins.Top = 5
           ParentFont = False
           TabOrder = 14
+          Visible = False
           StyleName = 'Windows'
         end
         object btncliente: TButton
@@ -330,8 +339,8 @@ object FrmMain: TFrmMain
           StyleName = 'Windows'
         end
         object Button3: TButton
-          Left = 446
-          Top = 161
+          Left = 184
+          Top = 227
           Width = 120
           Height = 60
           Caption = 'Prueba de log'
@@ -339,7 +348,7 @@ object FrmMain: TFrmMain
           OnClick = Button3Click
         end
         object btnRegistros: TButton
-          Left = 446
+          Left = 184
           Top = 95
           Width = 120
           Height = 60
@@ -358,8 +367,8 @@ object FrmMain: TFrmMain
         end
       end
       object Button2: TButton
-        Left = 449
-        Top = 243
+        Left = 187
+        Top = 177
         Width = 120
         Height = 60
         Caption = 'Prueba de toast'

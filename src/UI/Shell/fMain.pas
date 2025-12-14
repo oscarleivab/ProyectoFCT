@@ -152,7 +152,7 @@ begin
   inherited;
   //Dblog('Error al crear la base de datos inicial',conERROR,AppSession.UserId.ToString);
   //TxtLog('Error al crear la base de datos inicial');
-  DBLog('Se ha guardado correctamente el registro.', conINFO, tipoINFO, idINFO);
+  DBLog('Esto es una prueba del botón', conERROR, tipoERROR, idERROR);
 end;
 
 procedure TFrmMain.HideMainMenuBar(const AHide: Boolean);
@@ -256,6 +256,7 @@ begin
     FrStatusBar.Visible:=true;
     HideMainMenuBar(false);
     MenuPrincipalBar1.enabled:=true;
+    DBLog('Usuario iniciado correctamente.', conINFO, tipoINFO, idINFO);
   end
   else
   begin

@@ -82,8 +82,8 @@ inherited FrEdCliente: TFrEdCliente
           Caption = 'Tipo'
         end
         object labeldocumento: TLabel
-          Left = 10
-          Top = 82
+          Left = 3
+          Top = 74
           Width = 63
           Height = 15
           Caption = 'Documento'

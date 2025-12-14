@@ -9,6 +9,7 @@ inherited FrListadoLog: TFrListadoLog
       Height = 17
       Caption = 'Filtrar por ERROR'
       TabOrder = 0
+      OnClick = chkERRORClick
     end
     object chkINFO: TCheckBox
       Left = 16
@@ -17,6 +18,7 @@ inherited FrListadoLog: TFrListadoLog
       Height = 17
       Caption = 'Filtrar por INFO'
       TabOrder = 1
+      OnClick = chkINFOClick
     end
   end
   inherited DBGridListado: TDBGrid
@@ -26,5 +28,7 @@ inherited FrListadoLog: TFrListadoLog
   inherited Menulateral: TPanel
     Top = 67
     Height = 609
+    ExplicitTop = 67
+    ExplicitHeight = 609
   end
 end

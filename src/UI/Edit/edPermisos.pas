@@ -8,7 +8,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error,
   FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
   FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
-  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.Mask, dmConnection, Vcl.Grids;
+  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.Mask, dmConnection, Vcl.Grids, uTranslator, uLog;
 
 type
   TFrEdit1 = class(TFrEdit)
@@ -176,7 +176,8 @@ begin
   FDQuery.Post;
   FDQuery.ApplyUpdates(-1);
 
-  ShowMessage('Permiso guardado correctamente.');
+  MostrarToast(T_('info','saveok'), 'success');
+  DBLog('El usuario ha editado un permiso', conINFO, tipoINFO, idINFO);
 end;
 
 end.

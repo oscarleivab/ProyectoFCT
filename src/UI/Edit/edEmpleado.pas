@@ -236,10 +236,6 @@ begin
     EditPassword.SetFocus;
     Exit(False);
   end;
-
-
-
-
 end;
 
 Procedure TFrEdEmpleado.CargarTipoDoc;

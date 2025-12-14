@@ -49,7 +49,7 @@ type
 implementation
 
 uses
-fmain;
+fmain, uLog;
 
 {$R *.dfm}
 
@@ -105,6 +105,7 @@ begin
         FOrigen.ActualizarRegistro(FDQuery.FieldByName(GetIdFieldName).AsInteger);
 
       MostrarToast(T_('info','saveok'), 'ok');
+      DBLog('El usuario ha creado un registro correctamente', conINFO, tipoINFO, idINFO);
     end;
 
  end;

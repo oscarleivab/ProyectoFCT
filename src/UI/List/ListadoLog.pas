@@ -15,6 +15,8 @@ type
   TFrListadoLog = class(TListadoFrame)
     chkINFO: TCheckBox;
     chkERROR: TCheckBox;
+    procedure chkERRORClick(Sender: TObject);
+    procedure chkINFOClick(Sender: TObject);
   private
     procedure CargarListado(filtro: string); override;
   protected
@@ -85,6 +87,18 @@ begin
   finally
     tiposSeleccionados.Free;
   end;
+end;
+
+procedure TFrListadoLog.chkERRORClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
+end;
+
+procedure TFrListadoLog.chkINFOClick(Sender: TObject);
+begin
+  inherited;
+  CargarListado(buscaedit.Text);
 end;
 
 procedure TFrListadoLog.Loaded;

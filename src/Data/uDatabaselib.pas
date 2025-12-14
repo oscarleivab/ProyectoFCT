@@ -18,7 +18,6 @@ uses
 
 implementation
 
-
 procedure DestruirTransaccion(TR: TFDTransaction);
 begin
   if Assigned(TR) then

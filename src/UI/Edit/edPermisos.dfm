@@ -34,6 +34,7 @@ inherited FrEdit1: TFrEdit1
         Ctl3D = True
         ParentCtl3D = False
         TabOrder = 0
+        ExplicitTop = 3
         object labelnombre: TLabel
           Left = 299
           Top = 24
@@ -140,7 +141,6 @@ inherited FrEdit1: TFrEdit1
           Top = 69
           Width = 97
           Height = 17
-          Caption = 'DBccrearcliente'
           TabOrder = 2
         end
         object DBceditarcliente: TDBCheckBox
@@ -148,7 +148,6 @@ inherited FrEdit1: TFrEdit1
           Top = 106
           Width = 97
           Height = 17
-          Caption = 'DBceditarcliente'
           TabOrder = 3
         end
         object DBclistarcliente: TDBCheckBox
@@ -156,7 +155,6 @@ inherited FrEdit1: TFrEdit1
           Top = 144
           Width = 97
           Height = 17
-          Caption = 'DBclistarcliente'
           TabOrder = 4
         end
         object DBccrearproveedor: TDBCheckBox
@@ -164,7 +162,6 @@ inherited FrEdit1: TFrEdit1
           Top = 184
           Width = 97
           Height = 17
-          Caption = 'DBccrearproveedor'
           TabOrder = 5
         end
         object DBceditarproveedor: TDBCheckBox
@@ -172,7 +169,6 @@ inherited FrEdit1: TFrEdit1
           Top = 224
           Width = 97
           Height = 17
-          Caption = 'DBceditarproveedor'
           TabOrder = 6
         end
         object DBclistarproveedor: TDBCheckBox
@@ -180,7 +176,6 @@ inherited FrEdit1: TFrEdit1
           Top = 69
           Width = 97
           Height = 17
-          Caption = 'DBclistarproveedor'
           TabOrder = 7
         end
         object DBccrearempleado: TDBCheckBox
@@ -188,7 +183,6 @@ inherited FrEdit1: TFrEdit1
           Top = 106
           Width = 97
           Height = 17
-          Caption = 'DBccrearempleado'
           TabOrder = 8
         end
         object DBceditarempleado: TDBCheckBox
@@ -196,7 +190,6 @@ inherited FrEdit1: TFrEdit1
           Top = 144
           Width = 97
           Height = 17
-          Caption = 'DBceditarempleado'
           TabOrder = 9
         end
         object DBclistarempleado: TDBCheckBox
@@ -204,7 +197,6 @@ inherited FrEdit1: TFrEdit1
           Top = 184
           Width = 97
           Height = 17
-          Caption = 'DBclistarempleado'
           TabOrder = 10
         end
         object DBactivo: TDBCheckBox
@@ -212,7 +204,6 @@ inherited FrEdit1: TFrEdit1
           Top = 224
           Width = 97
           Height = 17
-          Caption = 'DBactivo'
           TabOrder = 11
         end
       end

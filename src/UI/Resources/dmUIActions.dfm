@@ -68,6 +68,12 @@ object dmActions: TdmActions
                 Caption = '&Clientes'
                 ImageIndex = 4
                 ImageName = 'cliente'
+              end
+              item
+                Action = ActProveedores
+                Caption = '&Proveedores'
+                ImageIndex = 15
+                ImageName = 'proveedor'
               end>
             Caption = '&Entidad'
             ImageIndex = 4
@@ -160,7 +166,6 @@ object dmActions: TdmActions
     object ActRegistros: TAction
       Category = 'Entidad'
       Caption = 'Registros'
-      ImageIndex = 16
       ImageName = 'albaran'
       OnExecute = ActRegistrosExecute
     end
