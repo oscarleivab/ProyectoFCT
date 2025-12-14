@@ -106,8 +106,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
-        <DCC_ExeOutput>D:\Gevensoft 3\GevensoftERP\Bin\Debug\</DCC_ExeOutput>
-        <DCC_DcuOutput>D:\Gevensoft 3\GevensoftERP\Dcu\</DCC_DcuOutput>
+        <DCC_ExeOutput>D:\ProyectoFCT\Bin\Debug\</DCC_ExeOutput>
+        <DCC_DcuOutput>D:\ProyectoFCT\Dcu\</DCC_DcuOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -258,6 +258,11 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="UI\Shell\fConfiguracion.pas">
+            <Form>FrConfiguracion</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -284,13 +289,13 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="..\Bin\Debug\Gevensoft.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="D:\Gevensoft 3\GevensoftERP\Bin\Debug\Gevensoft.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>Gevensoft.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\Bin\Debug\Gevensoft.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="D:\Gevensoft 3\GevensoftERP\Bin\Debug\Gevensoft.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win64">
                         <RemoteName>Gevensoft.rsm</RemoteName>
                         <Overwrite>true</Overwrite>

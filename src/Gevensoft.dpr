@@ -39,7 +39,8 @@ uses
   ListadoPermisos in 'UI\List\ListadoPermisos.pas' {ListadoFramePermisos: TFrame},
   edPermisos in 'UI\Edit\edPermisos.pas' {FrEdit1: TFrame},
   edProveedor in 'UI\Edit\edProveedor.pas' {FrEdProveedor: TFrame},
-  ListadoProveedores in 'UI\List\ListadoProveedores.pas' {ListadoFrameProveedor: TFrame};
+  ListadoProveedores in 'UI\List\ListadoProveedores.pas' {ListadoFrameProveedor: TFrame},
+  fConfiguracion in 'UI\Shell\fConfiguracion.pas' {FrConfiguracion: TFrame};
 
 {$R *.res}
 

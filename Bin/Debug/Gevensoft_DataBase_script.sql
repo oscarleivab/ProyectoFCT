@@ -1,6 +1,27 @@
+CREATE DATABASE bdgevensoftbase;
+CREATE DATABASE empresa1;
+
+\c bdgevensoftbase;
+
+CREATE TABLE empresa (
+    id SERIAL PRIMARY KEY,
+    bdname VARCHAR(100) NOT NULL,          -- Nombre de la base de datos de la empresa
+    orden INTEGER NOT NULL DEFAULT 0,      -- Orden de aparición en el ComboBox
+    host VARCHAR(100) NOT NULL,            -- Dirección del servidor
+    port INTEGER NOT NULL DEFAULT 5432,    -- Puerto de conexión (por defecto 5432)
+    userbd VARCHAR(100) NOT NULL,          -- Usuario para conectar a la BD
+    passbd VARCHAR(100) NOT NULL,          -- Contraseña de conexión
+    empresaname VARCHAR(100) NOT NULL,     -- Nombre visible de la empresa
+    activa BOOLEAN NOT NULL DEFAULT TRUE   -- Indica si la empresa está activa
+);
+
+INSERT INTO empresa (bdname, orden, host, port, userbd, passbd, empresaname, activa)
+VALUES ('empresa1', 1, 'localhost', 5432, 'postgres', '2003', 'Empresa 1', TRUE);
+
 -- =========================
 -- TABLAS BASE
 -- =========================
+\c empresa1;
 
 CREATE TABLE tipo_documento_identidad (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -177,9 +198,9 @@ CREATE TABLE logbd (
 
 -- Insertar permiso predeterminado de Administrador
 INSERT INTO permisos (
-    nombre, crearcliente, editarcliente, listarcliente,
-    crearproveedor, editarproveedor, listarproveedor,
-    creareempleado, editarempleado, listarempleado
+    nombre, ccrearcliente, ceditarcliente, clistarcliente,
+    ccrearproveedor, ceditarproveedor, clistarproveedor,
+    ccrearempleado, ceditarempleado, clistarempleado
 ) VALUES (
     'Administrador', TRUE, TRUE, TRUE,
     TRUE, TRUE, TRUE,

@@ -206,6 +206,7 @@ object FrmMain: TFrmMain
           ParentFont = False
           TabOrder = 8
           StyleName = 'Windows'
+          OnClick = botonConfiguracionClick
         end
         object botonCerrarSesion: TButton
           Left = 184

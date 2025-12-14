@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls,uTranslator, Vcl.ExtCtrls, Vcl.Imaging.pngimage, Vcl.ComCtrls,
   System.Actions, Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnMan, uLog,
   Vcl.ToolWin, Vcl.ActnCtrls, Vcl.ActnMenus, uConfigIni, System.UITypes,utoashelper,FormBase,FrameBase,FrameListado,ListadoClientes,ListadoEmpleado,
-  ListadoLog, ListadoPermisos, ListadoProveedores;
+  ListadoLog, ListadoPermisos, ListadoProveedores, fConfiguracion;
 
 type
   TFrmMain = class(TFBase)
@@ -38,6 +38,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure botonConfiguracionClick(Sender: TObject);
   private
 
     //Objetos
@@ -136,6 +137,28 @@ begin
   // Cargar datos de la sesión en la barra de estado
   if Assigned(FrStatusBar) then
     FrStatusBar.UpdateStatus(AppSession.UserName, AppSession.CompanyName);
+end;
+
+procedure TFrmMain.botonConfiguracionClick(Sender: TObject);
+var
+  ListadoConfig: TFrConfiguracion;
+  nuevaTab: TTabSheet;
+begin
+  if not sheetcreada('Configuración') then
+  begin
+    nuevaTab := TTabSheet.Create(PageControl1);
+    nuevaTab.name := 'TabSheetConfig';
+    nuevaTab.ImageIndex:=1;
+    TranslateTree(nuevaTab,'FrmMain');
+
+    // Se le asigna el "TPageControl"
+    nuevaTab.PageControl := PageControl1;
+    ListadoConfig := TFrConfiguracion.Create(nuevaTab);
+    ListadoConfig.Parent := nuevaTab;
+    ListadoConfig.Align := Alclient;
+    PageControl1.ActivePageIndex := PageControl1.PageCount - 1;
+    LoadAvailableLanguages(ListadoConfig.cboidiomac);
+  end;
 end;
 
 procedure TFrmMain.Button2Click(Sender: TObject);
